@@ -1,0 +1,73 @@
+using System;
+using UnityEngine;
+
+/// <summary>
+/// 将军配置
+/// </summary>
+[Serializable]
+public class GeneralConfigItem
+{
+    [Header("基础信息")]
+    public string GeneralId;
+    public string Name;
+
+    [TextArea(2, 3)]
+    public string Biography;
+
+    public Sprite Portrait;
+
+    [Header("属性")]
+    public GeneralPersonality Personality;
+
+    [Tooltip("初始兵力")]
+    [Range(0, 100)]
+    public int InitialTroops = 80;
+
+    [Tooltip("初始信任度")]
+    [Range(0, 100)]
+    public int InitialTrust = 50;
+
+    [Tooltip("初始士气")]
+    [Range(0, 100)]
+    public int InitialMorale = 60;
+
+    [Header("技能")]
+    [Tooltip("技能ID列表 (从SkillConfig中选择)")]
+    public string[] SkillIds;
+
+    [Header("出价系数")]
+    [Tooltip("ATK出价系数")]
+    public float AtkBidModifier = 1f;
+
+    [Tooltip("DEF出价系数")]
+    public float DefBidModifier = 1f;
+
+    [Tooltip("RET出价系数")]
+    public float RetBidModifier = 1f;
+}
+
+/// <summary>
+/// 将军配置表
+/// </summary>
+[CreateAssetMenu(fileName = "GeneralConfig", menuName = "WarBroker/GeneralConfig")]
+public class GeneralConfig : ScriptableObject
+{
+    [Header("己方将军")]
+    public GeneralConfigItem[] AllyGenerals;
+
+    [Header("敌方将军")]
+    public GeneralConfigItem[] EnemyGenerals;
+
+    public GeneralConfigItem GetGeneral(string generalId)
+    {
+        foreach (var g in AllyGenerals)
+        {
+            if (g.GeneralId == generalId) return g;
+        }
+        foreach (var g in EnemyGenerals)
+        {
+            if (g.GeneralId == generalId) return g;
+        }
+        return null;
+    }
+}

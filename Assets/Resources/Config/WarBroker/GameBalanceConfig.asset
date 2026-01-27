@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48a9953330ef1bc4097bb4301e1a63e9, type: 3}
+  m_Name: GameBalanceConfig
+  m_EditorClassIdentifier: 
+  CommissionRate: 0.02
+  PriceImpactRate: 0.02
+  StorageCostPerUnit: 3
+  PriceRandomRange: 0.05
+  BankInterestRate: 0.05
+  LoanRatio: 1.5
+  FuturesMarginRate: 0.2
+  ForceLiquidationRate: 0.8
+  MaxFuturesDuration: 3
+  RandomModifierMin: 0.75
+  RandomModifierMax: 1.25
+  CritChance: 0.05
+  CritMultiplier: 1.5
+  FumbleChance: 0.05
+  FumbleMultiplier: 0.5
+  BaseReinforcement: 10
+  RoutTroopThreshold: 20
+  RoutScoreThreshold: 30
+  ReorganizeTurns: 3
+  DisobeyTrustThreshold: 50
+  DisobeyChanceLow: 0.2
+  DisobeyChanceVeryLow: 0.5
+  FlankSupportBonus: 0.1
+  FlankThreatPenalty: 0.1
+  FlankThreatMoralePenalty: 5
+  SurroundBonus: 0.25
+  SurroundedMoralePenalty: 15
+  AuditSupplyShortage: 30
+  AuditGeneralRouted: 20
+  AuditFailureThreshold: 100
+  RandomEventChance: 0.4

@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e1778757901287428b46d9df9c9845a, type: 3}
+  m_Name: SkillConfig
+  m_EditorClassIdentifier: 
+  Skills:
+  - SkillId: fanatic_charge
+    SkillName: "\u5148\u767B"
+    Description: "ATK\u83B7\u80DC\u65F6\u6218\u7EBF\u989D\u5916+1"
+    Personality: 0
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 1
+    CombatBonus: 0
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0
+  - SkillId: fanatic_bloodlust
+    SkillName: "\u55DC\u8840"
+    Description: "\u8FDE\u7EEDATK\u6218\u6597\u529B+20%"
+    Personality: 0
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 1
+    BonusLineMovement: 0
+    CombatBonus: 0.2
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0
+  - SkillId: fanatic_laststand
+    SkillName: "\u6B7B\u6218"
+    Description: "\u5175\u529B<30\u65F6ATK\u6218\u6597\u529B+50%"
+    Personality: 0
+    TroopThreshold: 30
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0.5
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0
+  - SkillId: fanatic_defiant
+    SkillName: "\u4E0D\u9000"
+    Description: "\u88AB\u6307\u6D3ERET\u65F630%\u6297\u547D\u6539DEF"
+    Personality: 0
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0.3
+  - SkillId: conservative_ironwall
+    SkillName: "\u94C1\u58C1"
+    Description: "DEF\u6210\u529F\u65F6\u654C\u65B9-5\u5175\u529B"
+    Personality: 1
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0
+    AllyTroopChange: 0
+    EnemyTroopChange: -5
+    DisobeyChance: 0
+  - SkillId: conservative_patience
+    SkillName: "\u4EE5\u9038\u5F85\u52B3"
+    Description: "\u8FDE\u7EEDDEF\u6218\u6597\u529B+50%"
+    Personality: 1
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 1
+    BonusLineMovement: 0
+    CombatBonus: 0.5
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0
+  - SkillId: conservative_rearguard
+    SkillName: "\u65AD\u540E"
+    Description: "RET\u65F6\u5DF1\u65B9\u635F\u5931\u51CF\u534A(+5\u5175\u529B\u8865\u507F)"
+    Personality: 1
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0
+    AllyTroopChange: 5
+    EnemyTroopChange: 0
+    DisobeyChance: 0
+  - SkillId: conservative_timid
+    SkillName: "\u602F\u6218"
+    Description: "\u5175\u529B<50\u65F6ATK\u53EF\u80FD\u6297\u547D\u6539DEF"
+    Personality: 1
+    TroopThreshold: 50
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0.3
+  - SkillId: opportunist_momentum
+    SkillName: "\u987A\u98CE\u6D6A"
+    Description: "\u6218\u7EBF\u22654\u65F6ATK\u6218\u6597\u529B+30%"
+    Personality: 2
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 4
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0.3
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0
+  - SkillId: opportunist_turtle
+    SkillName: "\u9006\u98CE\u82DF"
+    Description: "\u6218\u7EBF\u22642\u65F6DEF\u6218\u6597\u529B+30%"
+    Personality: 2
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0.3
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0
+  - SkillId: opportunist_feint
+    SkillName: "\u8BC8\u8D25"
+    Description: "RET\u8BF1\u654C\u8FFD\u51FB\uFF0C\u654C\u65B9\u989D\u5916-10\u5175\u529B"
+    Personality: 2
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0
+    AllyTroopChange: 0
+    EnemyTroopChange: -10
+    DisobeyChance: 0
+  - SkillId: opportunist_adapt
+    SkillName: "\u89C1\u673A\u884C\u4E8B"
+    Description: "\u6240\u6709\u6307\u4EE4\u6218\u6597\u529B+10%"
+    Personality: 2
+    TroopThreshold: 0
+    MoraleThreshold: 0
+    FrontlineThreshold: 0
+    RequireConsecutive: 0
+    BonusLineMovement: 0
+    CombatBonus: 0.1
+    AllyTroopChange: 0
+    EnemyTroopChange: 0
+    DisobeyChance: 0

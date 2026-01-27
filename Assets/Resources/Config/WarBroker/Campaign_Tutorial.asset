@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3de8092c050fb94b917c6b64b225966, type: 3}
+  m_Name: Campaign_Tutorial
+  m_EditorClassIdentifier: 
+  CampaignId: Campaign_Tutorial
+  CampaignName: "\u6559\u7A0B\u6218\u5F79\uFF1A\u6ED1\u94C1\u5362"
+  Description: "\u521D\u59CB\u6218\u5F79\uFF0C\u5B66\u4E60\u5E02\u573A\u4EA4\u6613\u3001\u6307\u4EE4\u5206\u914D\u4E0E\u6218\u573A\u7BA1\u7406\u7684\u57FA\u672C\u64CD\u4F5C\u3002"
+  MaxTurns: 20
+  InitialCash: 500
+  InitialAtkInventory: 2
+  InitialDefInventory: 2
+  InitialRetInventory: 2
+  InitialFrontlinePosition: 3
+  GeneralConfig: {fileID: 11400000, guid: 976ca2edd99e01b4c89f75361caeef09, type: 2}
+  AllyFrontlineAssignments:
+  - Position: 0
+    GeneralId: ally_left
+  - Position: 1
+    GeneralId: ally_center
+  - Position: 2
+    GeneralId: ally_right
+  EnemyFrontlineAssignments:
+  - Position: 0
+    GeneralId: enemy_left
+  - Position: 1
+    GeneralId: enemy_center
+  - Position: 2
+    GeneralId: enemy_right
+  VictorInitialCash: 500
+  VictorDifficulty: 0.5
+  AvailableEvents:
+  - EventId: evt_plague
+    EventName: "\u761F\u75AB\u7206\u53D1"
+    Description: "\u519B\u4E2D\u761F\u75AB\u8513\u5EF6\uFF0C\u6240\u6709\u5C06\u519B\u5175\u529B-10"
+    ProductionModifier: 0
+    AtkDemandModifier: 0
+    DefDemandModifier: 0.3
+    RetDemandModifier: 0.2
+    AllTroopChange: -10
+    RandomTrustChange: 0
+    Duration: 2
+  - EventId: evt_supply
+    EventName: "\u8865\u7ED9\u7EBF\u7545\u901A"
+    Description: "\u540E\u65B9\u8865\u7ED9\u5145\u8DB3\uFF0C\u4EA7\u80FD\u63D0\u5347"
+    ProductionModifier: 0.5
+    AtkDemandModifier: 0.1
+    DefDemandModifier: 0
+    RetDemandModifier: 0
+    AllTroopChange: 0
+    RandomTrustChange: 0
+    Duration: 2
+  - EventId: evt_morale_boost
+    EventName: "\u6377\u62A5\u4F20\u6765"
+    Description: "\u53CB\u519B\u53D6\u5F97\u5927\u6377\uFF0C\u5168\u519B\u58EB\u6C14\u63D0\u5347"
+    ProductionModifier: 0
+    AtkDemandModifier: 0.2
+    DefDemandModifier: 0
+    RetDemandModifier: 0
+    AllTroopChange: 0
+    RandomTrustChange: 10
+    Duration: 1
