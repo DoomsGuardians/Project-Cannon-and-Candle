@@ -136,6 +136,7 @@ public class GameplayManager : ManagerBase
         else if (bid < 0) general.Trust = Mathf.Max(0, general.Trust - 10);
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnOrderAssigned, generalId, order);
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, data.Player.Cash, null);
 
         return true;
     }

@@ -48,6 +48,15 @@ public class GameplayWindow : WindowBase
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnStart, OnTurnStart);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnTurnEnd);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnRandomEvent, OnRandomEvent);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnTradeExecuted, OnFinanceChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnFuturesOpened, OnFinanceChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnFuturesClosed, OnFinanceChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnForceLiquidation, OnFinanceChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnPriceUpdate, OnFinanceChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnOrderAssigned, OnFinanceChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnCashChange, OnFinanceChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnNetWorthChange, OnFinanceChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnAuditValueChange, OnFinanceChanged);
 
         RefreshUI();
     }
@@ -96,6 +105,7 @@ public class GameplayWindow : WindowBase
     private void OnTurnStart(object param1, object param2) => RefreshUI();
     private void OnTurnEnd(object param1, object param2) => RefreshUI();
     private void OnRandomEvent(object param1, object param2) => RefreshUI();
+    private void OnFinanceChanged(object param1, object param2) => RefreshUI();
 
     private void HideAllPanels()
     {

@@ -77,6 +77,7 @@ public class MarketSystem : ILogic
                 Price = market.CurrentPrices[orderType],
                 TotalAmount = totalCost
             }, null);
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, player.Cash, null);
 
         return true;
     }
@@ -115,6 +116,7 @@ public class MarketSystem : ILogic
                 Price = market.CurrentPrices[orderType],
                 TotalAmount = totalRevenue
             }, null);
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, player.Cash, null);
 
         return true;
     }
@@ -160,6 +162,7 @@ public class MarketSystem : ILogic
         player.FuturesPositions.Add(contract);
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnFuturesOpened, contract, null);
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, player.Cash, null);
 
         return true;
     }
@@ -180,6 +183,7 @@ public class MarketSystem : ILogic
         player.FuturesPositions.Remove(contract);
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnFuturesClosed, contract, pnl);
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, player.Cash, null);
 
         return true;
     }
@@ -236,6 +240,7 @@ public class MarketSystem : ILogic
 
         campaignData.Player.Cash += amount;
         campaignData.Player.BankDebt += amount;
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, campaignData.Player.Cash, null);
 
         return true;
     }
@@ -247,6 +252,7 @@ public class MarketSystem : ILogic
 
         player.Cash -= amount;
         player.BankDebt -= amount;
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, player.Cash, null);
 
         return true;
     }
@@ -269,6 +275,7 @@ public class MarketSystem : ILogic
             totalInventory += kvp.Value;
         }
         player.Cash -= totalInventory * balanceConfig.StorageCostPerUnit;
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, player.Cash, null);
     }
 
     #endregion
