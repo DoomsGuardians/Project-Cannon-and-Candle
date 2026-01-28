@@ -26,14 +26,7 @@ public class GameplayManager : ManagerBase
 
     public override void OnShow()
     {
-        campaignSystem.InitNewCampaign(CampaignId, marketSystem, battleSystem);
-        campaignSystem.StartTurn();
-
-        RegisterEvents();
-
-        // 打开主界面和默认面板
-        uiService.ShowWindow<GameplayWindow>("GameplayWindow");
-        uiService.ShowWindow<GeneralPanel>("GeneralPanel");
+        BeginGame();
     }
 
     public override void OnExit()
@@ -51,6 +44,29 @@ public class GameplayManager : ManagerBase
     private void UnregisterEvents()
     {
         eventService.RemoveEventListeningByTarget(this);
+    }
+
+    public void BeginGame()
+    {
+        if (campaignSystem == null || marketSystem == null || battleSystem == null)
+        {
+            Debug.LogError("[GameplayManager] 系统未初始化，无法开始战役。");
+            return;
+        }
+
+        campaignSystem.InitNewCampaign(CampaignId, marketSystem, battleSystem);
+        if (campaignSystem.Data == null)
+        {
+            Debug.LogError($"[GameplayManager] 战役配置加载失败: {CampaignId}");
+            return;
+        }
+
+        campaignSystem.StartTurn();
+
+        RegisterEvents();
+
+        // 打开主界面
+        uiService.ShowWindow<GameplayWindow>("GameplayWindow");
     }
 
     #region 玩家操作接口
@@ -120,6 +136,7 @@ public class GameplayManager : ManagerBase
         else if (bid < 0) general.Trust = Mathf.Max(0, general.Trust - 10);
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnOrderAssigned, generalId, order);
+        eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, data.Player.Cash, null);
 
         return true;
     }

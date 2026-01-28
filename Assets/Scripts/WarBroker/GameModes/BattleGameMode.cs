@@ -9,6 +9,8 @@ public class BattleGameMode : GameModeBase
 
     public override void EnterGameMode()
     {
+        EnsureUILayerSystem();
+
         // 实例化 GameplayManager
         var prefab = resService.LoadResource<GameObject>("Prefabs/WarBroker/GameplayManager");
         if (prefab != null)
@@ -23,7 +25,15 @@ public class BattleGameMode : GameModeBase
         }
 
         // 注册所有 UI 窗口
-        RegisterWindow<GameplayWindow>("Prefabs/WarBroker/UI/GameplayWindow", "GameplayWindow");
+        var stageConfig = GameRoot.Instance.stageSystem?.currentStageConfig;
+        if (stageConfig != null && stageConfig.UIWindowBase != null)
+        {
+            RegisterWindow<GameplayWindow>(stageConfig.UIWindowBase, "GameplayWindow");
+        }
+        else
+        {
+            RegisterWindow<GameplayWindow>("Prefabs/WarBroker/UI/GameplayWindow", "GameplayWindow");
+        }
         RegisterWindow<MarketPanel>("Prefabs/WarBroker/UI/MarketPanel", "MarketPanel");
         RegisterWindow<BattlefieldPanel>("Prefabs/WarBroker/UI/BattlefieldPanel", "BattlefieldPanel");
         RegisterWindow<GeneralPanel>("Prefabs/WarBroker/UI/GeneralPanel", "GeneralPanel");
@@ -35,6 +45,11 @@ public class BattleGameMode : GameModeBase
     public override void StartGame()
     {
         base.StartGame();
+        var gameplayManager = managerService.GetManager<GameplayManager>();
+        if (gameplayManager != null)
+        {
+            gameplayManager.BeginGame();
+        }
     }
 
     public override void OnUpdate() { }
@@ -53,12 +68,50 @@ public class BattleGameMode : GameModeBase
             return;
         }
 
+        RegisterWindow<T>(prefab, windowName);
+    }
+
+    private void RegisterWindow<T>(GameObject prefab, string windowName) where T : WindowBase, new()
+    {
+        if (prefab == null)
+        {
+            Debug.LogWarning($"[BattleGameMode] UI prefab not found for: {windowName}");
+            return;
+        }
+
         var obj = GameObject.Instantiate(prefab);
+        obj.name = prefab.name;
+        obj.SetActive(false);
         var window = new T();
         window.gameObject = obj;
         window.transform = obj.transform;
         window.Name = windowName;
 
         uIService.RegisterWindow(windowName, window);
+
+        var layerRoot = uIService.GetLayerRoot(window.uiLayer);
+        if (layerRoot != null)
+        {
+            window.transform.SetParent(layerRoot, false);
+        }
+    }
+
+    private void EnsureUILayerSystem()
+    {
+        if (uIService.GetLayerRoot(UILayer.Normal) != null)
+        {
+            return;
+        }
+
+        Transform uiRoot = GameObject.Find("UIRoot")?.transform;
+        if (uiRoot == null)
+        {
+            var rootObject = new GameObject("UIRoot");
+            rootObject.transform.SetParent(GameRoot.Instance.transform, false);
+            uiRoot = rootObject.transform;
+        }
+
+        Camera uiCamera = uiRoot.GetComponentInChildren<Camera>();
+        uIService.InitLayerSystem(uiRoot, uiCamera);
     }
 }

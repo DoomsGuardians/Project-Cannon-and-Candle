@@ -155,6 +155,7 @@ public static class WarBrokerUIPrefabGenerator
         SetField(window, "btnGeneral", btnGeneral.GetComponent<Button>());
         SetField(window, "btnIntel", btnIntel.GetComponent<Button>());
         SetField(window, "btnHistory", btnHistory.GetComponent<Button>());
+        SetField(window, "contentArea", contentArea.GetComponent<RectTransform>());
         SetField(window, "btnEndTurn", btnEndTurn.GetComponent<Button>());
         SetField(window, "txtEventInfo", txtEventInfo.GetComponent<Text>());
 
@@ -557,13 +558,11 @@ public static class WarBrokerUIPrefabGenerator
     private static GameObject CreateUICanvas(string name)
     {
         var go = new GameObject(name);
-        var canvas = go.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        var scaler = go.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-        go.AddComponent<GraphicRaycaster>();
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
         go.AddComponent<CanvasGroup>();
         return go;
     }

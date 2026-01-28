@@ -57,6 +57,12 @@ public class CampaignSystem : ILogic
 
     public void StartTurn()
     {
+        if (Data == null)
+        {
+            Debug.LogError("[CampaignSystem] Campaign data is null, cannot start turn.");
+            return;
+        }
+
         Data.CurrentPhase = TurnPhase.TurnStart;
 
         TryTriggerRandomEvent();
