@@ -17,6 +17,9 @@ public class GameplayWindowBinder : UIBinder
     public Button btnIntel;
     public Button btnHistory;
 
+    [Header("内容区")]
+    public RectTransform contentArea;
+
     [Header("底部操作栏")]
     public Button btnEndTurn;
     public Text txtEventInfo;

@@ -8,6 +8,7 @@ public class GameplayWindow : WindowBase
 {
     private Text txtTurn, txtPhase, txtCash, txtNetWorth, txtAudit, txtEventInfo;
     private Button btnMarket, btnBattle, btnGeneral, btnIntel, btnHistory, btnEndTurn;
+    private RectTransform contentArea;
 
     private GameplayManager gameplayManager;
     private string currentPanel = "GeneralPanel";
@@ -28,6 +29,7 @@ public class GameplayWindow : WindowBase
             txtNetWorth = b.txtNetWorth; txtAudit = b.txtAudit; txtEventInfo = b.txtEventInfo;
             btnMarket = b.btnMarket; btnBattle = b.btnBattle; btnGeneral = b.btnGeneral;
             btnIntel = b.btnIntel; btnHistory = b.btnHistory; btnEndTurn = b.btnEndTurn;
+            contentArea = b.contentArea;
         }
     }
 
@@ -39,6 +41,9 @@ public class GameplayWindow : WindowBase
         AddButtonListener(btnIntel, () => SwitchPanel("IntelPanel"));
         AddButtonListener(btnHistory, () => SwitchPanel("HistoryPanel"));
         AddButtonListener(btnEndTurn, OnEndTurnClicked);
+
+        HideAllPanels();
+        EnsurePanelsInContentArea();
 
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnStart, OnTurnStart);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnTurnEnd);
@@ -59,6 +64,8 @@ public class GameplayWindow : WindowBase
             uIService.HideWindow(name);
         }
         uIService.ShowWindow<WindowBase>(panelName);
+        var panel = uIService.GetWindow<WindowBase>(panelName);
+        AttachPanelToContentArea(panel);
         currentPanel = panelName;
     }
 
@@ -89,4 +96,40 @@ public class GameplayWindow : WindowBase
     private void OnTurnStart(object param1, object param2) => RefreshUI();
     private void OnTurnEnd(object param1, object param2) => RefreshUI();
     private void OnRandomEvent(object param1, object param2) => RefreshUI();
+
+    private void HideAllPanels()
+    {
+        foreach (var name in PanelNames)
+        {
+            uIService.HideWindow(name);
+        }
+    }
+
+    private void EnsurePanelsInContentArea()
+    {
+        foreach (var name in PanelNames)
+        {
+            var panel = uIService.GetWindow<WindowBase>(name);
+            AttachPanelToContentArea(panel);
+        }
+    }
+
+    private void AttachPanelToContentArea(WindowBase panel)
+    {
+        if (panel == null || panel.transform == null || contentArea == null)
+        {
+            return;
+        }
+
+        panel.transform.SetParent(contentArea, false);
+        panel.transform.SetAsLastSibling();
+
+        if (panel.transform is RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+    }
 }
