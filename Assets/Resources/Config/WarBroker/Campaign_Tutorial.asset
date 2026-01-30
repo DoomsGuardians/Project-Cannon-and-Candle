@@ -20,6 +20,7 @@ MonoBehaviour:
   InitialAtkInventory: 2
   InitialDefInventory: 2
   InitialRetInventory: 2
+  InitialReserves: 60
   InitialFrontlinePosition: 3
   GeneralConfig: {fileID: 11400000, guid: 976ca2edd99e01b4c89f75361caeef09, type: 2}
   AllyFrontlineAssignments:
@@ -41,12 +42,12 @@ MonoBehaviour:
   AvailableEvents:
   - EventId: evt_plague
     EventName: "\u761F\u75AB\u7206\u53D1"
-    Description: "\u519B\u4E2D\u761F\u75AB\u8513\u5EF6\uFF0C\u6240\u6709\u5C06\u519B\u5175\u529B-10"
+    Description: "\u519B\u4E2D\u761F\u75AB\u8513\u5EF6\uFF0C\u6240\u6709\u5C06\u519B\u5175\u529B-2"
     ProductionModifier: 0
     AtkDemandModifier: 0
     DefDemandModifier: 0.3
     RetDemandModifier: 0.2
-    AllTroopChange: -10
+    AllTroopChange: -2
     RandomTrustChange: 0
     Duration: 2
   - EventId: evt_supply

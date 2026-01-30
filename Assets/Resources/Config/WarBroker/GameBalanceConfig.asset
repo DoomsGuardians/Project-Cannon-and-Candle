@@ -43,3 +43,11 @@ MonoBehaviour:
   AuditGeneralRouted: 20
   AuditFailureThreshold: 100
   RandomEventChance: 0.4
+  AlphaContactBase: 0.2
+  AlphaCriticalBonus: 0.15
+  AlphaLowHPBonus: 0.1
+  BetaMomentumThreshold: 0.1
+  BetaMomentumMultiplier: 1.2
+  BetaPanicReserveThreshold: 20
+  BetaPanicMultiplier: 1.3
+  GammaSensitivity: 0.5

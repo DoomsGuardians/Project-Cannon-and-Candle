@@ -69,7 +69,7 @@ public class WarBrokerDebugConsole : MonoBehaviour
         GUILayout.Label("--- 市场价格 ---");
         foreach (var kvp in data.Market.CurrentPrices)
         {
-            GUILayout.Label($"  {kvp.Key}: {kvp.Value:F2} (库存: {data.Market.MarketInventory[kvp.Key]})");
+            GUILayout.Label($"  {kvp.Key}: {kvp.Value:F2} (库存: {data.Market.MarketInventory[kvp.Key]:F2})");
         }
 
         GUILayout.Label("--- 玩家 ---");
@@ -127,6 +127,7 @@ public class WarBrokerDebugConsole : MonoBehaviour
         GUILayout.Label($"阶段: {data.CurrentPhase}");
         GUILayout.Label($"审计值: {data.Player.AuditValue}");
         GUILayout.Label($"净资产: {data.Player.CalculateNetWorth(data.Market):F2}");
+        GUILayout.Label($"后备役: {data.Battle.CurrentReserves}");
 
         if (data.ActiveEvent != null)
         {
@@ -173,7 +174,7 @@ public class WarBrokerDebugConsole : MonoBehaviour
         {
             foreach (var g in data.Battle.AllyGenerals)
             {
-                g.Troops = 100;
+                g.Troops = 20;
                 g.Trust = 100;
                 g.Morale = 100;
                 g.ReorganizeTurns = 0;

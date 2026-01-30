@@ -54,13 +54,14 @@ public class WarBrokerDebugWindow : EditorWindow
         EditorGUILayout.LabelField("玩家", EditorStyles.boldLabel);
         EditorGUILayout.LabelField($"  现金: {data.Player.Cash:F2}  负债: {data.Player.BankDebt:F2}");
         EditorGUILayout.LabelField($"  净资产: {data.Player.CalculateNetWorth(data.Market):F2}  审计: {data.Player.AuditValue}");
+        EditorGUILayout.LabelField($"  后备役: {data.Battle.CurrentReserves}");
         foreach (var kvp in data.Player.Inventory)
             EditorGUILayout.LabelField($"  {kvp.Key}: {kvp.Value}");
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("市场", EditorStyles.boldLabel);
         foreach (var kvp in data.Market.CurrentPrices)
-            EditorGUILayout.LabelField($"  {kvp.Key}: {kvp.Value:F2} (库存: {data.Market.MarketInventory[kvp.Key]})");
+            EditorGUILayout.LabelField($"  {kvp.Key}: {kvp.Value:F2} (库存: {data.Market.MarketInventory[kvp.Key]:F2})");
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("战线", EditorStyles.boldLabel);

@@ -20,8 +20,8 @@ public class GeneralConfigItem
     public GeneralPersonality Personality;
 
     [Tooltip("初始兵力")]
-    [Range(0, 100)]
-    public int InitialTroops = 80;
+    [Range(0, 20)]
+    public int InitialTroops = 16;
 
     [Tooltip("初始信任度")]
     [Range(0, 100)]

@@ -13,10 +13,10 @@ public class OrderConfigItem
     public float BasePrice;
 
     [Tooltip("每回合产能")]
-    public int ProductionPerTurn;
+    public float ProductionPerTurn;
 
     [Tooltip("初始市场库存")]
-    public int InitialStock;
+    public float InitialStock;
 }
 
 /// <summary>
@@ -27,9 +27,9 @@ public class OrderConfig : ScriptableObject
 {
     public OrderConfigItem[] Orders = new OrderConfigItem[]
     {
-        new() { OrderType = OrderType.ATK, BasePrice = 40f, ProductionPerTurn = 3, InitialStock = 10 },
-        new() { OrderType = OrderType.DEF, BasePrice = 35f, ProductionPerTurn = 3, InitialStock = 10 },
-        new() { OrderType = OrderType.RET, BasePrice = 25f, ProductionPerTurn = 2, InitialStock = 8 }
+        new() { OrderType = OrderType.ATK, BasePrice = 40f, ProductionPerTurn = 3f, InitialStock = 10f },
+        new() { OrderType = OrderType.DEF, BasePrice = 35f, ProductionPerTurn = 3f, InitialStock = 10f },
+        new() { OrderType = OrderType.RET, BasePrice = 25f, ProductionPerTurn = 2f, InitialStock = 8f }
     };
 
     public OrderConfigItem GetConfig(OrderType type)

@@ -47,8 +47,10 @@ public class BattleSystem : ILogic
             if (allyGeneral == null || enemyGeneral == null) continue;
             if (allyGeneral.GetStatus(balanceConfig) == GeneralStatus.Routed) continue;
 
+            var allyOrder = allyGeneral.AssignedOrder ?? OrderType.DEF;
+
             var result = ResolveSingleBattle(allyGeneral, enemyGeneral,
-                allyGeneral.AssignedOrder ?? OrderType.DEF,
+                allyOrder,
                 enemyOrders.GetValueOrDefault(enemyGeneral.GeneralId, OrderType.DEF));
 
             results.Add(result);
@@ -76,6 +78,108 @@ public class BattleSystem : ILogic
 
         UpdateConsecutiveOrder(ally, allyOrder);
 
+        // 判断接触/脱离状态
+        if (IsEngaged(ally, enemy))
+        {
+            ProcessEngaged(ally, enemy, allyOrder, enemyOrder, result);
+        }
+        else
+        {
+            ProcessDisengaged(ally, enemy, allyOrder, enemyOrder, result);
+        }
+
+        CheckSkillTrigger(ally, allyOrder, result);
+        ApplyBattleResult(ally, enemy, result);
+
+        return result;
+    }
+
+    /// <summary>判断是否处于接触状态 (Gap = E - P - 1 <= 0)</summary>
+    public bool IsEngaged(GeneralData ally, GeneralData enemy)
+    {
+        int gap = enemy.GridPosition - ally.GridPosition - 1;
+        return gap <= 0;
+    }
+
+    /// <summary>获取两军之间的间隙</summary>
+    public int GetGap(GeneralData ally, GeneralData enemy)
+    {
+        return enemy.GridPosition - ally.GridPosition - 1;
+    }
+
+    /// <summary>处理脱离状态战斗</summary>
+    private void ProcessDisengaged(GeneralData ally, GeneralData enemy,
+        OrderType allyOrder, OrderType enemyOrder, BattleResult result)
+    {
+        // 脱离状态：无直接战斗，只有移动
+        result.AllyTroopChange = 0;
+        result.EnemyTroopChange = 0;
+        result.LineMovement = 0;
+
+        // 我方行动
+        switch (allyOrder)
+        {
+            case OrderType.ATK:
+                // 推进：GridPosition++
+                ally.GridPosition = Mathf.Min(5, ally.GridPosition + 1);
+                result.Description = $"{ally.Name}向前推进";
+                break;
+            case OrderType.DEF:
+                // 驻扎：不动
+                result.Description = $"{ally.Name}原地驻扎";
+                break;
+            case OrderType.RET:
+                // 后撤+回血：GridPosition--, HP+1, 消耗后备役
+                if (ally.GridPosition > 1)
+                {
+                    ally.GridPosition--;
+                    if (campaignData.Battle.CurrentReserves > 0)
+                    {
+                        result.AllyTroopChange = 1;
+                        campaignData.Battle.CurrentReserves--;
+                        result.Description = $"{ally.Name}后撤休整，恢复1点兵力";
+                    }
+                    else
+                    {
+                        result.Description = $"{ally.Name}后撤，但后备役不足无法补员";
+                    }
+                }
+                else
+                {
+                    result.Description = $"{ally.Name}已在最后方，无法后撤";
+                }
+                break;
+        }
+
+        // 敌方行动
+        switch (enemyOrder)
+        {
+            case OrderType.ATK:
+                enemy.GridPosition = Mathf.Max(1, enemy.GridPosition - 1);
+                break;
+            case OrderType.DEF:
+                // 不动
+                break;
+            case OrderType.RET:
+                if (enemy.GridPosition < 5)
+                {
+                    enemy.GridPosition++;
+                    result.EnemyTroopChange = 1; // 敌方也回血
+                }
+                break;
+        }
+
+        // 检查是否因移动而进入接触状态
+        if (IsEngaged(ally, enemy))
+        {
+            result.Description += "（双方进入接触状态）";
+        }
+    }
+
+    /// <summary>处理接触状态战斗（使用对抗表）</summary>
+    private void ProcessEngaged(GeneralData ally, GeneralData enemy,
+        OrderType allyOrder, OrderType enemyOrder, BattleResult result)
+    {
         float allyCombat = CalculateCombatPower(ally, ally.Position);
         float enemyCombat = CalculateCombatPower(enemy, ally.Position);
 
@@ -85,11 +189,33 @@ public class BattleSystem : ILogic
         (result.LineMovement, result.AllyTroopChange, result.EnemyTroopChange) =
             GetCombatOutcome(allyOrder, enemyOrder, allyCombat, enemyCombat);
 
-        CheckSkillTrigger(ally, allyOrder, result);
+        // 处理RET回血时消耗后备役
+        if (allyOrder == OrderType.RET && result.AllyTroopChange > 0)
+        {
+            if (campaignData.Battle.CurrentReserves >= result.AllyTroopChange)
+            {
+                campaignData.Battle.CurrentReserves -= result.AllyTroopChange;
+            }
+            else
+            {
+                result.AllyTroopChange = campaignData.Battle.CurrentReserves;
+                campaignData.Battle.CurrentReserves = 0;
+            }
+        }
 
-        ApplyBattleResult(ally, enemy, result);
-
-        return result;
+        // 更新GridPosition基于战斗结果
+        if (result.LineMovement > 0)
+        {
+            // 我方推进
+            ally.GridPosition = Mathf.Min(5, ally.GridPosition + 1);
+            enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
+        }
+        else if (result.LineMovement < 0)
+        {
+            // 敌方推进
+            ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
+            enemy.GridPosition = Mathf.Max(1, enemy.GridPosition - 1);
+        }
     }
 
     private void UpdateConsecutiveOrder(GeneralData general, OrderType order)
@@ -111,9 +237,9 @@ public class BattleSystem : ILogic
 
         float troopMod = general.Troops switch
         {
-            >= 80 => 1.0f,
-            >= 50 => 0.9f,
-            >= 20 => 0.7f,
+            >= 16 => 1.0f,   // 80% 兵力 (16/20)
+            >= 10 => 0.9f,   // 50% 兵力 (10/20)
+            >= 4 => 0.7f,    // 20% 兵力 (4/20)
             _ => 0.5f
         };
 
@@ -214,8 +340,8 @@ public class BattleSystem : ILogic
 
         frontline.LinePosition = newPos;
 
-        ally.Troops = Mathf.Clamp(ally.Troops + result.AllyTroopChange, 0, 100);
-        enemy.Troops = Mathf.Clamp(enemy.Troops + result.EnemyTroopChange, 0, 100);
+        ally.Troops = Mathf.Clamp(ally.Troops + result.AllyTroopChange, 0, 20);
+        enemy.Troops = Mathf.Clamp(enemy.Troops + result.EnemyTroopChange, 0, 20);
 
         if (result.LineMovement > 0)
         {
@@ -353,7 +479,7 @@ public class BattleSystem : ILogic
             };
 
             int reinforcement = Mathf.RoundToInt(balanceConfig.BaseReinforcement * positionMod);
-            general.Troops = Mathf.Min(100, general.Troops + reinforcement);
+            general.Troops = Mathf.Min(20, general.Troops + reinforcement);
         }
     }
 

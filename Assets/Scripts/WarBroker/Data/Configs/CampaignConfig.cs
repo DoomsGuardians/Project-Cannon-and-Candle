@@ -32,6 +32,11 @@ public class CampaignConfig : ScriptableObject
     [Tooltip("初始RET库存")]
     public int InitialRetInventory = 2;
 
+    [Header("===== 后备役设置 =====")]
+    [Tooltip("初始后备役兵力")]
+    [Range(0, 100)]
+    public int InitialReserves = 60;
+
     [Header("===== 战场设置 =====")]
     [Tooltip("初始战线位置 (1-5)")]
     [Range(1, 5)]

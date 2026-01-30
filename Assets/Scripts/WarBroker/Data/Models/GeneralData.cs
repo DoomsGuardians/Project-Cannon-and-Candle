@@ -13,6 +13,7 @@ public class GeneralData
     public GeneralPersonality Personality => Config.Personality;
 
     public FrontlinePosition Position;
+    public int GridPosition = 3;  // 战线位置 (1-5)，初始为中间
 
     public int Troops;
     public int Trust;
@@ -21,6 +22,11 @@ public class GeneralData
     public List<SkillConfigItem> Skills;
 
     public OrderType? AssignedOrder;
+
+    // 意图系统
+    public OrderType? DefaultIntent;  // AI生成的默认意图
+    public OrderType? FinalIntent;    // 最终执行的意图
+    public IntentSource IntentSource; // 意图来源
 
     public int ReorganizeTurns;
 
@@ -47,17 +53,29 @@ public class GeneralData
 
     public float CalculateCompositeScore()
     {
-        return Troops * 0.4f + Trust * 0.3f + Morale * 0.3f;
+        // Troops 范围从 0-100 变为 0-20，需要乘以 5 归一化到 0-100 范围
+        return (Troops * 5) * 0.4f + Trust * 0.3f + Morale * 0.3f;
     }
 
     public GeneralStatus GetStatus(GameBalanceConfig balance)
     {
-        if (Troops < balance.RoutTroopThreshold) return GeneralStatus.Routed;
-        float score = CalculateCompositeScore();
-        if (score < balance.RoutScoreThreshold) return GeneralStatus.Routed;
-        if (score < 50) return GeneralStatus.Critical;
-        if (score < 70) return GeneralStatus.Wounded;
-        return GeneralStatus.Healthy;
+        // 检查溃败条件
+        if (Troops <= 0) return GeneralStatus.Routed;
+
+        // 兵力过低直接溃败
+        if (Troops <= balance.RoutTroopThreshold)
+            return GeneralStatus.Routed;
+
+        // 综合评分过低也会溃败
+        float compositeScore = CalculateCompositeScore();
+        if (compositeScore < balance.RoutScoreThreshold)
+            return GeneralStatus.Routed;
+
+        // 根据综合评分判断状态
+        if (compositeScore < 50) return GeneralStatus.Critical;
+        if (compositeScore < 70) return GeneralStatus.Wounded;
+        if (compositeScore < 85) return GeneralStatus.Healthy;
+        return GeneralStatus.FullStrength;
     }
 
     public float CalculateBid(OrderType orderType, float marketPrice, GameBalanceConfig balance)

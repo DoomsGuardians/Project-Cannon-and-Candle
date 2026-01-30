@@ -17,10 +17,11 @@ public enum GeneralPersonality
 /// <summary>将军状态</summary>
 public enum GeneralStatus
 {
-    Healthy,   // 健康 (>70)
-    Wounded,   // 受伤 (50-70)
-    Critical,  // 濒死 (30-50)
-    Routed     // 溃败 (<30 或 兵力<20)
+    FullStrength, // 满编 (HP > 15)
+    Healthy,      // 健康 (HP 11-15)
+    Wounded,      // 受伤 (HP 6-10)
+    Critical,     // 濒死 (HP 1-5)
+    Routed        // 溃败 (HP <= 0)
 }
 
 /// <summary>战线位置</summary>
@@ -41,9 +42,27 @@ public enum FuturesDirection
 /// <summary>回合阶段</summary>
 public enum TurnPhase
 {
-    TurnStart,      // 回合开始
-    PlayerAction,   // 玩家行动
-    TurnEnd,        // 回合结算
-    BattleResolve,  // 战斗结算
-    MarketUpdate    // 市场更新
+    TurnStart,       // 回合开始（内部状态）
+    EventPhase,      // 事件阶段
+    MarketPhase,     // 市场阶段
+    IntentPhase,     // 意图阶段
+    BattlePhase,     // 战斗阶段
+    SettlementPhase  // 结算阶段
+}
+
+/// <summary>游戏结果</summary>
+public enum GameResult
+{
+    InProgress, // 进行中
+    Victory,    // 胜利
+    Defeat,     // 失败
+    Draw        // 平局
+}
+
+/// <summary>意图来源</summary>
+public enum IntentSource
+{
+    Default,    // 默认意图（灰色气泡）
+    Reinforced, // 强化（金色气泡）
+    Overridden  // 篡改（红色气泡）
 }

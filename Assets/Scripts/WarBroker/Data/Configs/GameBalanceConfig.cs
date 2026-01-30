@@ -77,16 +77,16 @@ public class GameBalanceConfig : ScriptableObject
     [Header("===== 将军参数 =====")]
 
     [Tooltip("基础补员 (每回合)")]
-    [Range(0, 30)]
-    public int BaseReinforcement = 10;
+    [Range(0, 5)]
+    public int BaseReinforcement = 2;
 
     [Tooltip("溃败兵力阈值")]
-    [Range(0, 50)]
-    public int RoutTroopThreshold = 20;
+    [Range(0, 10)]
+    public int RoutTroopThreshold = 4;
 
     [Tooltip("溃败综合评分阈值")]
     [Range(0, 50)]
-    public int RoutScoreThreshold = 30;
+    public int RoutScoreThreshold = 20;
 
     [Tooltip("重整所需回合")]
     [Range(1, 5)]
@@ -145,4 +145,38 @@ public class GameBalanceConfig : ScriptableObject
     [Tooltip("随机事件触发概率")]
     [Range(0f, 1f)]
     public float RandomEventChance = 0.4f;
+
+    [Header("===== 三因子定价 =====")]
+
+    [Tooltip("Alpha基础值：接触状态")]
+    [Range(0f, 0.5f)]
+    public float AlphaContactBase = 0.20f;
+
+    [Tooltip("Alpha临界修正")]
+    [Range(0f, 0.3f)]
+    public float AlphaCriticalBonus = 0.15f;
+
+    [Tooltip("Alpha低血量修正")]
+    [Range(0f, 0.2f)]
+    public float AlphaLowHPBonus = 0.10f;
+
+    [Tooltip("Beta动量阈值")]
+    [Range(0f, 0.3f)]
+    public float BetaMomentumThreshold = 0.10f;
+
+    [Tooltip("Beta动量乘数")]
+    [Range(1f, 2f)]
+    public float BetaMomentumMultiplier = 1.2f;
+
+    [Tooltip("Beta恐慌阈值（后备役）")]
+    [Range(0, 50)]
+    public int BetaPanicReserveThreshold = 20;
+
+    [Tooltip("Beta恐慌乘数")]
+    [Range(1f, 2f)]
+    public float BetaPanicMultiplier = 1.3f;
+
+    [Tooltip("Gamma流通盘敏感度")]
+    [Range(0f, 1f)]
+    public float GammaSensitivity = 0.5f;
 }

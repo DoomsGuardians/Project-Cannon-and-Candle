@@ -24,7 +24,62 @@
   - ScriptableObject配置驱动
   - 事件总线 (EventService)
 
-## 1.3 代码规范
+## 1.3 Levity Framework 核心约束（重要！）
+
+开发必须遵循框架已有组件，**禁止重复造轮子**：
+
+### 输入系统
+| 需求 | 框架组件 | 用法 |
+|------|----------|------|
+| 锁定/解锁输入通道 | `InputRouter` | `InputRouter.Acquire(channel, owner)` / `Release()` |
+| 检查输入状态 | `InputService` | `inputService.InputEnabled` |
+| 输入通道类型 | `InputChannel` | `Gameplay`, `UI`, `Naninovel` |
+
+### UI系统
+| 需求 | 框架组件 | 用法 |
+|------|----------|------|
+| 窗口基类 | `WindowBase` | 所有UI窗口必须继承 |
+| 层级管理 | `UILayerManager` | `uIService.GetLayerRoot(UILayer.xxx)` |
+| 窗口显示/隐藏 | `UIService` | `ShowWindow<T>()` / `HideWindow()` |
+| 全屏遮挡 | `UIOcclusionManager` | 设置 `IsFullScreen = true` |
+| 窗口动画 | `UIAnimator` | `PlayShowAnimation()` / `PlayHideAnimation()` |
+| UI层级枚举 | `UILayer` | `Scene`, `Background`, `Normal`, `Info`, `Top`, `Tip` |
+
+### 事件系统
+| 需求 | 框架组件 | 用法 |
+|------|----------|------|
+| 监听事件 | `EventService` | `eventService.AddEventListening(id, handler)` |
+| 发送事件 | `EventService` | `eventService.SendMessage(id, arg1, arg2)` |
+| 清理监听 | `EventService` | `eventService.RemoveEventListeningByTarget(this)` |
+| 事件ID定义 | `WarBrokerEventID` | 强转为 `EventID` 使用 |
+
+### 开发模式约束
+```csharp
+// ✅ 正确：使用框架组件
+public class MyPanel : WindowBase
+{
+    public override void OnShow()
+    {
+        base.OnShow();
+        InputRouter.Acquire(InputChannel.Gameplay, this);  // 锁定输入
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnXxx, OnXxx);
+    }
+    
+    public override void OnHide()
+    {
+        base.OnHide();
+        InputRouter.Release(InputChannel.Gameplay, this);  // 释放输入
+        eventService.RemoveEventListeningByTarget(this);   // 清理监听
+    }
+}
+
+// ❌ 错误：重复造轮子
+public class InputLayerManager : MonoBehaviour { }     // 不要新建
+public class PopupManager : MonoBehaviour { }          // 不要新建
+public class MyWindow : MonoBehaviour { }              // 必须继承 WindowBase
+```
+
+## 1.4 代码规范
 
 - 命名空间：无（框架未使用）
 - 类命名：PascalCase
@@ -36,6 +91,52 @@
 ---
 
 # 二、当前开发进度分析
+
+## 2.0 UI/UX架构原则
+
+### 设计理念
+
+| 原则 | 说明 |
+|------|------|
+| **战场优先** | 3D沙盘是视觉中心，UI不应完全遮挡 |
+| **分层输入** | UI层与3D场景层输入隔离，互不干扰 |
+| **信息分级** | 操作用固定面板，通知用临时弹窗 |
+| **P社风格** | 战场可自由旋转观察，类似欧陆风云/十字军之王 |
+
+### 元素分类
+
+| 类型 | 实现方式 | 示例 |
+|------|----------|------|
+| **战场视图** | 3D Scene + 独立相机 | 战线、将军单位、锡兵模型 |
+| **操作面板** | Screen Space UI (Canvas) | 市场交易、将军干涉、回合控制 |
+| **信息弹窗** | Screen Space Popup | 随机事件、战斗结算、确认对话框 |
+| **悬浮标签** | World Space UI | 将军意图气泡、HP条 |
+| **状态栏** | Screen Space UI | 顶部回合/资金、底部提示 |
+
+### 市场面板结构
+
+```
+MarketPanel
+├── Tab: 现货市场 (SpotMarketTab)
+│   ├── ATK指令: 价格/流通盘/持有量 + 买入/卖出
+│   ├── DEF指令: 价格/流通盘/持有量 + 买入/卖出
+│   ├── RET指令: 价格/流通盘/持有量 + 买入/卖出
+│   └── 三因子分解显示
+│
+└── Tab: 期货市场 (FuturesMarketTab)
+    ├── 开仓区: 类型/方向/数量/保证金
+    ├── 持仓列表: 合约详情/浮动盈亏/平仓按钮
+    └── 汇总: 总保证金/总浮盈
+```
+
+### 输入优先级
+
+```
+1. Popup弹窗 (最高) - 阻塞所有其他输入
+2. 操作面板 - 鼠标悬停时阻止3D场景输入
+3. 3D将军单位点击 - 打开详情面板
+4. 3D战场相机 - 旋转/缩放 (最低)
+```
 
 ## 2.1 已完成模块
 
@@ -624,111 +725,751 @@ private bool TryVictorPurchase(OrderType type, int quantity)
 
 ---
 
-## 3.3 Phase 3: UI实现 (表现层)
+## 3.3 Phase 3: 表现层架构
 
-### Task 3.1: GeneralPanel (将军管理面板)
+### 3.3.0 框架复用原则（重要！）
 
-**目标**：显示将军状态，支持拖拽干涉
+**必须使用框架已有组件**：
 
-**新建文件**：
-- `Assets/Scripts/WarBroker/UI/GeneralPanel.cs`
-- `Assets/Scripts/WarBroker/UI/GeneralCard.cs`
+| 需求 | 框架组件 | 位置 |
+|------|----------|------|
+| 输入分层 | `InputRouter` + `InputChannel` | Core/GameService/InputService/Integration/ |
+| UI层级管理 | `UILayerManager` + `UILayer` | Core/GameService/UIService/ |
+| 全屏遮挡管理 | `UIOcclusionManager` | Core/GameService/UIService/ |
+| 窗口动画 | `UIAnimator` | Core/GameService/UIService/Components/ |
+| 事件广播 | `EventService` | Core/GameService/EventService/ |
+| 窗口基类 | `WindowBase` | Core/GameCommand/Window/ |
 
-**实现要点**：
+**禁止重复造轮子**：
+- ❌ 不要新建 InputLayerManager（使用 InputRouter）
+- ❌ 不要新建 PopupManager（使用 UIService + UILayer.Top）
+- ❌ 不要新建 UIPanelInputBlocker（使用 InputRouter.Acquire/Release）
+- ❌ 不要在 WindowBase 外管理窗口生命周期
+
+**必须遵循的模式**：
+- ✅ 所有 UI 窗口继承 WindowBase
+- ✅ 使用 eventService.AddEventListening / RemoveEventListeningByTarget
+- ✅ 使用 InputRouter.Acquire/Release 管理输入通道
+- ✅ 使用 uIService.ShowWindow / HideWindow 管理窗口显示
+
+### 屏幕布局设计
+
+```
+┌────────────────────────────────────────────────────────┐
+│  [顶部状态栏] (UILayer.Info)                            │
+├────────────────────────────────────┬───────────────────┤
+│                                    │                   │
+│                                    │ [操作面板]         │
+│         3D 战场沙盘                 │ (UILayer.Normal)  │
+│     (Scene Camera)                 │                   │
+│                                    │ ┌─────┬─────┐     │
+│     ┌───┐  ┌───┐  ┌───┐           │ │现货 │期货 │     │
+│     │将军│  │将军│  │将军│          │ ├─────┴─────┤     │
+│     └───┘  └───┘  └───┘           │ │  交易区   │     │
+│         ↑                          │ └───────────┘     │
+│    World Space UI                  │                   │
+│    (UILayer.Scene)                 │ [结束回合]         │
+├────────────────────────────────────┴───────────────────┤
+│  [底部提示栏] (UILayer.Info)                            │
+└────────────────────────────────────────────────────────┘
+
+        ┌─────────────┐
+        │  随机事件    │  ← UILayer.Top
+        │  战斗结算    │     (IsFullScreen=false)
+        └─────────────┘
+```
+
+### Task 3.1: 输入分层（使用 InputRouter）
+
+**目标**：操作UI时锁定战场相机输入
+
+**使用框架已有的 InputRouter，无需新建组件**：
 
 ```csharp
-// GeneralPanel.cs
-public class GeneralPanel : WindowBase
+// BattlefieldCamera.cs - 战场相机控制
+public class BattlefieldCamera : MonoBehaviour
 {
-    public Transform generalCardContainer;
-    public List<GeneralCard> generalCards;
+    [Header("相机设置")]
+    public float rotateSpeed = 100f;
+    public float zoomSpeed = 5f;
+    public float minZoom = 5f;
+    public float maxZoom = 20f;
     
-    public override void OnShow()
+    private InputService inputService;
+    private Camera cam;
+    private float currentZoom = 10f;
+    private float currentAngle = 45f;
+    
+    void Start()
     {
-        RefreshAllCards();
-        eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnStart, OnTurnStart);
+        inputService = GameRoot.Instance.inputService;
+        cam = GetComponent<Camera>();
     }
     
-    private void RefreshAllCards()
+    void Update()
     {
-        var data = campaignSystem.Data;
-        foreach (var general in data.Battle.AllyGenerals)
+        // 框架的 InputRouter 会通过 InputService.InputEnabled 控制
+        // 当 UI 调用 InputRouter.Acquire(Gameplay, this) 时，InputEnabled 变 false
+        if (!inputService.InputEnabled) return;
+        
+        HandleRotation();
+        HandleZoom();
+    }
+    
+    private void HandleRotation()
+    {
+        if (Input.GetMouseButton(2))
         {
-            var card = GetOrCreateCard(general.GeneralId);
-            card.Refresh(general);
+            currentAngle += Input.GetAxis("Mouse X") * rotateSpeed * Time.deltaTime;
+            transform.rotation = Quaternion.Euler(45f, currentAngle, 0f);
+        }
+    }
+    
+    private void HandleZoom()
+    {
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (Mathf.Abs(scroll) > 0.01f)
+        {
+            currentZoom = Mathf.Clamp(currentZoom - scroll * zoomSpeed, minZoom, maxZoom);
+            cam.orthographicSize = currentZoom;
         }
     }
 }
 
-// GeneralCard.cs - 单个将军卡片
-public class GeneralCard : MonoBehaviour, IDropHandler
+// MarketPanel.cs - 使用 InputRouter 锁定输入
+public class MarketPanel : WindowBase
 {
-    public Text txtName, txtHP, txtMorale;
-    public Image imgIntentBubble;
-    public Text txtIntent;
-    
-    private GeneralData generalData;
-    
-    public void Refresh(GeneralData data)
+    public override void OnShow()
     {
-        generalData = data;
-        txtName.text = data.Name;
-        txtHP.text = $"HP: {data.HP}/20";
-        txtMorale.text = $"士气: {data.Morale}";
-        
-        // 意图气泡
-        if (data.DefaultIntent.HasValue)
-        {
-            txtIntent.text = data.DefaultIntent.Value.ToString();
-            imgIntentBubble.color = data.IntentSource switch
-            {
-                IntentSource.Default => Color.gray,
-                IntentSource.Reinforced => Color.yellow,
-                IntentSource.Overridden => Color.red,
-                _ => Color.gray
-            };
-        }
+        base.OnShow();
+        // 使用框架的 InputRouter 锁定 Gameplay 输入
+        InputRouter.Acquire(InputChannel.Gameplay, this);
+        // ... 其他初始化
     }
     
-    // 拖拽干涉
-    public void OnDrop(PointerEventData eventData)
+    public override void OnHide()
     {
-        var draggedOrder = eventData.pointerDrag.GetComponent<OrderDragItem>();
-        if (draggedOrder == null) return;
-        
-        var orderType = draggedOrder.OrderType;
-        var intentSystem = GameRoot.Instance.GetSystem<IntentSystem>();
-        
-        if (orderType == generalData.DefaultIntent)
-        {
-            // 同类型 = 强化
-            intentSystem.TryReinforce(generalData, orderType, playerData);
-        }
-        else
-        {
-            // 异类型 = 篡改
-            intentSystem.TryOverride(generalData, orderType, playerData);
-        }
-        
-        Refresh(generalData);
+        base.OnHide();
+        // 释放锁定
+        InputRouter.Release(InputChannel.Gameplay, this);
+        // 使用框架方法清理事件监听
+        eventService.RemoveEventListeningByTarget(this);
     }
 }
 ```
 
-### Task 3.2: BattlefieldPanel (战场面板)
+### Task 3.2: 弹窗系统（使用 UIService + UILayer）
 
-**目标**：可视化三条战线和单位位置
+**目标**：事件通知、战斗结算使用弹窗
+
+**使用框架已有的 UIService 层级系统，无需新建 PopupManager**：
+
+```csharp
+// EventPopup.cs - 随机事件弹窗
+public class EventPopup : WindowBase
+{
+    // 构造时设置层级
+    public EventPopup()
+    {
+        uiLayer = UILayer.Top;       // 在最上层显示
+        IsFullScreen = false;        // 不触发遮挡管理
+        IsAlwaysVisible = true;      // 不被其他全屏窗口遮挡
+    }
+    
+    private Text txtTitle, txtDescription, txtEffects;
+    private Button btnConfirm;
+    private RandomEventConfig eventConfig;
+    
+    public override void OnAwake()
+    {
+        base.OnAwake();
+        // 绑定组件（使用 Binder 模式）
+        var binder = gameObject.GetComponent<EventPopupBinder>();
+        if (binder != null)
+        {
+            txtTitle = binder.txtTitle;
+            txtDescription = binder.txtDescription;
+            txtEffects = binder.txtEffects;
+            btnConfirm = binder.btnConfirm;
+        }
+    }
+    
+    public override void OnShow()
+    {
+        base.OnShow();
+        AddButtonListener(btnConfirm, OnConfirm);
+    }
+    
+    public void Setup(RandomEventConfig config)
+    {
+        eventConfig = config;
+        txtTitle.text = config.EventName;
+        txtDescription.text = config.Description;
+        txtEffects.text = FormatEffects(config);
+    }
+    
+    private void OnConfirm()
+    {
+        // 使用框架的 UIAnimator 播放关闭动画
+        PlayHideAnimation(() => {
+            uIService.HideWindow(Name);
+        });
+    }
+    
+    private string FormatEffects(RandomEventConfig config)
+    {
+        var sb = new System.Text.StringBuilder();
+        if (config.AtkDemandModifier != 0) 
+            sb.AppendLine($"ATK需求 {config.AtkDemandModifier:+0%;-0%}");
+        if (config.DefDemandModifier != 0) 
+            sb.AppendLine($"DEF需求 {config.DefDemandModifier:+0%;-0%}");
+        if (config.RetDemandModifier != 0) 
+            sb.AppendLine($"RET需求 {config.RetDemandModifier:+0%;-0%}");
+        return sb.ToString();
+    }
+}
+
+// BattleResultPopup.cs - 战斗结算弹窗
+public class BattleResultPopup : WindowBase
+{
+    public BattleResultPopup()
+    {
+        uiLayer = UILayer.Top;
+        IsFullScreen = false;
+        IsAlwaysVisible = true;
+    }
+    
+    private Transform resultListRoot;
+    private GameObject resultItemPrefab;
+    private Button btnConfirm;
+    
+    public override void OnAwake()
+    {
+        base.OnAwake();
+        var binder = gameObject.GetComponent<BattleResultPopupBinder>();
+        // ... 绑定组件
+    }
+    
+    public void Setup(List<BattleResult> results)
+    {
+        // 清空并重建列表
+        foreach (Transform child in resultListRoot)
+            Destroy(child.gameObject);
+        
+        foreach (var result in results)
+        {
+            var item = Instantiate(resultItemPrefab, resultListRoot);
+            var display = item.GetComponent<BattleResultItem>();
+            display.Setup(result);
+        }
+    }
+}
+
+// 在 BattleGameMode 中注册弹窗
+public class BattleGameMode : GameModeBase
+{
+    public override void EnterGameMode()
+    {
+        base.EnterGameMode();
+        EnsureUILayerSystem();
+        
+        // 注册弹窗（使用现有框架方法）
+        RegisterWindow<EventPopup>("EventPopup", "Prefabs/UI/EventPopup");
+        RegisterWindow<BattleResultPopup>("BattleResultPopup", "Prefabs/UI/BattleResultPopup");
+        
+        // 监听事件以显示弹窗
+        eventService.AddEventListening(
+            (EventID)WarBrokerEventID.OnRandomEvent, OnRandomEvent);
+        eventService.AddEventListening(
+            (EventID)WarBrokerEventID.OnBattleResult, OnBattleResult);
+    }
+    
+    private void OnRandomEvent(object arg1, object arg2)
+    {
+        var config = arg1 as RandomEventConfig;
+        if (config == null) return;
+        
+        var popup = uIService.ShowWindowWithAnimation<EventPopup>("EventPopup");
+        popup?.Setup(config);
+    }
+    
+    private void OnBattleResult(object arg1, object arg2)
+    {
+        // 收集本回合所有战斗结果后显示
+        // ...
+    }
+}
+```
+
+### Task 3.3: 3D战场场景系统
+
+**目标**：实现P社风格的3D沙盘战场
 
 **新建文件**：
-- `Assets/Scripts/WarBroker/UI/BattlefieldPanel.cs`
-- `Assets/Scripts/WarBroker/UI/LaneDisplay.cs`
+- `Assets/Scripts/WarBroker/Battlefield/BattlefieldSceneController.cs`
+- `Assets/Scripts/WarBroker/Battlefield/GeneralUnit3D.cs`
+- `Assets/Scripts/WarBroker/Battlefield/BattlefieldCamera.cs`
 
-### Task 3.3: MarketPanel改造
+```csharp
+// BattlefieldSceneController.cs - 战场场景控制器
+public class BattlefieldSceneController : MonoBehaviour
+{
+    [Header("场景引用")]
+    public Transform leftLaneRoot;
+    public Transform centerLaneRoot;
+    public Transform rightLaneRoot;
+    
+    [Header("预制体")]
+    public GameObject generalUnitPrefab;
+    
+    private Dictionary<string, GeneralUnit3D> allyUnits = new();
+    private Dictionary<string, GeneralUnit3D> enemyUnits = new();
+    
+    private CampaignSystem campaignSystem;
+    private EventService eventService;
+    
+    void Start()
+    {
+        campaignSystem = GameRoot.Instance.campaignSystem;
+        eventService = GameRoot.Instance.eventService;
+        
+        // 使用框架的事件系统监听
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnStart, OnTurnStart);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleResult, OnBattleResult);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnGeneralRouted, OnGeneralRouted);
+    }
+    
+    void OnDestroy()
+    {
+        // 使用框架方法清理事件监听
+        eventService?.RemoveEventListeningByTarget(this);
+    }
+    
+    public void Initialize(CampaignRuntimeData data)
+    {
+        foreach (var general in data.Battle.AllyGenerals)
+        {
+            var unit = SpawnUnit(general, isAlly: true);
+            allyUnits[general.GeneralId] = unit;
+        }
+        
+        foreach (var general in data.Battle.EnemyGenerals)
+        {
+            var unit = SpawnUnit(general, isAlly: false);
+            enemyUnits[general.GeneralId] = unit;
+        }
+    }
+    
+    private GeneralUnit3D SpawnUnit(GeneralData data, bool isAlly)
+    {
+        var laneRoot = GetLaneRoot(data.Position);
+        var go = Instantiate(generalUnitPrefab, laneRoot);
+        var unit = go.GetComponent<GeneralUnit3D>();
+        unit.Initialize(data, isAlly);
+        return unit;
+    }
+    
+    private Transform GetLaneRoot(FrontlinePosition pos)
+    {
+        return pos switch
+        {
+            FrontlinePosition.Left => leftLaneRoot,
+            FrontlinePosition.Center => centerLaneRoot,
+            FrontlinePosition.Right => rightLaneRoot,
+            _ => centerLaneRoot
+        };
+    }
+    
+    private void OnTurnStart(object arg1, object arg2)
+    {
+        RefreshAllUnits();
+    }
+    
+    private void OnBattleResult(object arg1, object arg2)
+    {
+        var result = arg1 as BattleResult;
+        if (result == null) return;
+        StartCoroutine(PlayBattleAnimation(result));
+    }
+    
+    private void OnGeneralRouted(object arg1, object arg2)
+    {
+        var general = arg1 as GeneralData;
+        if (general == null) return;
+        
+        if (allyUnits.TryGetValue(general.GeneralId, out var unit))
+        {
+            unit.PlayRoutedAnimation();
+        }
+    }
+    
+    private void RefreshAllUnits()
+    {
+        foreach (var kvp in allyUnits) kvp.Value.Refresh();
+        foreach (var kvp in enemyUnits) kvp.Value.Refresh();
+    }
+    
+    private IEnumerator PlayBattleAnimation(BattleResult result)
+    {
+        // 播放战斗动画
+        yield return new WaitForSeconds(0.5f);
+    }
+}
 
-**目标**：显示三因子分解、流通盘状态
+// GeneralUnit3D.cs - 将军3D单位
+public class GeneralUnit3D : MonoBehaviour
+{
+    [Header("视觉组件")]
+    public Transform modelRoot;
+    public GameObject[] soldierModels;  // 20个锡兵模型
+    
+    [Header("World Space UI (UILayer.Scene)")]
+    public Canvas worldCanvas;
+    public Image imgIntentBubble;
+    public Text txtIntent;
+    
+    [Header("选中效果")]
+    public GameObject selectionIndicator;
+    
+    private GeneralData data;
+    private bool isAlly;
+    private EventService eventService;
+    
+    public void Initialize(GeneralData generalData, bool ally)
+    {
+        data = generalData;
+        isAlly = ally;
+        eventService = GameRoot.Instance.eventService;
+        Refresh();
+    }
+    
+    public void Refresh()
+    {
+        // 更新锡兵模型显示
+        for (int i = 0; i < soldierModels.Length; i++)
+        {
+            soldierModels[i].SetActive(i < data.HP);
+        }
+        
+        // 更新意图气泡
+        UpdateIntentBubble();
+        
+        // 更新位置
+        float z = (data.GridPosition - 3) * 2f;
+        transform.localPosition = new Vector3(0, 0, z);
+    }
+    
+    private void UpdateIntentBubble()
+    {
+        if (data.DefaultIntent.HasValue)
+        {
+            worldCanvas.gameObject.SetActive(true);
+            txtIntent.text = data.DefaultIntent.Value switch
+            {
+                OrderType.ATK => "⚔",
+                OrderType.DEF => "🛡",
+                OrderType.RET => "↩",
+                _ => "?"
+            };
+            imgIntentBubble.color = data.IntentSource switch
+            {
+                IntentSource.Default => Color.gray,
+                IntentSource.Reinforced => new Color(1f, 0.84f, 0f),
+                IntentSource.Overridden => Color.red,
+                _ => Color.gray
+            };
+        }
+        else
+        {
+            worldCanvas.gameObject.SetActive(false);
+        }
+    }
+    
+    // 点击将军单位 - 发送事件由UI响应
+    void OnMouseDown()
+    {
+        if (!isAlly) return;
+        
+        // 使用框架事件系统发送选中事件
+        eventService.SendMessage(
+            (EventID)WarBrokerEventID.OnGeneralSelected, data, null);
+    }
+    
+    public void PlayRoutedAnimation()
+    {
+        // 使用 DOTween 播放溃败动画（框架已初始化 DOTween）
+        transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+    }
+}
+```
+
+### Task 3.4: MarketPanel重构（现货/期货Tab）
+
+**目标**：分离现货市场和期货市场为两个Tab页
 
 **修改文件**：
 - `Assets/Scripts/WarBroker/UI/MarketPanel.cs`
+
+```csharp
+// MarketPanel.cs - 重构为Tab结构
+public class MarketPanel : WindowBase
+{
+    private Button btnSpotTab, btnFuturesTab;
+    private GameObject spotTabContent, futuresTabContent;
+    
+    // 现货区域
+    private Text txtAtkPrice, txtDefPrice, txtRetPrice;
+    private Text txtAtkFloat, txtDefFloat, txtRetFloat;
+    private Button btnAtkBuy, btnAtkSell, btnDefBuy, btnDefSell, btnRetBuy, btnRetSell;
+    
+    // 期货区域
+    private Transform futuresListRoot;
+    private Button btnOpenFutures;
+    
+    private MarketTabType currentTab = MarketTabType.Spot;
+    private GameplayManager gameplayManager;
+    
+    public override void OnAwake()
+    {
+        base.OnAwake();
+        gameplayManager = GameRoot.Instance.managerService.GetManager<GameplayManager>();
+        
+        // 使用 Binder 模式绑定组件
+        var binder = gameObject.GetComponent<MarketPanelBinder>();
+        if (binder != null)
+        {
+            btnSpotTab = binder.btnSpotTab;
+            btnFuturesTab = binder.btnFuturesTab;
+            spotTabContent = binder.spotTabContent;
+            futuresTabContent = binder.futuresTabContent;
+            // ... 其他绑定
+        }
+    }
+    
+    public override void OnShow()
+    {
+        base.OnShow();
+        
+        // 使用框架的 InputRouter 锁定 Gameplay 输入
+        InputRouter.Acquire(InputChannel.Gameplay, this);
+        
+        AddButtonListener(btnSpotTab, () => SwitchTab(MarketTabType.Spot));
+        AddButtonListener(btnFuturesTab, () => SwitchTab(MarketTabType.Futures));
+        
+        // 使用框架事件系统监听市场事件
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnPriceUpdate, OnRefresh);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnTradeExecuted, OnRefresh);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnFuturesOpened, OnRefresh);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnFuturesClosed, OnRefresh);
+        
+        SwitchTab(MarketTabType.Spot);
+        RefreshUI();
+    }
+    
+    public override void OnHide()
+    {
+        base.OnHide();
+        
+        // 释放输入锁
+        InputRouter.Release(InputChannel.Gameplay, this);
+        
+        // 使用框架方法清理事件监听
+        eventService.RemoveEventListeningByTarget(this);
+    }
+    
+    private void SwitchTab(MarketTabType tab)
+    {
+        currentTab = tab;
+        spotTabContent.SetActive(tab == MarketTabType.Spot);
+        futuresTabContent.SetActive(tab == MarketTabType.Futures);
+        
+        btnSpotTab.interactable = (tab != MarketTabType.Spot);
+        btnFuturesTab.interactable = (tab != MarketTabType.Futures);
+        
+        RefreshUI();
+    }
+    
+    private void OnRefresh(object arg1, object arg2) => RefreshUI();
+    
+    private void RefreshUI()
+    {
+        var data = gameplayManager.GetCampaignData();
+        if (data == null) return;
+        
+        if (currentTab == MarketTabType.Spot)
+            RefreshSpotMarket(data);
+        else
+            RefreshFuturesMarket(data);
+    }
+    
+    private void RefreshSpotMarket(CampaignRuntimeData data)
+    {
+        // 显示三种指令的价格、流通盘、持有量
+        txtAtkPrice.text = $"${data.Market.CurrentPrices[OrderType.ATK]:F2}";
+        txtAtkFloat.text = $"流通: {data.Market.Float[OrderType.ATK]}";
+        // ... 其他更新
+    }
+    
+    private void RefreshFuturesMarket(CampaignRuntimeData data)
+    {
+        // 显示持仓列表
+        // ...
+    }
+}
+
+public enum MarketTabType { Spot, Futures }
+```
+
+### Task 3.5: GeneralDetailPanel（将军详情侧边栏）
+
+**目标**：点击3D将军单位后，侧边滑出详情面板
+
+**新建文件**：
+- `Assets/Scripts/WarBroker/UI/GeneralDetailPanel.cs`
+
+```csharp
+// GeneralDetailPanel.cs - 将军详情面板
+public class GeneralDetailPanel : WindowBase
+{
+    private Text txtName, txtPersonality, txtHP, txtTrust, txtMorale;
+    private Slider sliderHP;
+    private Image imgIntentBubble;
+    private Text txtIntent, txtIntentSource;
+    private Button btnReinforce, btnOverrideATK, btnOverrideDEF, btnOverrideRET;
+    
+    private GeneralData currentGeneral;
+    private GameplayManager gameplayManager;
+    private IntentSystem intentSystem;
+    
+    public GeneralDetailPanel()
+    {
+        uiLayer = UILayer.Normal;  // 与操作面板同层
+    }
+    
+    public override void OnAwake()
+    {
+        base.OnAwake();
+        gameplayManager = GameRoot.Instance.managerService.GetManager<GameplayManager>();
+        
+        var binder = gameObject.GetComponent<GeneralDetailPanelBinder>();
+        // ... 绑定组件
+    }
+    
+    public override void OnShow()
+    {
+        base.OnShow();
+        
+        // 监听将军选中事件
+        eventService.AddEventListening(
+            (EventID)WarBrokerEventID.OnGeneralSelected, OnGeneralSelected);
+        
+        // 绑定按钮
+        AddButtonListener(btnReinforce, OnReinforce);
+        AddButtonListener(btnOverrideATK, () => OnOverride(OrderType.ATK));
+        AddButtonListener(btnOverrideDEF, () => OnOverride(OrderType.DEF));
+        AddButtonListener(btnOverrideRET, () => OnOverride(OrderType.RET));
+    }
+    
+    public override void OnHide()
+    {
+        base.OnHide();
+        eventService.RemoveEventListeningByTarget(this);
+    }
+    
+    private void OnGeneralSelected(object arg1, object arg2)
+    {
+        currentGeneral = arg1 as GeneralData;
+        if (currentGeneral == null) return;
+        
+        Refresh();
+        
+        // 使用框架的 UIAnimator 播放滑入动画
+        PlayShowAnimation();
+    }
+    
+    private void Refresh()
+    {
+        var g = currentGeneral;
+        
+        txtName.text = g.Name;
+        txtPersonality.text = g.Personality switch
+        {
+            GeneralPersonality.Fanatic => "狂热",
+            GeneralPersonality.Conservative => "保守",
+            GeneralPersonality.Opportunist => "投机",
+            _ => "未知"
+        };
+        txtHP.text = $"{g.HP}/20";
+        sliderHP.value = g.HP / 20f;
+        txtTrust.text = $"信任: {g.Trust}";
+        txtMorale.text = $"士气: {g.Morale}";
+        
+        // 意图显示
+        if (g.DefaultIntent.HasValue)
+        {
+            txtIntent.text = g.DefaultIntent.Value.ToString();
+            imgIntentBubble.color = g.IntentSource switch
+            {
+                IntentSource.Default => Color.gray,
+                IntentSource.Reinforced => new Color(1f, 0.84f, 0f),
+                IntentSource.Overridden => Color.red,
+                _ => Color.gray
+            };
+            txtIntentSource.text = g.IntentSource switch
+            {
+                IntentSource.Default => "（默认意图）",
+                IntentSource.Reinforced => "（已强化）",
+                IntentSource.Overridden => "（已篡改）",
+                _ => ""
+            };
+        }
+        
+        RefreshInterventionButtons();
+    }
+    
+    private void RefreshInterventionButtons()
+    {
+        var data = gameplayManager.GetCampaignData();
+        var player = data.Player;
+        var intent = currentGeneral.DefaultIntent;
+        
+        // 强化：需要1份同类型
+        bool canReinforce = intent.HasValue && 
+            currentGeneral.IntentSource == IntentSource.Default &&
+            player.Inventory[intent.Value] >= 1;
+        btnReinforce.interactable = canReinforce;
+        
+        // 篡改：需要3份异类型
+        btnOverrideATK.interactable = intent != OrderType.ATK && player.Inventory[OrderType.ATK] >= 3;
+        btnOverrideDEF.interactable = intent != OrderType.DEF && player.Inventory[OrderType.DEF] >= 3;
+        btnOverrideRET.interactable = intent != OrderType.RET && player.Inventory[OrderType.RET] >= 3;
+    }
+    
+    private void OnReinforce()
+    {
+        if (currentGeneral == null) return;
+        
+        var data = gameplayManager.GetCampaignData();
+        if (intentSystem.TryReinforce(currentGeneral, currentGeneral.DefaultIntent.Value, data.Player))
+        {
+            // 使用框架事件系统广播
+            eventService.SendMessage((EventID)WarBrokerEventID.OnIntentReinforced, currentGeneral, null);
+            Refresh();
+        }
+    }
+    
+    private void OnOverride(OrderType orderType)
+    {
+        if (currentGeneral == null) return;
+        
+        var data = gameplayManager.GetCampaignData();
+        if (intentSystem.TryOverride(currentGeneral, orderType, data.Player))
+        {
+            eventService.SendMessage((EventID)WarBrokerEventID.OnIntentOverridden, currentGeneral, null);
+            Refresh();
+        }
+    }
+}
 
 ---
 
@@ -773,11 +1514,17 @@ public class GeneralCard : MonoBehaviour, IDropHandler
 |----------|------|--------|
 | `Systems/PricingEngine.cs` | 三因子定价 | P1 |
 | `Systems/IntentSystem.cs` | 将军意图 | P1 |
-| `UI/GeneralPanel.cs` | 将军管理 | P2 |
-| `UI/GeneralCard.cs` | 将军卡片 | P2 |
-| `UI/BattlefieldPanel.cs` | 战场显示 | P2 |
-| `UI/LaneDisplay.cs` | 战线显示 | P2 |
-| `UI/OrderDragItem.cs` | 指令拖拽 | P2 |
+| `Battlefield/BattlefieldSceneController.cs` | 3D战场控制 | P2 |
+| `Battlefield/GeneralUnit3D.cs` | 将军3D单位 | P2 |
+| `Battlefield/BattlefieldCamera.cs` | 战场相机（使用InputRouter） | P2 |
+| `UI/GeneralDetailPanel.cs` | 将军详情侧边栏 | P2 |
+| `UI/EventPopup.cs` | 事件弹窗（继承WindowBase） | P2 |
+| `UI/BattleResultPopup.cs` | 战斗结算弹窗（继承WindowBase） | P2 |
+
+**注意**：以下文件**不需要新建**（框架已提供）：
+- ~~InputLayerManager.cs~~ → 使用 `InputRouter`
+- ~~PopupManager.cs~~ → 使用 `UIService` + `UILayer.Top`
+- ~~SpotMarketTab.cs / FuturesMarketTab.cs~~ → 直接在 `MarketPanel` 内实现Tab切换
 
 ---
 
@@ -920,11 +1667,23 @@ Week 5: Phase 4 (流程完善)
 
 ## 8.3 Phase 3 验收
 
-- [ ] GeneralPanel显示所有己方将军
-- [ ] 意图气泡颜色正确（灰/金/红）
-- [ ] 可以拖拽指令到将军卡片上
-- [ ] BattlefieldPanel显示三条战线
-- [ ] 单位位置正确显示
+**框架遵循检查**：
+- [ ] 所有 UI 窗口继承 `WindowBase`
+- [ ] 使用 `InputRouter.Acquire/Release` 而非自定义输入管理
+- [ ] 使用 `eventService.AddEventListening` / `RemoveEventListeningByTarget`
+- [ ] 弹窗通过 `UIService.ShowWindow` 显示，设置 `uiLayer = UILayer.Top`
+- [ ] 没有重复造轮子（无 PopupManager、无 InputLayerManager）
+
+**功能验收**：
+- [ ] 3D战场场景可旋转、缩放
+- [ ] 将军以3D单位显示，20个锡兵模型根据HP显示/隐藏
+- [ ] 意图气泡悬浮在3D单位上方（World Space UI）
+- [ ] 点击己方将军单位，侧边滑出详情面板
+- [ ] 可在详情面板进行强化/篡改操作
+- [ ] 操作UI（MarketPanel等）显示时，战场相机输入被 InputRouter 锁定
+- [ ] MarketPanel 分为现货/期货两个Tab
+- [ ] 随机事件以 EventPopup（UILayer.Top）显示
+- [ ] 战斗结算以 BattleResultPopup（UILayer.Top）显示
 
 ## 8.4 Phase 4 验收
 

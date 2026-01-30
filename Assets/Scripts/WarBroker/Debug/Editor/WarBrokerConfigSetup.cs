@@ -50,10 +50,10 @@ public static class WarBrokerConfigSetup
             new SkillConfigItem
             {
                 SkillId = "fanatic_laststand", SkillName = "死战",
-                Description = "兵力<30时ATK战斗力+50%",
+                Description = "兵力<6时ATK战斗力+50%",
                 Personality = GeneralPersonality.Fanatic,
                 TriggerOrder = OrderType.ATK,
-                TroopThreshold = 30,
+                TroopThreshold = 6,
                 CombatBonus = 0.5f
             },
             new SkillConfigItem
@@ -69,10 +69,10 @@ public static class WarBrokerConfigSetup
             new SkillConfigItem
             {
                 SkillId = "conservative_ironwall", SkillName = "铁壁",
-                Description = "DEF成功时敌方-5兵力",
+                Description = "DEF成功时敌方-1兵力",
                 Personality = GeneralPersonality.Conservative,
                 TriggerOrder = OrderType.DEF,
-                EnemyTroopChange = -5
+                EnemyTroopChange = -1
             },
             new SkillConfigItem
             {
@@ -86,18 +86,18 @@ public static class WarBrokerConfigSetup
             new SkillConfigItem
             {
                 SkillId = "conservative_rearguard", SkillName = "断后",
-                Description = "RET时己方损失减半(+5兵力补偿)",
+                Description = "RET时己方损失减半(+1兵力补偿)",
                 Personality = GeneralPersonality.Conservative,
                 TriggerOrder = OrderType.RET,
-                AllyTroopChange = 5
+                AllyTroopChange = 1
             },
             new SkillConfigItem
             {
                 SkillId = "conservative_timid", SkillName = "怯战",
-                Description = "兵力<50时ATK可能抗命改DEF",
+                Description = "兵力<10时ATK可能抗命改DEF",
                 Personality = GeneralPersonality.Conservative,
                 TriggerOrder = OrderType.ATK,
-                TroopThreshold = 50,
+                TroopThreshold = 10,
                 DisobeyToOrder = OrderType.DEF,
                 DisobeyChance = 0.3f
             },
@@ -122,10 +122,10 @@ public static class WarBrokerConfigSetup
             new SkillConfigItem
             {
                 SkillId = "opportunist_feint", SkillName = "诈败",
-                Description = "RET诱敌追击，敌方额外-10兵力",
+                Description = "RET诱敌追击，敌方额外-2兵力",
                 Personality = GeneralPersonality.Opportunist,
                 TriggerOrder = OrderType.RET,
-                EnemyTroopChange = -10
+                EnemyTroopChange = -2
             },
             new SkillConfigItem
             {
@@ -152,7 +152,7 @@ public static class WarBrokerConfigSetup
                 GeneralId = "ally_left", Name = "冯·布吕歇尔",
                 Biography = "普鲁士元帅，以勇猛著称",
                 Personality = GeneralPersonality.Fanatic,
-                InitialTroops = 80, InitialTrust = 50, InitialMorale = 60,
+                InitialTroops = 16, InitialTrust = 50, InitialMorale = 60,
                 SkillIds = new[] { "fanatic_charge", "fanatic_bloodlust" },
                 AtkBidModifier = 1.5f, DefBidModifier = 0.7f, RetBidModifier = 0.5f
             },
@@ -161,7 +161,7 @@ public static class WarBrokerConfigSetup
                 GeneralId = "ally_center", Name = "库图佐夫",
                 Biography = "俄国元帅，老谋深算的防守大师",
                 Personality = GeneralPersonality.Conservative,
-                InitialTroops = 80, InitialTrust = 50, InitialMorale = 60,
+                InitialTroops = 16, InitialTrust = 50, InitialMorale = 60,
                 SkillIds = new[] { "conservative_ironwall", "conservative_rearguard" },
                 AtkBidModifier = 0.5f, DefBidModifier = 1.5f, RetBidModifier = 1.2f
             },
@@ -170,7 +170,7 @@ public static class WarBrokerConfigSetup
                 GeneralId = "ally_right", Name = "塔列朗",
                 Biography = "法国外交官，见风使舵的机会主义者",
                 Personality = GeneralPersonality.Opportunist,
-                InitialTroops = 80, InitialTrust = 50, InitialMorale = 60,
+                InitialTroops = 16, InitialTrust = 50, InitialMorale = 60,
                 SkillIds = new[] { "opportunist_momentum", "opportunist_adapt" },
                 AtkBidModifier = 1.0f, DefBidModifier = 1.0f, RetBidModifier = 1.0f
             }
@@ -183,7 +183,7 @@ public static class WarBrokerConfigSetup
                 GeneralId = "enemy_left", Name = "拿破仑",
                 Biography = "法兰西皇帝，军事天才",
                 Personality = GeneralPersonality.Opportunist,
-                InitialTroops = 80, InitialTrust = 60, InitialMorale = 70,
+                InitialTroops = 16, InitialTrust = 60, InitialMorale = 70,
                 SkillIds = new[] { "opportunist_momentum", "opportunist_feint" },
                 AtkBidModifier = 1.0f, DefBidModifier = 1.0f, RetBidModifier = 1.0f
             },
@@ -192,7 +192,7 @@ public static class WarBrokerConfigSetup
                 GeneralId = "enemy_center", Name = "威灵顿",
                 Biography = "英国公爵，防御战术大师",
                 Personality = GeneralPersonality.Conservative,
-                InitialTroops = 80, InitialTrust = 60, InitialMorale = 70,
+                InitialTroops = 16, InitialTrust = 60, InitialMorale = 70,
                 SkillIds = new[] { "conservative_ironwall", "conservative_patience" },
                 AtkBidModifier = 0.5f, DefBidModifier = 1.5f, RetBidModifier = 1.2f
             },
@@ -201,7 +201,7 @@ public static class WarBrokerConfigSetup
                 GeneralId = "enemy_right", Name = "内伊",
                 Biography = "法国元帅，勇者中的勇者",
                 Personality = GeneralPersonality.Fanatic,
-                InitialTroops = 80, InitialTrust = 60, InitialMorale = 70,
+                InitialTroops = 16, InitialTrust = 60, InitialMorale = 70,
                 SkillIds = new[] { "fanatic_laststand", "fanatic_defiant" },
                 AtkBidModifier = 1.5f, DefBidModifier = 0.7f, RetBidModifier = 0.5f
             }
@@ -253,6 +253,7 @@ public static class WarBrokerConfigSetup
         config.InitialAtkInventory = 2;
         config.InitialDefInventory = 2;
         config.InitialRetInventory = 2;
+        config.InitialReserves = 60;
         config.InitialFrontlinePosition = 3;
         config.GeneralConfig = generalConfig;
         config.VictorInitialCash = 500f;
@@ -277,8 +278,8 @@ public static class WarBrokerConfigSetup
             new RandomEventConfig
             {
                 EventId = "evt_plague", EventName = "瘟疫爆发",
-                Description = "军中瘟疫蔓延，所有将军兵力-10",
-                AllTroopChange = -10, Duration = 2,
+                Description = "军中瘟疫蔓延，所有将军兵力-2",
+                AllTroopChange = -2, Duration = 2,
                 DefDemandModifier = 0.3f, RetDemandModifier = 0.2f
             },
             new RandomEventConfig

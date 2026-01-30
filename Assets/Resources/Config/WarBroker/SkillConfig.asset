@@ -41,9 +41,9 @@ MonoBehaviour:
     DisobeyChance: 0
   - SkillId: fanatic_laststand
     SkillName: "\u6B7B\u6218"
-    Description: "\u5175\u529B<30\u65F6ATK\u6218\u6597\u529B+50%"
+    Description: "\u5175\u529B<6\u65F6ATK\u6218\u6597\u529B+50%"
     Personality: 0
-    TroopThreshold: 30
+    TroopThreshold: 6
     MoraleThreshold: 0
     FrontlineThreshold: 0
     RequireConsecutive: 0
@@ -67,7 +67,7 @@ MonoBehaviour:
     DisobeyChance: 0.3
   - SkillId: conservative_ironwall
     SkillName: "\u94C1\u58C1"
-    Description: "DEF\u6210\u529F\u65F6\u654C\u65B9-5\u5175\u529B"
+    Description: "DEF\u6210\u529F\u65F6\u654C\u65B9-1\u5175\u529B"
     Personality: 1
     TroopThreshold: 0
     MoraleThreshold: 0
@@ -76,7 +76,7 @@ MonoBehaviour:
     BonusLineMovement: 0
     CombatBonus: 0
     AllyTroopChange: 0
-    EnemyTroopChange: -5
+    EnemyTroopChange: -1
     DisobeyChance: 0
   - SkillId: conservative_patience
     SkillName: "\u4EE5\u9038\u5F85\u52B3"
@@ -93,7 +93,7 @@ MonoBehaviour:
     DisobeyChance: 0
   - SkillId: conservative_rearguard
     SkillName: "\u65AD\u540E"
-    Description: "RET\u65F6\u5DF1\u65B9\u635F\u5931\u51CF\u534A(+5\u5175\u529B\u8865\u507F)"
+    Description: "RET\u65F6\u5DF1\u65B9\u635F\u5931\u51CF\u534A(+1\u5175\u529B\u8865\u507F)"
     Personality: 1
     TroopThreshold: 0
     MoraleThreshold: 0
@@ -101,14 +101,14 @@ MonoBehaviour:
     RequireConsecutive: 0
     BonusLineMovement: 0
     CombatBonus: 0
-    AllyTroopChange: 5
+    AllyTroopChange: 1
     EnemyTroopChange: 0
     DisobeyChance: 0
   - SkillId: conservative_timid
     SkillName: "\u602F\u6218"
-    Description: "\u5175\u529B<50\u65F6ATK\u53EF\u80FD\u6297\u547D\u6539DEF"
+    Description: "\u5175\u529B<10\u65F6ATK\u53EF\u80FD\u6297\u547D\u6539DEF"
     Personality: 1
-    TroopThreshold: 50
+    TroopThreshold: 10
     MoraleThreshold: 0
     FrontlineThreshold: 0
     RequireConsecutive: 0
@@ -145,7 +145,7 @@ MonoBehaviour:
     DisobeyChance: 0
   - SkillId: opportunist_feint
     SkillName: "\u8BC8\u8D25"
-    Description: "RET\u8BF1\u654C\u8FFD\u51FB\uFF0C\u654C\u65B9\u989D\u5916-10\u5175\u529B"
+    Description: "RET\u8BF1\u654C\u8FFD\u51FB\uFF0C\u654C\u65B9\u989D\u5916-2\u5175\u529B"
     Personality: 2
     TroopThreshold: 0
     MoraleThreshold: 0
@@ -154,7 +154,7 @@ MonoBehaviour:
     BonusLineMovement: 0
     CombatBonus: 0
     AllyTroopChange: 0
-    EnemyTroopChange: -10
+    EnemyTroopChange: -2
     DisobeyChance: 0
   - SkillId: opportunist_adapt
     SkillName: "\u89C1\u673A\u884C\u4E8B"

@@ -56,6 +56,9 @@ public class GeneralPanel : WindowBase
 
     public override void OnShow()
     {
+        // 获取输入锁，锁定战场相机输入
+        InputRouter.Acquire(InputChannel.Gameplay, this);
+
         eventService.AddEventListening((EventID)WarBrokerEventID.OnOrderAssigned, OnOrderAssigned);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnStart, OnRefresh);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnRefresh);
@@ -66,6 +69,9 @@ public class GeneralPanel : WindowBase
 
     public override void OnHide()
     {
+        // 释放输入锁
+        InputRouter.Release(InputChannel.Gameplay, this);
+
         eventService.RemoveEventListeningByTarget(this);
     }
 
@@ -104,7 +110,7 @@ public class GeneralPanel : WindowBase
 
             if (card.txtName != null) card.txtName.text = general.Name;
             if (card.txtPersonality != null) card.txtPersonality.text = general.Personality.ToString();
-            if (card.sliderTroops != null) { card.sliderTroops.maxValue = 100; card.sliderTroops.value = general.Troops; }
+            if (card.sliderTroops != null) { card.sliderTroops.maxValue = 20; card.sliderTroops.value = general.Troops; }
             if (card.sliderTrust != null) { card.sliderTrust.maxValue = 100; card.sliderTrust.value = general.Trust; }
             if (card.sliderMorale != null) { card.sliderMorale.maxValue = 100; card.sliderMorale.value = general.Morale; }
             if (card.txtStatus != null) card.txtStatus.text = general.GetStatus(balanceConfig).ToString();

@@ -9,10 +9,22 @@ public class FrontlineData
     public int LinePosition; // 1-5
     public int StagnantTurns;
 
+    // 占领状态追踪
+    public int TurnsAtEnemyBase;  // 在敌方本阵的回合数
+    public int TurnsAtAllyBase;   // 在己方本阵的回合数
+
+    /// <summary>是否在敌方本阵（Grid 5）</summary>
+    public bool IsAtEnemyBase => LinePosition >= 5;
+
+    /// <summary>是否在己方本阵（Grid 1）</summary>
+    public bool IsAtAllyBase => LinePosition <= 1;
+
     public void InitFromConfig(CampaignConfig config)
     {
         LinePosition = config.InitialFrontlinePosition;
         StagnantTurns = 0;
+        TurnsAtEnemyBase = 0;
+        TurnsAtAllyBase = 0;
     }
 }
 
@@ -40,9 +52,12 @@ public class BattleData
     public Dictionary<FrontlinePosition, FrontlineData> Frontlines;
     public List<GeneralData> AllyGenerals;
     public List<GeneralData> EnemyGenerals;
+    public int CurrentReserves;  // 当前后备役
 
     public void InitFromConfig(CampaignConfig campaignConfig, SkillConfig skillConfig)
     {
+        CurrentReserves = campaignConfig.InitialReserves;
+
         Frontlines = new Dictionary<FrontlinePosition, FrontlineData>();
         foreach (FrontlinePosition pos in Enum.GetValues(typeof(FrontlinePosition)))
         {

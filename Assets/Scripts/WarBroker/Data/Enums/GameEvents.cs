@@ -26,10 +26,12 @@ public enum WarBrokerEventID
     OnCashChange,
     OnNetWorthChange,
     OnAuditValueChange,
+    OnIntentChanged,
 
     // 游戏事件
     OnRandomEvent,
     OnVictoryConditionMet,
     OnDefeatConditionMet,
+    OnDrawConditionMet,
     OnGameEnd
 }

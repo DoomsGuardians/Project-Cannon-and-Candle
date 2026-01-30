@@ -15,6 +15,8 @@ public class MarketSystem : ILogic
 
     private CampaignRuntimeData campaignData;
 
+    private PricingEngine pricingEngine;
+
     private int nextContractId = 1;
 
     public void OnInit()
@@ -24,6 +26,8 @@ public class MarketSystem : ILogic
 
         balanceConfig = resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
         orderConfig = resService.LoadResource<OrderConfig>(ConfigPaths.ORDER_CONFIG);
+
+        pricingEngine = new PricingEngine();
     }
 
     public void OnEnterState() { }
@@ -33,7 +37,10 @@ public class MarketSystem : ILogic
     public void SetRuntimeData(CampaignRuntimeData data)
     {
         campaignData = data;
+        pricingEngine.Init(balanceConfig, orderConfig, data);
     }
+
+    public PricingEngine GetPricingEngine() => pricingEngine;
 
     #region 现货交易
 
@@ -286,25 +293,31 @@ public class MarketSystem : ILogic
     {
         var market = campaignData.Market;
 
+        // 记录历史价格（在更新前）
+        market.PriceHistory.Add(new Dictionary<OrderType, float>(market.CurrentPrices));
+
+        // 补充市场库存
         foreach (var item in orderConfig.Orders)
         {
             market.MarketInventory[item.OrderType] += item.ProductionPerTurn;
         }
 
+        // 使用三因子定价引擎计算新价格
         foreach (OrderType orderType in Enum.GetValues(typeof(OrderType)))
         {
-            float demand = demandModifiers.GetValueOrDefault(orderType, 1f);
-            float supply = market.MarketInventory[orderType];
-            float supplyDemandRatio = demand / Mathf.Max(1, supply);
+            float basePrice = pricingEngine.CalculatePrice(orderType);
 
+            // 应用需求修正
+            float demand = demandModifiers.GetValueOrDefault(orderType, 1f);
+            basePrice *= demand;
+
+            // 应用随机波动
             float randomFactor = 1f + UnityEngine.Random.Range(
                 -balanceConfig.PriceRandomRange,
                 balanceConfig.PriceRandomRange);
 
-            market.CurrentPrices[orderType] *= supplyDemandRatio * randomFactor;
+            market.CurrentPrices[orderType] = basePrice * randomFactor;
         }
-
-        market.PriceHistory.Add(new Dictionary<OrderType, float>(market.CurrentPrices));
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnPriceUpdate, null, null);
     }

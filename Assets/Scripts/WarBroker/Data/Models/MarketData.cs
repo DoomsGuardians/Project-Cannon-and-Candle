@@ -6,19 +6,22 @@ using System.Collections.Generic;
 public class MarketData
 {
     public Dictionary<OrderType, float> CurrentPrices;
-    public Dictionary<OrderType, int> MarketInventory;
+    public Dictionary<OrderType, float> MarketInventory;
+    public Dictionary<OrderType, float> InitialFloat;  // 初始流通盘（用于Gamma计算）
     public List<Dictionary<OrderType, float>> PriceHistory;
 
     public void InitFromConfig(OrderConfig config)
     {
         CurrentPrices = new Dictionary<OrderType, float>();
-        MarketInventory = new Dictionary<OrderType, int>();
+        MarketInventory = new Dictionary<OrderType, float>();
+        InitialFloat = new Dictionary<OrderType, float>();
         PriceHistory = new List<Dictionary<OrderType, float>>();
 
         foreach (var item in config.Orders)
         {
             CurrentPrices[item.OrderType] = item.BasePrice;
             MarketInventory[item.OrderType] = item.InitialStock;
+            InitialFloat[item.OrderType] = item.InitialStock;
         }
     }
 }

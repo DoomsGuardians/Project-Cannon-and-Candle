@@ -107,3 +107,4 @@ TestResults*.xml
 **/[Ss]andbox/
 .claude/settings.local.json
 Assets/NaninovelData/.nani/Transient/Bridging/Server
+*.slnx

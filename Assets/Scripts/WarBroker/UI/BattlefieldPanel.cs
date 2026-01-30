@@ -58,7 +58,12 @@ public class BattlefieldPanel : WindowBase
         RefreshFrontline(FrontlinePosition.Right, sliderRight, txtRightAlly, txtRightEnemy, battle);
 
         if (txtEventInfo != null)
-            txtEventInfo.text = data.ActiveEvent != null ? $"事件: {data.ActiveEvent.EventName} - {data.ActiveEvent.Description}" : "";
+        {
+            string info = $"后备役: {data.Battle.CurrentReserves}";
+            if (data.ActiveEvent != null)
+                info += $"\n事件: {data.ActiveEvent.EventName} - {data.ActiveEvent.Description}";
+            txtEventInfo.text = info;
+        }
     }
 
     private void RefreshFrontline(FrontlinePosition pos, Slider slider, Text allyText, Text enemyText, BattleData battle)
