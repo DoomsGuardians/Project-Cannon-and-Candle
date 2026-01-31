@@ -43,6 +43,10 @@ public class BattleResult
     public string Description;
     public bool WasCrit;
     public bool WasFumble;
+
+    // GDD v6.0: 战术系统
+    public string AllyTactic;
+    public string EnemyTactic;
 }
 
 /// <summary>战场运行时数据</summary>

@@ -43,18 +43,19 @@
 │                                                          │
 │  ┌─────────────┐  ┌──────────────────────────────────┐   │
 │  │ 场景层       │  │ UI 层                             │   │
-│  │ (GameMode)  │  │ (WindowBase)                     │   │
+│  │ (GameMode)  │  │ (WindowBase + Binder)             │   │
 │  │             │  │                                  │   │
 │  │ BattleGame  │  │ GameplayWindow  MarketPanel      │   │
-│  │   Mode      │  │ BattlefieldPanel GeneralPanel    │   │
-│  │ Gameplay    │  │ IntelPanel  HistoryPanel          │   │
-│  │   Manager   │  │ GameEndWindow                    │   │
+│  │   Mode      │  │ InfoPanel       ObjectivePanel   │   │
+│  │ Gameplay    │  │ GeneralDetailPanel               │   │
+│  │   Manager   │  │ BattleResultPopup  EventPopup    │   │
+│  │             │  │ CampaignEndPopup                 │   │
 │  └─────────────┘  └──────────────────────────────────┘   │
 │                                                          │
 │  ┌──────────────────────────────────────────────────────┐ │
 │  │ 调试层 (Editor / Runtime)                             │ │
 │  │ WarBrokerConfigSetup  WarBrokerDebugWindow           │ │
-│  │ WarBrokerDebugConsole WarBrokerUIPrefabGenerator     │ │
+│  │ WarBrokerDebugConsole                                │ │
 │  └──────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -711,14 +712,11 @@ public class BattleGameMode : GameModeBase
         var manager = obj.GetComponent<GameplayManager>();
         managerService.RegisterManager(manager);
 
-        // 2. 注册 7 个 UI 窗口
-        RegisterWindow<GameplayWindow>("Prefabs/WarBroker/UI/GameplayWindow", "GameplayWindow");
-        RegisterWindow<MarketPanel>("Prefabs/WarBroker/UI/MarketPanel", "MarketPanel");
-        RegisterWindow<BattlefieldPanel>("Prefabs/WarBroker/UI/BattlefieldPanel", "BattlefieldPanel");
-        RegisterWindow<GeneralPanel>("Prefabs/WarBroker/UI/GeneralPanel", "GeneralPanel");
-        RegisterWindow<IntelPanel>("Prefabs/WarBroker/UI/IntelPanel", "IntelPanel");
-        RegisterWindow<HistoryPanel>("Prefabs/WarBroker/UI/HistoryPanel", "HistoryPanel");
-        RegisterWindow<GameEndWindow>("Prefabs/WarBroker/UI/GameEndWindow", "GameEndWindow");
+        // 2. 注册 UI 窗口
+        RegisterWindow<GameplayWindow>("Prefabs/WarBroker/UI/Windows/GameplayWindow", "GameplayWindow");
+        RegisterWindow<MarketPanel>("Prefabs/WarBroker/UI/Panels/MarketPanel", "MarketPanel");
+        RegisterWindow<InfoPanel>("Prefabs/WarBroker/UI/Panels/InfoPanel", "InfoPanel");
+        RegisterWindow<CampaignEndPopup>("Prefabs/WarBroker/UI/Popups/CampaignEndPopup", "CampaignEndPopup");
     }
 
     private void RegisterWindow<T>(string prefabPath, string windowName) where T : WindowBase, new()
@@ -735,7 +733,7 @@ public class BattleGameMode : GameModeBase
 }
 ```
 
-> **注意**: `WindowBase` 不是 MonoBehaviour，而是纯 C# 类。窗口通过 `new T()` 创建，手动绑定 GameObject。
+> **注意**: `WindowBase` 不是 MonoBehaviour，而是纯 C# 类。窗口通过 `new T()` 创建，手动绑定 GameObject。Prefab 上只挂载 Binder 组件。
 
 ### 5.2 GameplayManager
 
@@ -796,35 +794,68 @@ public class GameplayManager : ManagerBase
 
 ```
 Prefab 上挂载: XxxBinder : UIBinder (MonoBehaviour)
-                ↓ 持有序列化的 UI 引用
+                ↓ 持有序列化的 UI 引用（使用 TMPro 组件）
 运行时创建:    XxxWindow : WindowBase (纯 C# 类)
                 ↓ 在 OnAwake() 中读取 Binder
                 GetComponent<XxxBinder>() → 绑定字段
 ```
 
-**文件**: `UI/Binders/UIBinder.cs`
+**重要**: Prefab 上只挂载 Binder 脚本，不挂载 Window 脚本。
+
+**文件**: `UI/Base/UIBinder.cs`
 
 ```csharp
 public class UIBinder : MonoBehaviour { }
 ```
 
-每个 Binder 独立文件（Unity 要求文件名 == 类名）：
-- `GameplayWindowBinder.cs`
-- `MarketPanelBinder.cs`
-- `BattlefieldPanelBinder.cs`
-- `GeneralPanelBinder.cs`
-- `IntelPanelBinder.cs`
-- `HistoryPanelBinder.cs`
-- `GameEndWindowBinder.cs`
+### 6.2 UI 目录结构
 
-### 6.2 GameplayWindow
+```
+Assets/Scripts/WarBroker/UI/
+├── Base/
+│   └── UIBinder.cs              ← Binder 基类
+├── Windows/
+│   ├── GameplayWindow.cs        ← 主界面
+│   └── GameplayWindowBinder.cs
+├── Panels/
+│   ├── MarketPanel.cs           ← 市场面板
+│   ├── MarketPanelBinder.cs
+│   ├── InfoPanel.cs             ← 情报面板
+│   ├── InfoPanelBinder.cs
+│   ├── GeneralDetailPanel.cs    ← 将军详情侧边栏
+│   ├── GeneralDetailPanelBinder.cs
+│   ├── ObjectivePanel.cs        ← 委托任务面板
+│   ├── ObjectivePanelBinder.cs
+│   ├── TopStatusBar.cs          ← 顶部状态栏
+│   ├── TopStatusBarBinder.cs
+│   ├── BottomBar.cs             ← 底部操作栏
+│   └── BottomBarBinder.cs
+├── Popups/
+│   ├── BattleResultPopup.cs     ← 战斗结算弹窗
+│   ├── BattleResultPopupBinder.cs
+│   ├── EventPopup.cs            ← 随机事件弹窗
+│   ├── EventPopupBinder.cs
+│   ├── CampaignEndPopup.cs      ← 战役结束弹窗
+│   └── CampaignEndPopupBinder.cs
+├── Items/
+│   ├── BattleResultItemBinder.cs ← 战斗结果列表项
+│   └── FuturesPositionItemBinder.cs ← 期货持仓列表项
+└── Tabs/
+    ├── SpotMarketTab.cs         ← 现货交易 Tab (MonoBehaviour)
+    └── FuturesMarketTab.cs      ← 期货交易 Tab (MonoBehaviour)
+```
 
-**文件**: `UI/GameplayWindow.cs`
+> **注意**: `SpotMarketTab` 和 `FuturesMarketTab` 是 MonoBehaviour，需要挂载到 MarketPanel 的子节点上。
+
+### 6.3 GameplayWindow
+
+**文件**: `UI/Windows/GameplayWindow.cs`
 
 主游戏界面，包含：
 - 顶部状态栏：回合数、阶段、现金、净资产、审计值
-- Tab 切换：市场/战场/将军/情报/历史
+- Tab 切换：市场/情报
 - 底部操作栏：结束回合按钮、事件提示
+- 内容区：加载 MarketPanel/InfoPanel
 
 ```csharp
 public class GameplayWindow : WindowBase
@@ -832,7 +863,7 @@ public class GameplayWindow : WindowBase
     public override void OnAwake()
     {
         var b = gameObject.GetComponent<GameplayWindowBinder>();
-        // ... 读取 UI 引用
+        // ... 读取 UI 引用（TMP_Text, Button 等）
     }
 
     public override void OnShow()
@@ -844,69 +875,49 @@ public class GameplayWindow : WindowBase
 
     private void SwitchPanel(string panelName)
     {
-        // 隐藏所有子面板，显示指定面板
         foreach (var name in PanelNames) uIService.HideWindow(name);
         uIService.ShowWindow<WindowBase>(panelName);
     }
 }
 ```
 
-### 6.3 MarketPanel
+### 6.4 MarketPanel
 
-**文件**: `UI/MarketPanel.cs`
+**文件**: `UI/Panels/MarketPanel.cs`
 
 市场交易面板：
-- 现货交易（ATK/DEF/RET 买卖）
-- 期货操作（开仓/平仓）
-- 银行借贷（借入/还款）
+- Tab 切换：现货 / 期货
+- 现货交易：ATK/DEF/RET 买卖（通过 SpotMarketTab）
+- 期货操作：开仓/平仓（通过 FuturesMarketTab）
+- 银行借贷：借入/还款
 
-监听事件：`OnTradeExecuted`, `OnTurnEnd`
+监听事件：`OnTradeExecuted`, `OnTurnEnd`, `OnCashChange`, `OnFuturesOpened`, `OnFuturesClosed`
 
-### 6.4 BattlefieldPanel
+### 6.5 InfoPanel
 
-**文件**: `UI/BattlefieldPanel.cs`
-
-战场可视化面板：
-- 3 条战线 Slider (1-5)
-- 每条战线显示己方/敌方将军信息
-- 活跃事件显示
-
-监听事件：`OnBattleResult`, `OnTurnStart`, `OnTurnEnd`
-
-### 6.5 GeneralPanel
-
-**文件**: `UI/GeneralPanel.cs`
-
-将军管理面板：
-- 3 张己方将军卡片
-- 每张卡片：名称、性格、兵力/信任/士气 Slider、状态
-- ATK/DEF/RET 指令分配按钮（高亮显示已分配指令）
-- 技能列表
-
-监听事件：`OnOrderAssigned`, `OnTurnStart`, `OnTurnEnd`
-
-### 6.6 IntelPanel
-
-**文件**: `UI/IntelPanel.cs`
+**文件**: `UI/Panels/InfoPanel.cs`
 
 情报面板：市场趋势、战线态势、敌方将军信息
 
-### 6.7 HistoryPanel
+### 6.6 GeneralDetailPanel
 
-**文件**: `UI/HistoryPanel.cs`
+**文件**: `UI/Panels/GeneralDetailPanel.cs`
 
-历史面板：可滚动的回合历史记录（净资产、指令、价格快照）
+将军详情侧边栏（点击将军时从右侧滑入）：
+- 将军信息：名称、性格、位置
+- 属性条：兵力/信任/士气 Slider
+- 意图显示：当前意图、来源（默认/强化/篡改）
+- 操作按钮：强化、篡改、关闭
 
-### 6.8 GameEndWindow
+监听事件：`OnIntentChanged`, `OnTradeExecuted`
 
-**文件**: `UI/GameEndWindow.cs`
+### 6.7 Popup 弹窗
 
-游戏结束弹窗（Top 层）：
-- 胜利/失败标题
-- 统计信息（回合数、净资产、现金、审计值）
-- 重新开始 / 返回主菜单按钮
-
-监听事件：`OnGameEnd`
+| 弹窗 | 触发时机 | 功能 |
+|------|---------|------|
+| BattleResultPopup | 战斗结算后 | 显示各战线战斗结果 |
+| EventPopup | 随机事件触发 | 显示事件描述和效果 |
+| CampaignEndPopup | 游戏结束 | 显示胜负、统计、重新开始/返回主菜单 |
 
 ---
 
@@ -978,34 +989,90 @@ Assets/Scripts/WarBroker/
 ├── Systems/
 │   ├── MarketSystem.cs           ← 市场交易系统
 │   ├── BattleSystem.cs           ← 战斗结算系统
-│   └── CampaignSystem.cs         ← 战役流程系统
+│   ├── CampaignSystem.cs         ← 战役流程系统
+│   ├── IntentSystem.cs           ← 意图强化/篡改系统
+│   ├── PricingEngine.cs          ← 三因子定价引擎
+│   └── CommissionSystem.cs       ← 委托任务系统
 ├── Managers/
 │   └── GameplayManager.cs        ← 游戏流程管理器
 ├── GameModes/
 │   └── BattleGameMode.cs         ← 战斗场景 GameMode
+├── Battlefield/
+│   └── GeneralClickHandler.cs    ← 将军点击交互
 ├── UI/
-│   ├── GameplayWindow.cs         ← 主界面
-│   ├── MarketPanel.cs            ← 市场面板
-│   ├── BattlefieldPanel.cs       ← 战场面板
-│   ├── GeneralPanel.cs           ← 将军面板
-│   ├── IntelPanel.cs             ← 情报面板
-│   ├── HistoryPanel.cs           ← 历史面板
-│   ├── GameEndWindow.cs          ← 游戏结束弹窗
-│   └── Binders/
-│       ├── UIBinder.cs           ← Binder 基类
-│       ├── GameplayWindowBinder.cs
-│       ├── MarketPanelBinder.cs
-│       ├── BattlefieldPanelBinder.cs
-│       ├── GeneralPanelBinder.cs
-│       ├── IntelPanelBinder.cs
-│       ├── HistoryPanelBinder.cs
-│       └── GameEndWindowBinder.cs
+│   ├── Base/
+│   │   └── UIBinder.cs           ← Binder 基类
+│   ├── Windows/
+│   │   ├── GameplayWindow.cs     ← 主界面
+│   │   └── GameplayWindowBinder.cs
+│   ├── Panels/
+│   │   ├── MarketPanel.cs        ← 市场面板
+│   │   ├── MarketPanelBinder.cs
+│   │   ├── InfoPanel.cs          ← 情报面板
+│   │   ├── InfoPanelBinder.cs
+│   │   ├── GeneralDetailPanel.cs ← 将军详情侧边栏
+│   │   ├── GeneralDetailPanelBinder.cs
+│   │   ├── ObjectivePanel.cs     ← 委托任务面板
+│   │   ├── ObjectivePanelBinder.cs
+│   │   ├── TopStatusBar.cs       ← 顶部状态栏
+│   │   ├── TopStatusBarBinder.cs
+│   │   ├── BottomBar.cs          ← 底部操作栏
+│   │   └── BottomBarBinder.cs
+│   ├── Popups/
+│   │   ├── BattleResultPopup.cs  ← 战斗结算弹窗
+│   │   ├── BattleResultPopupBinder.cs
+│   │   ├── EventPopup.cs         ← 随机事件弹窗
+│   │   ├── EventPopupBinder.cs
+│   │   ├── CampaignEndPopup.cs   ← 战役结束弹窗
+│   │   └── CampaignEndPopupBinder.cs
+│   ├── Items/
+│   │   ├── BattleResultItemBinder.cs
+│   │   └── FuturesPositionItemBinder.cs
+│   └── Tabs/
+│       ├── SpotMarketTab.cs      ← 现货交易 Tab (MonoBehaviour)
+│       └── FuturesMarketTab.cs   ← 期货交易 Tab (MonoBehaviour)
 └── Debug/
     ├── WarBrokerDebugConsole.cs  ← 运行时调试面板
     └── Editor/
-        ├── WarBrokerConfigSetup.cs       ← 配置一键填充
-        ├── WarBrokerDebugWindow.cs       ← Editor 调试窗口
-        └── WarBrokerUIPrefabGenerator.cs ← UI Prefab 生成器
+        ├── WarBrokerConfigSetup.cs   ← 配置一键填充
+        └── WarBrokerDebugWindow.cs   ← Editor 调试窗口
 ```
 
-**总计：36 个 C# 文件**
+**UI Prefab 目录**:
+
+```
+Assets/Resources/Prefabs/WarBroker/
+├── GameplayManager.prefab       ← 游戏管理器
+├── UI/
+│   ├── Windows/
+│   │   └── GameplayWindow.prefab
+│   ├── Panels/
+│   │   ├── MarketPanel.prefab
+│   │   ├── InfoPanel.prefab
+│   │   ├── GeneralDetailPanel.prefab
+│   │   ├── ObjectivePanel.prefab
+│   │   ├── TopStatusBar.prefab
+│   │   └── BottomBar.prefab
+│   ├── Popups/
+│   │   ├── BattleResultPopup.prefab
+│   │   ├── EventPopup.prefab
+│   │   └── CampaignEndPopup.prefab
+│   └── Items/
+│       ├── BattleResultItem.prefab
+│       └── FuturesPositionItem.prefab
+└── Battlefield/
+    ├── GeneralBase.prefab        ← 将军底座
+    ├── TinSoldier.prefab         ← 锡兵模型
+    └── FrontlineGrid.prefab      ← 战线格子
+```
+
+**配置文件目录**:
+
+```
+Assets/Resources/Config/WarBroker/
+├── GameBalanceConfig.asset
+├── OrderConfig.asset
+├── SkillConfig.asset
+├── GeneralConfig.asset
+└── Campaign_Tutorial.asset
+```

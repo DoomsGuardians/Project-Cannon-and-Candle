@@ -17,6 +17,7 @@ public class CampaignSystem : ILogic
     private SkillConfig skillConfig;
 
     private IntentSystem intentSystem;
+    private CommissionSystem commissionSystem;
 
     public CampaignRuntimeData Data { get; private set; }
 
@@ -31,6 +32,8 @@ public class CampaignSystem : ILogic
 
         intentSystem = new IntentSystem();
         intentSystem.Init(balanceConfig);
+
+        commissionSystem = new CommissionSystem();
     }
 
     public void OnEnterState() { }
@@ -56,9 +59,13 @@ public class CampaignSystem : ILogic
 
         marketSystem.SetRuntimeData(Data);
         battleSystem.SetRuntimeData(Data);
+
+        // 初始化委托系统
+        commissionSystem.Init(Data, balanceConfig);
     }
 
     public IntentSystem GetIntentSystem() => intentSystem;
+    public CommissionSystem GetCommissionSystem() => commissionSystem;
 
     #region 回合流程
 
@@ -68,7 +75,10 @@ public class CampaignSystem : ILogic
     /// <summary>游戏结束原因</summary>
     public string GameEndReason { get; private set; }
 
-    /// <summary>开始新回合</summary>
+    /// <summary>
+    /// 开始新回合 (GDD v6.0 五阶段流程)
+    /// 阶段 I：周报与开盘
+    /// </summary>
     public void StartTurn()
     {
         if (Data == null)
@@ -79,46 +89,69 @@ public class CampaignSystem : ILogic
 
         Data.CurrentPhase = TurnPhase.TurnStart;
 
-        // 重置将军指令
+        // Step 1: 时间推进
+        // Week++ 已在上一回合结束时完成
+
+        // Step 2: 费用结算
+        marketSystem.ApplyInterest();      // 银行利息
+        marketSystem.ApplyStorageCost();   // 仓储费
+
+        // Step 3: 随机事件抽取与公示
+        TryTriggerRandomEvent();
+
+        // Step 4: 将军意图生成（灰色气泡）
+        GenerateAllIntents();
+
+        // Step 5: 市场开盘（价格刷新 + 记录 Open）
+        var demandModifiers = CalculateDemandModifiers();
+        marketSystem.UpdatePrices(demandModifiers);
+        marketSystem.InitializeKLineForTurn();  // 记录 Open 价格
+
+        eventService.SendMessage((EventID)WarBrokerEventID.OnTurnStart, Data.CurrentTurn, null);
+
+        // 自动进入阶段 II：玩家操盘
+        EnterPlayerPhase();
+    }
+
+    /// <summary>
+    /// 阶段 II：玩家操盘 (GDD v6.0)
+    /// 玩家进行金融交易、政治干涉、银行操作
+    /// </summary>
+    public void EnterPlayerPhase()
+    {
+        Data.CurrentPhase = TurnPhase.MarketPhase;
+
+        // 重置将军指令（允许玩家重新分配）
         foreach (var general in Data.Battle.AllyGenerals)
         {
             general.AssignedOrder = null;
         }
 
-        eventService.SendMessage((EventID)WarBrokerEventID.OnTurnStart, Data.CurrentTurn, null);
-
-        // 自动进入事件阶段
-        EnterEventPhase();
-    }
-
-    /// <summary>事件阶段：随机事件触发</summary>
-    public void EnterEventPhase()
-    {
-        Data.CurrentPhase = TurnPhase.EventPhase;
-        TryTriggerRandomEvent();
-        eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.EventPhase, null);
-    }
-
-    /// <summary>进入市场阶段：价格更新，等待玩家交易</summary>
-    public void EnterMarketPhase()
-    {
-        Data.CurrentPhase = TurnPhase.MarketPhase;
-        var demandModifiers = CalculateDemandModifiers();
-        marketSystem.UpdatePrices(demandModifiers);
         eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.MarketPhase, null);
-        // 等待玩家交易操作，玩家完成后调用 EnterIntentPhase()
+        // 等待玩家操作完成，玩家点击"结束本周"后调用 EnterVictorPhase()
     }
 
-    /// <summary>进入意图阶段：生成将军意图，等待玩家强化/篡改</summary>
-    public void EnterIntentPhase()
+    /// <summary>
+    /// 阶段 III：维克多行动 (GDD v6.0)
+    /// 维克多进行军事采购和投机操作
+    /// </summary>
+    public void EnterVictorPhase()
     {
         Data.CurrentPhase = TurnPhase.IntentPhase;
-        GenerateAllIntents();
+
+        // 执行维克多 AI
+        ExecuteVictorAI();
+
         eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.IntentPhase, null);
-        // 等待玩家强化/篡改操作，玩家完成后调用 EnterBattlePhase()
+
+        // 自动进入阶段 IV：战斗推演
+        EnterBattlePhase();
     }
 
-    /// <summary>进入战斗阶段：战斗结算</summary>
+    /// <summary>
+    /// 阶段 IV：战斗推演 (GDD v6.0)
+    /// 抗命检查 → 战术揭示 → 伤害计算 → 战线移动
+    /// </summary>
     public void EnterBattlePhase()
     {
         // 检查所有将军是否已分配指令
@@ -128,36 +161,58 @@ public class CampaignSystem : ILogic
 
             if (general.AssignedOrder == null)
             {
-                Debug.LogWarning($"将军{general.Name}未分配指令");
-                return;
+                Debug.LogWarning($"将军{general.Name}未分配指令，使用默认意图");
+                general.AssignedOrder = general.DefaultIntent ?? OrderType.DEF;
             }
         }
 
         Data.CurrentPhase = TurnPhase.BattlePhase;
 
-        // 执行维克多AI
-        var victorOrders = ExecuteVictorAI();
+        // 战斗结算（包含抗命检查、战术揭示、伤害计算、战线移动）
+        var victorOrders = new Dictionary<string, OrderType>();
+        foreach (var enemy in Data.Battle.EnemyGenerals)
+        {
+            victorOrders[enemy.GeneralId] = enemy.DefaultIntent ?? OrderType.DEF;
+        }
 
-        // 战斗结算
         var battleResults = battleSystem.ResolveBattles(victorOrders);
-        battleSystem.ApplyReinforcements();
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.BattlePhase, null);
+
+        // 自动进入阶段 V：回合结算
+        EnterSettlementPhase();
     }
 
-    /// <summary>进入结算阶段：利息计算、期货结算、胜负判定</summary>
+    /// <summary>
+    /// 阶段 V：回合结算 (GDD v6.0)
+    /// 记录 Close → 基地恢复 → 溃败重组 → 军工厂产出 → 期货到期 → 胜负检查
+    /// </summary>
     public void EnterSettlementPhase()
     {
         Data.CurrentPhase = TurnPhase.SettlementPhase;
 
-        // 记录回合历史
-        RecordTurn();
+        // Step 1: 记录 K 线 Close 价格和成交量
+        marketSystem.FinalizeKLineForTurn();
 
-        // 市场结算
-        marketSystem.ApplyInterest();
-        marketSystem.ApplyStorageCost();
+        // Step 2: 基地恢复（Grid 1 部队 HP+2，消耗 Reserves）
+        battleSystem.ApplyReinforcements();
+
+        // Step 3: 溃败重组（处理复活逻辑）
+        // 已在 ApplyReinforcements 中处理
+
+        // Step 4: 军工厂产出（补充流通盘）
+        // 已在下一回合 StartTurn 中的 UpdatePrices 调用
+
+        // Step 5: 期货到期（3 回合前的期货强制交割）
         marketSystem.SettleExpiredFutures();
         marketSystem.CheckForceLiquidation();
+
+        // Step 6: 胜负检查
+        UpdateOccupationStatus();
+        CheckVictoryConditions();
+
+        // 记录回合历史
+        RecordTurn();
 
         // 事件持续时间处理
         if (Data.ActiveEvent != null)
@@ -168,12 +223,6 @@ public class CampaignSystem : ILogic
                 Data.ActiveEvent = null;
             }
         }
-
-        // 更新占领状态
-        UpdateOccupationStatus();
-
-        // 胜负判定
-        CheckVictoryConditions();
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.SettlementPhase, null);
         eventService.SendMessage((EventID)WarBrokerEventID.OnTurnEnd, Data.CurrentTurn, null);
@@ -193,10 +242,9 @@ public class CampaignSystem : ILogic
         switch (Data.CurrentPhase)
         {
             case TurnPhase.EventPhase:
-                EnterMarketPhase();
-                break;
             case TurnPhase.MarketPhase:
-                EnterIntentPhase();
+                // 玩家操盘阶段结束，进入维克多行动
+                EnterVictorPhase();
                 break;
             case TurnPhase.IntentPhase:
                 EnterBattlePhase();
@@ -206,7 +254,6 @@ public class CampaignSystem : ILogic
                 break;
             default:
                 EnterBattlePhase();
-                EnterSettlementPhase();
                 break;
         }
     }
@@ -217,22 +264,17 @@ public class CampaignSystem : ILogic
         switch (Data.CurrentPhase)
         {
             case TurnPhase.TurnStart:
-                EnterEventPhase();
+                EnterPlayerPhase();
                 break;
             case TurnPhase.EventPhase:
-                EnterMarketPhase();
-                break;
             case TurnPhase.MarketPhase:
-                EnterIntentPhase();
+                EnterVictorPhase();
                 break;
             case TurnPhase.IntentPhase:
                 EnterBattlePhase();
                 break;
             case TurnPhase.BattlePhase:
                 EnterSettlementPhase();
-                break;
-            case TurnPhase.SettlementPhase:
-                // 结算阶段结束后自动进入下一回合
                 break;
         }
     }
@@ -479,8 +521,10 @@ public class CampaignSystem : ILogic
             }
 
             // 失败：敌方占领己方本阵（Grid 1）并保持 1 回合
+            // GDD v6.0: 政权崩溃清算
             if (frontline.TurnsAtAllyBase >= 1)
             {
+                ExecuteRegimeCollapseSettlement();
                 EndGame(GameResult.Defeat, $"战争失败 - {GetFrontlineName(frontline.Position)}沦陷");
                 return;
             }
@@ -506,6 +550,13 @@ public class CampaignSystem : ILogic
     {
         CurrentGameResult = result;
         GameEndReason = reason;
+
+        // 委托任务结算
+        if (commissionSystem != null)
+        {
+            Data.CommissionResults = commissionSystem.CheckAndSettleCommissions(out float totalBonus);
+            Data.CommissionTotalBonus = totalBonus;
+        }
 
         switch (result)
         {
@@ -541,6 +592,67 @@ public class CampaignSystem : ILogic
     {
         CheckVictoryConditions();
         return CurrentGameResult != GameResult.InProgress;
+    }
+
+    /// <summary>
+    /// 政权崩溃清算 (GDD v6.0)
+    /// Grid 1 沦陷时特殊清算：
+    /// - ATK、DEF 现货价格归零
+    /// - 空单按 $0 结算（最大收益）
+    /// </summary>
+    private void ExecuteRegimeCollapseSettlement()
+    {
+        Debug.Log("[政权崩溃] 执行特殊清算...");
+
+        var market = Data.Market;
+        var player = Data.Player;
+
+        // ATK、DEF 现货价格归零
+        market.CurrentPrices[OrderType.ATK] = 0f;
+        market.CurrentPrices[OrderType.DEF] = 0f;
+        // RET 价格保持不变（或可能暴涨）
+
+        Debug.Log($"[政权崩溃] ATK 价格: ${market.CurrentPrices[OrderType.ATK]}");
+        Debug.Log($"[政权崩溃] DEF 价格: ${market.CurrentPrices[OrderType.DEF]}");
+
+        // 玩家持有的 ATK、DEF 现货价值归零
+        int atkLoss = player.Inventory[OrderType.ATK];
+        int defLoss = player.Inventory[OrderType.DEF];
+        Debug.Log($"[政权崩溃] 现货损失: ATK×{atkLoss}, DEF×{defLoss}");
+
+        // 期货结算：空单按 $0 结算（最大收益）
+        float futuresPnL = 0f;
+        var contractsToSettle = new List<FuturesContract>();
+
+        foreach (var contract in player.FuturesPositions)
+        {
+            if (contract.TargetOrder == OrderType.ATK || contract.TargetOrder == OrderType.DEF)
+            {
+                float settlementPrice = 0f; // 按 $0 结算
+                float pnl = contract.CalculatePnL(settlementPrice);
+                futuresPnL += pnl;
+
+                // 返还保证金 + 盈亏
+                player.Cash += contract.Margin + pnl;
+
+                Debug.Log($"[政权崩溃] 期货结算: {contract.TargetOrder} {contract.Direction} " +
+                          $"开仓价${contract.OpenPrice} → 结算价${settlementPrice}, 盈亏${pnl}");
+
+                contractsToSettle.Add(contract);
+            }
+        }
+
+        // 移除已结算的期货合约
+        foreach (var contract in contractsToSettle)
+        {
+            player.FuturesPositions.Remove(contract);
+        }
+
+        Debug.Log($"[政权崩溃] 期货总盈亏: ${futuresPnL}");
+        Debug.Log($"[政权崩溃] 清算后现金: ${player.Cash}");
+
+        // 发送事件通知
+        eventService.SendMessage((EventID)WarBrokerEventID.OnRegimeCollapse, futuresPnL, null);
     }
 
     #endregion

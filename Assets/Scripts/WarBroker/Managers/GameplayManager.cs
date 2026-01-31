@@ -83,7 +83,8 @@ public class GameplayManager : ManagerBase
 
     public bool OpenFutures(OrderType type, FuturesDirection dir, int qty, int turns)
     {
-        return marketSystem.OpenFutures(type, dir, qty, turns, out _);
+        // GDD v6.0: 期货固定 3 回合，忽略 turns 参数
+        return marketSystem.OpenFutures(type, dir, qty, out _);
     }
 
     public bool CloseFutures(int contractId)
@@ -154,6 +155,7 @@ public class GameplayManager : ManagerBase
     public PlayerData GetPlayerData() => campaignSystem.Data.Player;
     public MarketData GetMarketData() => campaignSystem.Data.Market;
     public BattleData GetBattleData() => campaignSystem.Data.Battle;
+    public CommissionSystem GetCommissionSystem() => campaignSystem.GetCommissionSystem();
 
     #endregion
 

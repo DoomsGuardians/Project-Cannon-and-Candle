@@ -49,6 +49,10 @@ public class CampaignRuntimeData
     public RandomEventConfig ActiveEvent;
     public int EventRemainingTurns;
 
+    // 委托任务结算结果（战役结束时填充）
+    public Dictionary<string, bool> CommissionResults;
+    public float CommissionTotalBonus;
+
     public void InitFromConfig(CampaignConfig campaignConfig, OrderConfig orderConfig, SkillConfig skillConfig)
     {
         Config = campaignConfig;

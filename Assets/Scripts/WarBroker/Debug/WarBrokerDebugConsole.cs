@@ -69,7 +69,7 @@ public class WarBrokerDebugConsole : MonoBehaviour
         GUILayout.Label("--- 市场价格 ---");
         foreach (var kvp in data.Market.CurrentPrices)
         {
-            GUILayout.Label($"  {kvp.Key}: {kvp.Value:F2} (库存: {data.Market.MarketInventory[kvp.Key]:F2})");
+            GUILayout.Label($"  {kvp.Key}: {kvp.Value:F2} (库存: {data.Market.MarketInventory[kvp.Key]})");
         }
 
         GUILayout.Label("--- 玩家 ---");

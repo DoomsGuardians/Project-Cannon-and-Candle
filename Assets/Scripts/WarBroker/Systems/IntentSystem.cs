@@ -117,39 +117,39 @@ public class IntentSystem
         return finalWeights;
     }
 
-    /// <summary>获取性格基础权重</summary>
+    /// <summary>获取性格基础权重 (GDD v6.0 - 整数权重)</summary>
     private Dictionary<OrderType, float> GetBaseWeights(GeneralPersonality personality)
     {
         return personality switch
         {
             GeneralPersonality.Fanatic => new Dictionary<OrderType, float>
             {
-                { OrderType.ATK, 0.6f },
-                { OrderType.DEF, 0.3f },
-                { OrderType.RET, 0.1f }
+                { OrderType.ATK, 70f },
+                { OrderType.DEF, 20f },
+                { OrderType.RET, 10f }
             },
             GeneralPersonality.Conservative => new Dictionary<OrderType, float>
             {
-                { OrderType.ATK, 0.2f },
-                { OrderType.DEF, 0.5f },
-                { OrderType.RET, 0.3f }
+                { OrderType.ATK, 20f },
+                { OrderType.DEF, 50f },
+                { OrderType.RET, 30f }
             },
             GeneralPersonality.Opportunist => new Dictionary<OrderType, float>
             {
-                { OrderType.ATK, 0.4f },
-                { OrderType.DEF, 0.35f },
-                { OrderType.RET, 0.25f }
+                { OrderType.ATK, 40f },
+                { OrderType.DEF, 35f },
+                { OrderType.RET, 25f }
             },
             _ => new Dictionary<OrderType, float>
             {
-                { OrderType.ATK, 0.33f },
-                { OrderType.DEF, 0.34f },
-                { OrderType.RET, 0.33f }
+                { OrderType.ATK, 33f },
+                { OrderType.DEF, 34f },
+                { OrderType.RET, 33f }
             }
         };
     }
 
-    /// <summary>获取血量修正</summary>
+    /// <summary>获取血量修正 (GDD v6.0 完整修正表)</summary>
     private Dictionary<OrderType, float> GetHPModifier(GeneralPersonality personality, int troops)
     {
         var modifier = new Dictionary<OrderType, float>
@@ -159,30 +159,98 @@ public class IntentSystem
             { OrderType.RET, 1f }
         };
 
-        // 低血量时调整权重
-        if (troops <= 5) // Critical
+        // 根据 HP 和性格应用修正
+        if (troops >= 16 && troops <= 20) // 满编
         {
-            modifier[OrderType.ATK] = personality == GeneralPersonality.Fanatic ? 0.8f : 0.3f;
-            modifier[OrderType.DEF] = 1.5f;
-            modifier[OrderType.RET] = personality == GeneralPersonality.Fanatic ? 1.2f : 2.0f;
+            if (personality == GeneralPersonality.Fanatic)
+            {
+                modifier[OrderType.ATK] = 1.2f;
+                modifier[OrderType.DEF] = 0.8f;
+                modifier[OrderType.RET] = 0.5f;
+            }
+            else if (personality == GeneralPersonality.Conservative)
+            {
+                modifier[OrderType.ATK] = 1.0f;
+                modifier[OrderType.DEF] = 1.0f;
+                modifier[OrderType.RET] = 1.0f;
+            }
+            else if (personality == GeneralPersonality.Opportunist)
+            {
+                modifier[OrderType.ATK] = 1.1f;
+                modifier[OrderType.DEF] = 1.0f;
+                modifier[OrderType.RET] = 0.9f;
+            }
         }
-        else if (troops <= 10) // Wounded
+        else if (troops >= 11 && troops <= 15) // 健康
         {
-            modifier[OrderType.ATK] = personality == GeneralPersonality.Fanatic ? 1.0f : 0.6f;
-            modifier[OrderType.DEF] = 1.3f;
-            modifier[OrderType.RET] = personality == GeneralPersonality.Fanatic ? 1.0f : 1.4f;
+            if (personality == GeneralPersonality.Fanatic)
+            {
+                modifier[OrderType.ATK] = 1.1f;
+                modifier[OrderType.DEF] = 0.9f;
+                modifier[OrderType.RET] = 0.7f;
+            }
+            else if (personality == GeneralPersonality.Conservative)
+            {
+                modifier[OrderType.ATK] = 0.8f;
+                modifier[OrderType.DEF] = 1.1f;
+                modifier[OrderType.RET] = 1.2f;
+            }
+            else if (personality == GeneralPersonality.Opportunist)
+            {
+                modifier[OrderType.ATK] = 1.0f;
+                modifier[OrderType.DEF] = 1.0f;
+                modifier[OrderType.RET] = 1.0f;
+            }
         }
-        else if (troops >= 18) // Full Strength
+        else if (troops >= 6 && troops <= 10) // 受伤
         {
-            modifier[OrderType.ATK] = 1.3f;
-            modifier[OrderType.DEF] = 0.9f;
-            modifier[OrderType.RET] = 0.7f;
+            if (personality == GeneralPersonality.Fanatic)
+            {
+                modifier[OrderType.ATK] = 1.0f;
+                modifier[OrderType.DEF] = 1.0f;
+                modifier[OrderType.RET] = 1.0f;
+            }
+            else if (personality == GeneralPersonality.Conservative)
+            {
+                modifier[OrderType.ATK] = 0.5f;
+                modifier[OrderType.DEF] = 1.2f;
+                modifier[OrderType.RET] = 1.5f;
+            }
+            else if (personality == GeneralPersonality.Opportunist)
+            {
+                modifier[OrderType.ATK] = 0.8f;
+                modifier[OrderType.DEF] = 1.0f;
+                modifier[OrderType.RET] = 1.2f;
+            }
+        }
+        else if (troops >= 1 && troops <= 5) // 濒死（硬性规则）
+        {
+            if (personality == GeneralPersonality.Fanatic)
+            {
+                // 狂热者濒死：ATK暴增，RET归零（玉碎冲锋）
+                modifier[OrderType.ATK] = 1.5f;
+                modifier[OrderType.DEF] = 0.5f;
+                modifier[OrderType.RET] = 0f; // 硬性规则：RET归零
+            }
+            else if (personality == GeneralPersonality.Conservative)
+            {
+                // 保守者濒死：ATK归零，RET暴增（求生本能）
+                modifier[OrderType.ATK] = 0f; // 硬性规则：ATK归零
+                modifier[OrderType.DEF] = 1.5f;
+                modifier[OrderType.RET] = 3.0f;
+            }
+            else if (personality == GeneralPersonality.Opportunist)
+            {
+                modifier[OrderType.ATK] = 0.2f;
+                modifier[OrderType.DEF] = 1.0f;
+                modifier[OrderType.RET] = 2.0f;
+            }
         }
 
         return modifier;
     }
 
-    /// <summary>获取战线位置修正</summary>
+    /// <summary>获取战线位置修正 (GDD v6.0 完整位置修正表)</summary>
     private Dictionary<OrderType, float> GetGridModifier(int gridPosition)
     {
         var modifier = new Dictionary<OrderType, float>
@@ -192,18 +260,37 @@ public class IntentSystem
             { OrderType.RET, 1f }
         };
 
-        // 位置1-2（靠近己方）：更倾向进攻
-        if (gridPosition <= 2)
+        switch (gridPosition)
         {
-            modifier[OrderType.ATK] = 1.3f;
-            modifier[OrderType.RET] = 0.7f;
-        }
-        // 位置4-5（靠近敌方）：更倾向防守/撤退
-        else if (gridPosition >= 4)
-        {
-            modifier[OrderType.ATK] = 0.8f;
-            modifier[OrderType.DEF] = 1.2f;
-            modifier[OrderType.RET] = 1.3f;
+            case 1: // 己方基地（硬性规则：RET禁止）
+                modifier[OrderType.ATK] = 1.5f;
+                modifier[OrderType.DEF] = 2.0f;
+                modifier[OrderType.RET] = 0f; // 硬性规则：退无可退
+                break;
+
+            case 2: // 腹地
+                modifier[OrderType.ATK] = 1.0f;
+                modifier[OrderType.DEF] = 1.2f;
+                modifier[OrderType.RET] = 1.5f;
+                break;
+
+            case 3: // 中线
+                modifier[OrderType.ATK] = 1.0f;
+                modifier[OrderType.DEF] = 1.0f;
+                modifier[OrderType.RET] = 1.0f;
+                break;
+
+            case 4: // 敌方腹地
+                modifier[OrderType.ATK] = 1.2f;
+                modifier[OrderType.DEF] = 1.0f;
+                modifier[OrderType.RET] = 0.8f;
+                break;
+
+            case 5: // 敌方基地（硬性规则：ATK极大）
+                modifier[OrderType.ATK] = 3.0f; // 硬性规则：试图终结战役
+                modifier[OrderType.DEF] = 1.5f;
+                modifier[OrderType.RET] = 0.1f;
+                break;
         }
 
         return modifier;

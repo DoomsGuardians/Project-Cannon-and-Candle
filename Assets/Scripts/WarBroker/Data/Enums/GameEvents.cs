@@ -33,5 +33,6 @@ public enum WarBrokerEventID
     OnVictoryConditionMet,
     OnDefeatConditionMet,
     OnDrawConditionMet,
-    OnGameEnd
+    OnGameEnd,
+    OnRegimeCollapse  // GDD v6.0: 政权崩溃清算
 }

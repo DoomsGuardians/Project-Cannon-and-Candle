@@ -44,6 +44,10 @@ public class MarketSystem : ILogic
 
     #region 现货交易
 
+    /// <summary>
+    /// 买入现货 (GDD v6.0)
+    /// 逐张计算交易，每张交易后价格变化（通过 Beta 累积）
+    /// </summary>
     public bool BuyOrder(OrderType orderType, int quantity, out float totalCost)
     {
         totalCost = 0f;
@@ -56,12 +60,18 @@ public class MarketSystem : ILogic
             return false;
         }
 
-        float currentPrice = market.CurrentPrices[orderType];
+        // 逐张计算成本
         for (int i = 0; i < quantity; i++)
         {
-            float price = currentPrice * (1 + balanceConfig.PriceImpactRate * i);
-            float commission = price * balanceConfig.CommissionRate;
-            totalCost += price + commission;
+            float currentPrice = pricingEngine.CalculatePrice(orderType);
+            float commission = currentPrice * balanceConfig.CommissionRate;
+            totalCost += currentPrice + commission;
+
+            // 每张交易后应用交易冲击（通过 Beta 累积）
+            pricingEngine.ApplyTradeImpact(orderType, 1, true);
+
+            // 更新 K 线极值
+            UpdateKLineHighLow(orderType, currentPrice);
         }
 
         if (player.Cash < totalCost)
@@ -70,10 +80,16 @@ public class MarketSystem : ILogic
             return false;
         }
 
+        // 执行交易
         player.Cash -= totalCost;
         player.Inventory[orderType] += quantity;
         market.MarketInventory[orderType] -= quantity;
-        market.CurrentPrices[orderType] *= (1 + balanceConfig.PriceImpactRate * quantity);
+
+        // 记录消耗量
+        market.LastWeekBurn[orderType] += quantity;
+
+        // 更新当前价格
+        market.CurrentPrices[orderType] = pricingEngine.CalculatePrice(orderType);
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnTradeExecuted,
             new TransactionRecord
@@ -89,6 +105,10 @@ public class MarketSystem : ILogic
         return true;
     }
 
+    /// <summary>
+    /// 卖出现货 (GDD v6.0)
+    /// 逐张计算交易，每张交易后价格变化（通过 Beta 累积）
+    /// </summary>
     public bool SellOrder(OrderType orderType, int quantity, out float totalRevenue)
     {
         totalRevenue = 0f;
@@ -101,18 +121,27 @@ public class MarketSystem : ILogic
             return false;
         }
 
-        float currentPrice = market.CurrentPrices[orderType];
+        // 逐张计算收益
         for (int i = 0; i < quantity; i++)
         {
-            float price = currentPrice * (1 - balanceConfig.PriceImpactRate * i);
-            float commission = price * balanceConfig.CommissionRate;
-            totalRevenue += price - commission;
+            float currentPrice = pricingEngine.CalculatePrice(orderType);
+            float commission = currentPrice * balanceConfig.CommissionRate;
+            totalRevenue += currentPrice - commission;
+
+            // 每张交易后应用交易冲击（通过 Beta 累积）
+            pricingEngine.ApplyTradeImpact(orderType, 1, false);
+
+            // 更新 K 线极值
+            UpdateKLineHighLow(orderType, currentPrice);
         }
 
+        // 执行交易
         player.Cash += totalRevenue;
         player.Inventory[orderType] -= quantity;
         market.MarketInventory[orderType] += quantity;
-        market.CurrentPrices[orderType] *= (1 - balanceConfig.PriceImpactRate * quantity);
+
+        // 更新当前价格
+        market.CurrentPrices[orderType] = pricingEngine.CalculatePrice(orderType);
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnTradeExecuted,
             new TransactionRecord
@@ -128,22 +157,42 @@ public class MarketSystem : ILogic
         return true;
     }
 
+    /// <summary>更新 K 线的 High/Low (GDD v6.0)</summary>
+    private void UpdateKLineHighLow(OrderType orderType, float price)
+    {
+        var market = campaignData.Market;
+        var klineHistory = market.KLineHistory[orderType];
+
+        if (klineHistory.Count == 0) return;
+
+        var currentKLine = klineHistory[klineHistory.Count - 1];
+        if (currentKLine.Turn != campaignData.CurrentTurn)
+        {
+            // 新回合，创建新 K 线
+            return;
+        }
+
+        // 更新当前回合的 High/Low
+        currentKLine.High = Mathf.Max(currentKLine.High, price);
+        currentKLine.Low = Mathf.Min(currentKLine.Low, price);
+    }
+
     #endregion
 
     #region 期货交易
 
+    /// <summary>
+    /// 开立期货合约 (GDD v6.0: 固定 3 回合)
+    /// </summary>
     public bool OpenFutures(OrderType orderType, FuturesDirection direction,
-        int quantity, int expirationTurns, out FuturesContract contract)
+        int quantity, out FuturesContract contract)
     {
         contract = null;
         var market = campaignData.Market;
         var player = campaignData.Player;
 
-        if (expirationTurns > balanceConfig.MaxFuturesDuration)
-        {
-            Debug.LogWarning($"期货期限超过最大值: {balanceConfig.MaxFuturesDuration}");
-            return false;
-        }
+        // GDD v6.0: 期货固定 3 回合
+        const int FUTURES_DURATION = 3;
 
         float openPrice = market.CurrentPrices[orderType];
         float margin = openPrice * quantity * balanceConfig.FuturesMarginRate;
@@ -161,7 +210,7 @@ public class MarketSystem : ILogic
             Direction = direction,
             OpenPrice = openPrice,
             Quantity = quantity,
-            ExpirationTurn = campaignData.CurrentTurn + expirationTurns,
+            ExpirationTurn = campaignData.CurrentTurn + FUTURES_DURATION,
             Margin = margin
         };
 
@@ -296,11 +345,8 @@ public class MarketSystem : ILogic
         // 记录历史价格（在更新前）
         market.PriceHistory.Add(new Dictionary<OrderType, float>(market.CurrentPrices));
 
-        // 补充市场库存
-        foreach (var item in orderConfig.Orders)
-        {
-            market.MarketInventory[item.OrderType] += item.ProductionPerTurn;
-        }
+        // 军工厂动态产能 (GDD v6.0)
+        ReplenishMarketInventory();
 
         // 使用三因子定价引擎计算新价格
         foreach (OrderType orderType in Enum.GetValues(typeof(OrderType)))
@@ -320,6 +366,38 @@ public class MarketSystem : ILogic
         }
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnPriceUpdate, null, null);
+    }
+
+    /// <summary>
+    /// 军工厂动态产能 (GDD v6.0)
+    /// 本周产能 = 上周总消耗 × 产能系数(0.9~1.1)
+    /// 保底产能 3
+    /// </summary>
+    private void ReplenishMarketInventory()
+    {
+        var market = campaignData.Market;
+
+        foreach (OrderType orderType in Enum.GetValues(typeof(OrderType)))
+        {
+            float lastWeekBurn = market.LastWeekBurn[orderType];
+
+            // 产能系数随机 0.9~1.1
+            float productionFactor = UnityEngine.Random.Range(
+                balanceConfig.ProductionFactorMin,
+                balanceConfig.ProductionFactorMax);
+
+            // 动态产能 = 上周消耗 × 产能系数
+            float dynamicProduction = lastWeekBurn * productionFactor;
+
+            // 保底产能 3
+            int finalProduction = Mathf.Max(3, Mathf.RoundToInt(dynamicProduction));
+
+            // 补充库存 (MarketInventory 是 int 类型)
+            market.MarketInventory[orderType] += finalProduction;
+
+            // 重置消耗计数
+            market.LastWeekBurn[orderType] = 0f;
+        }
     }
 
     #endregion
@@ -359,6 +437,56 @@ public class MarketSystem : ILogic
         }
 
         return intel;
+    }
+
+    #endregion
+
+    #region K线管理 (GDD v6.0)
+
+    /// <summary>回合开始时初始化 K 线（Open 价格）</summary>
+    public void InitializeKLineForTurn()
+    {
+        var market = campaignData.Market;
+        int currentTurn = campaignData.CurrentTurn;
+
+        foreach (OrderType orderType in Enum.GetValues(typeof(OrderType)))
+        {
+            float openPrice = pricingEngine.CalculatePrice(orderType);
+
+            var kline = new KLineData
+            {
+                Turn = currentTurn,
+                Open = openPrice,
+                High = openPrice,
+                Low = openPrice,
+                Close = openPrice,
+                Volume = 0f
+            };
+
+            market.KLineHistory[orderType].Add(kline);
+        }
+    }
+
+    /// <summary>回合结束时记录 K 线（Close 价格和成交量）</summary>
+    public void FinalizeKLineForTurn()
+    {
+        var market = campaignData.Market;
+        int currentTurn = campaignData.CurrentTurn;
+
+        foreach (OrderType orderType in Enum.GetValues(typeof(OrderType)))
+        {
+            var klineHistory = market.KLineHistory[orderType];
+            if (klineHistory.Count == 0) continue;
+
+            var currentKLine = klineHistory[klineHistory.Count - 1];
+            if (currentKLine.Turn != currentTurn) continue;
+
+            // 记录 Close 价格
+            currentKLine.Close = pricingEngine.CalculatePrice(orderType);
+
+            // 记录成交量（本回合消耗量）
+            currentKLine.Volume = market.LastWeekBurn[orderType];
+        }
     }
 
     #endregion

@@ -80,13 +80,29 @@ public class GameBalanceConfig : ScriptableObject
     [Range(0, 5)]
     public int BaseReinforcement = 2;
 
-    [Tooltip("溃败兵力阈值")]
-    [Range(0, 10)]
-    public int RoutTroopThreshold = 4;
+    [Tooltip("复活后HP")]
+    [Range(1, 20)]
+    public int RespawnHP = 10;
 
-    [Tooltip("溃败综合评分阈值")]
-    [Range(0, 50)]
-    public int RoutScoreThreshold = 20;
+    [Tooltip("复活消耗后备役")]
+    [Range(1, 20)]
+    public int RespawnReserveCost = 10;
+
+    [Tooltip("基地休整回血")]
+    [Range(1, 5)]
+    public int BaseRecoveryHP = 2;
+
+    [Tooltip("基地休整消耗后备役")]
+    [Range(1, 5)]
+    public int BaseRecoveryCost = 2;
+
+    [Tooltip("RET回血")]
+    [Range(1, 3)]
+    public int RetHealHP = 1;
+
+    [Tooltip("RET消耗后备役")]
+    [Range(1, 3)]
+    public int RetHealCost = 1;
 
     [Tooltip("重整所需回合")]
     [Range(1, 5)]
@@ -176,7 +192,34 @@ public class GameBalanceConfig : ScriptableObject
     [Range(1f, 2f)]
     public float BetaPanicMultiplier = 1.3f;
 
-    [Tooltip("Gamma流通盘敏感度")]
-    [Range(0f, 1f)]
-    public float GammaSensitivity = 0.5f;
+    [Tooltip("Beta交易冲击系数")]
+    [Range(0f, 0.2f)]
+    public float ImpactCoefficient = 0.05f;
+
+    [Header("===== Alpha位置修正表 =====")]
+
+    [Tooltip("Grid 1 修正")]
+    public float AlphaGrid1Modifier = 0.15f;
+
+    [Tooltip("Grid 2 修正")]
+    public float AlphaGrid2Modifier = 0.10f;
+
+    [Tooltip("Grid 3 修正")]
+    public float AlphaGrid3Modifier = 0.05f;
+
+    [Tooltip("Grid 4 修正")]
+    public float AlphaGrid4Modifier = -0.05f;
+
+    [Tooltip("Grid 5 修正")]
+    public float AlphaGrid5Modifier = -0.10f;
+
+    [Header("===== 军工厂产能 =====")]
+
+    [Tooltip("产能系数最小值")]
+    [Range(0.5f, 1f)]
+    public float ProductionFactorMin = 0.9f;
+
+    [Tooltip("产能系数最大值")]
+    [Range(1f, 1.5f)]
+    public float ProductionFactorMax = 1.1f;
 }

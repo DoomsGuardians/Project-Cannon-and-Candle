@@ -4,8 +4,8 @@ using UnityEngine;
 
 /// <summary>
 /// MarketSystem 纯数据逻辑测试
-/// 注意：由�?MarketSystem 依赖 GameRoot (EventService/ResService)�?
-/// 这里测试的是运行时数据模型的核心计算逻辑，不依赖 MonoBehaviour�?
+/// 注意：由�?MarketSystem 依赖 GameRoot (EventService/ResService)�?
+/// 这里测试的是运行时数据模型的核心计算逻辑，不依赖 MonoBehaviour�?
 /// </summary>
 public class MarketDataTests
 {
@@ -23,11 +23,11 @@ public class MarketDataTests
                 { OrderType.DEF, 35f },
                 { OrderType.RET, 25f }
             },
-            MarketInventory = new Dictionary<OrderType, float>
+            MarketInventory = new Dictionary<OrderType, int>
             {
-                { OrderType.ATK, 10f },
-                { OrderType.DEF, 10f },
-                { OrderType.RET, 8f }
+                { OrderType.ATK, 10 },
+                { OrderType.DEF, 10 },
+                { OrderType.RET, 8 }
             },
             PriceHistory = new List<Dictionary<OrderType, float>>()
         };
@@ -70,7 +70,7 @@ public class MarketDataTests
             ContractId = 1,
             TargetOrder = OrderType.ATK,
             Direction = FuturesDirection.Long,
-            OpenPrice = 30f, // 当前40，盈�?0 per unit
+            OpenPrice = 30f, // 当前40，盈�?0 per unit
             Quantity = 2,
             Margin = 12f
         });

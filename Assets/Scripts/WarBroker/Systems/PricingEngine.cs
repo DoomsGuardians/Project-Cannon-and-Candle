@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 三因子定价引擎
+/// 三因子定价引擎 (GDD v6.0)
 /// Price = P_base × (1 + Alpha) × Beta × Gamma
-/// Alpha: 战场态势因子（接触状态、血量）
-/// Beta: 市场动量因子（价格趋势、恐慌）
-/// Gamma: 流通盘因子（供需关系）
+/// Alpha: 战场态势因子（交战中心+位置修正+临界修正）
+/// Beta: 交易冲击因子（回合间携带，交易时累积）
+/// Gamma: 流通盘因子（InitialFloat / CurrentFloat）
 /// </summary>
 public class PricingEngine
 {
@@ -27,152 +27,222 @@ public class PricingEngine
     {
         var basePrice = orderConfig.GetConfig(type).BasePrice;
         var alpha = CalculateAlpha(type);
-        var beta = CalculateBeta(type);
+        var beta = data.Market.BetaCarry[type]; // Beta从市场数据中读取
         var gamma = CalculateGamma(type);
 
         return basePrice * (1f + alpha) * beta * gamma;
     }
 
     /// <summary>
-    /// Alpha因子：战场态势
-    /// - 接触状态基础加成
-    /// - 临界状态修正
-    /// - 低血量修正
+    /// Alpha因子：战场态势 (GDD v6.0)
+    /// Step 1: 逐战线判断是否接触
+    /// Step 2: 计算交战中心，查询5级位置修正表
+    /// Step 3: 应用临界战役修正（Grid 1/5、濒死）
+    /// Step 4: 多战线平均
     /// </summary>
     private float CalculateAlpha(OrderType type)
     {
-        float alpha = 0f;
+        float totalAlpha = 0f;
+        int frontlineCount = 0;
 
-        // 检查是否有战线处于接触状态
-        bool hasEngaged = false;
-        bool hasCritical = false;
-        bool hasLowHP = false;
+        // 临界修正标志
+        bool hasGrid1Crisis = false;
+        bool hasGrid5Battle = false;
 
-        foreach (var general in data.Battle.AllyGenerals)
+        // Step 1-2: 逐战线计算
+        foreach (var ally in data.Battle.AllyGenerals)
         {
-            if (general.Troops <= 0) continue;
+            if (ally.Troops <= 0) continue;
 
-            var enemy = GetOpposingGeneral(general);
-            if (enemy != null && enemy.Troops > 0)
+            var enemy = GetOpposingGeneral(ally);
+            if (enemy == null || enemy.Troops <= 0) continue;
+
+            float frontlineAlpha = 0f;
+
+            // 检查是否接触
+            if (IsEngaged(ally, enemy))
             {
-                if (IsEngaged(general, enemy))
+                // 计算交战中心
+                float center = (ally.GridPosition + enemy.GridPosition) / 2f;
+
+                // 查询位置修正表
+                frontlineAlpha = GetPositionModifier(type, center);
+
+                // 濒死修正（该战线）
+                if (ally.Troops >= 1 && ally.Troops <= 5)
                 {
-                    hasEngaged = true;
+                    frontlineAlpha += 0.10f;
                 }
             }
 
-            var status = general.GetStatus(balanceConfig);
-            if (status == GeneralStatus.Critical)
-            {
-                hasCritical = true;
-            }
-            else if (status == GeneralStatus.Wounded)
-            {
-                hasLowHP = true;
-            }
+            // 检查临界位置
+            if (ally.GridPosition == 1) hasGrid1Crisis = true;
+            if (ally.GridPosition == 5) hasGrid5Battle = true;
+
+            totalAlpha += frontlineAlpha;
+            frontlineCount++;
         }
 
-        // 接触状态基础加成
-        if (hasEngaged)
+        // Step 3: 临界战役修正（全局叠加）
+        if (hasGrid1Crisis) totalAlpha += 0.15f * frontlineCount;
+        if (hasGrid5Battle) totalAlpha += 0.15f * frontlineCount;
+
+        // Step 4: 多战线平均
+        if (frontlineCount > 0)
         {
-            alpha += balanceConfig.AlphaContactBase;
+            return totalAlpha / frontlineCount;
         }
 
-        // 根据指令类型和战场状态调整
-        if (type == OrderType.ATK)
-        {
-            // 进攻令在接触状态下需求更高
-            if (hasEngaged) alpha += GetPositionModifier(type, 0.1f);
-        }
-        else if (type == OrderType.DEF)
-        {
-            // 防守令在临界状态下需求更高
-            if (hasCritical) alpha += balanceConfig.AlphaCriticalBonus;
-            if (hasLowHP) alpha += balanceConfig.AlphaLowHPBonus;
-        }
-        else if (type == OrderType.RET)
-        {
-            // 撤退令在临界状态下需求最高
-            if (hasCritical) alpha += balanceConfig.AlphaCriticalBonus * 1.5f;
-            if (hasLowHP) alpha += balanceConfig.AlphaLowHPBonus;
-        }
-
-        return alpha;
+        return 0f;
     }
 
     /// <summary>
-    /// Beta因子：市场动量
-    /// - 价格趋势（连续上涨/下跌）
-    /// - 恐慌效应（后备役不足）
+    /// 根据交战中心查询位置修正表 (GDD v6.0)
     /// </summary>
-    private float CalculateBeta(OrderType type)
+    private float GetPositionModifier(OrderType type, float center)
     {
-        float beta = 1f;
-
-        // 价格动量
-        float priceChangeRatio = GetPriceChangeRatio(type);
-        if (Mathf.Abs(priceChangeRatio) > balanceConfig.BetaMomentumThreshold)
+        // 5级位置修正表
+        if (center >= 1.0f && center < 1.5f)
         {
-            // 价格上涨时继续推高，下跌时继续压低
-            beta *= priceChangeRatio > 0
-                ? balanceConfig.BetaMomentumMultiplier
-                : 2f - balanceConfig.BetaMomentumMultiplier;
+            // Grid 1: 压迫己方基地 (ATK+5%, DEF+25%, RET+20%)
+            return type switch
+            {
+                OrderType.ATK => 0.05f,
+                OrderType.DEF => 0.25f,
+                OrderType.RET => 0.20f,
+                _ => 0f
+            };
+        }
+        else if (center >= 1.5f && center < 2.5f)
+        {
+            // Grid 2: 己方腹地 (ATK+10%, DEF+20%, RET+10%)
+            return type switch
+            {
+                OrderType.ATK => 0.10f,
+                OrderType.DEF => 0.20f,
+                OrderType.RET => 0.10f,
+                _ => 0f
+            };
+        }
+        else if (center >= 2.5f && center < 3.5f)
+        {
+            // Grid 3: 中线对峙 (ATK+15%, DEF+15%, RET+5%)
+            return type switch
+            {
+                OrderType.ATK => 0.15f,
+                OrderType.DEF => 0.15f,
+                OrderType.RET => 0.05f,
+                _ => 0f
+            };
+        }
+        else if (center >= 3.5f && center < 4.5f)
+        {
+            // Grid 4: 敌方腹地 (ATK+20%, DEF+10%, RET+0%)
+            return type switch
+            {
+                OrderType.ATK => 0.20f,
+                OrderType.DEF => 0.10f,
+                OrderType.RET => 0.00f,
+                _ => 0f
+            };
+        }
+        else if (center >= 4.5f && center <= 5.0f)
+        {
+            // Grid 5: 压迫敌方基地 (ATK+25%, DEF+5%, RET-5%)
+            return type switch
+            {
+                OrderType.ATK => 0.25f,
+                OrderType.DEF => 0.05f,
+                OrderType.RET => -0.05f,
+                _ => 0f
+            };
         }
 
-        // 恐慌效应：后备役不足时RET价格飙升
-        if (type == OrderType.RET && data.Battle.CurrentReserves < balanceConfig.BetaPanicReserveThreshold)
-        {
-            beta *= balanceConfig.BetaPanicMultiplier;
-        }
-
-        return beta;
+        return 0f;
     }
 
     /// <summary>
-    /// Gamma因子：流通盘
-    /// - 库存/初始流通盘比例
-    /// - 库存越少价格越高
+    /// Gamma因子：流通盘 (GDD v6.0)
+    /// Gamma = InitialFloat / Max(CurrentFloat, 1)
+    /// 流通盘越少，价格越高（逼空效应）
     /// </summary>
     private float CalculateGamma(OrderType type)
     {
         var market = data.Market;
-        float currentInventory = market.MarketInventory[type];
-        float initialFloat = market.InitialFloat[type];
+        int currentFloat = market.MarketInventory[type];
+        int initialFloat = market.InitialFloat[type];
 
         if (initialFloat <= 0) return 1f;
 
-        // 流通盘比例：当前库存 / 初始流通盘
-        float ratio = currentInventory / initialFloat;
+        // Gamma = InitialFloat / Max(CurrentFloat, 1)
+        float gamma = (float)initialFloat / Mathf.Max(currentFloat, 1);
 
-        // Gamma = 1 + sensitivity * (1 - ratio)
-        // 当库存为初始值时，Gamma = 1
-        // 当库存为0时，Gamma = 1 + sensitivity
-        float gamma = 1f + balanceConfig.GammaSensitivity * (1f - ratio);
-
-        return Mathf.Max(0.5f, gamma); // 最低0.5倍
+        return gamma;
     }
 
-    /// <summary>获取位置修正（基于战线位置）</summary>
-    private float GetPositionModifier(OrderType type, float center)
+    /// <summary>
+    /// 应用交易冲击到Beta (GDD v6.0)
+    /// 每笔交易后调用，累积到 BetaCarry
+    /// </summary>
+    public void ApplyTradeImpact(OrderType type, int quantity, bool isBuy)
     {
-        float modifier = 0f;
-        int engagedCount = 0;
+        var market = data.Market;
+        int currentFloat = market.MarketInventory[type];
 
-        foreach (var general in data.Battle.AllyGenerals)
+        if (currentFloat <= 0) return;
+
+        // Impact = 交易量 / CurrentFloat × ImpactCoefficient
+        float impact = Mathf.Abs(quantity) / (float)currentFloat * balanceConfig.ImpactCoefficient;
+
+        // 买入推高价格，卖出压低价格
+        if (isBuy)
         {
-            if (general.Troops <= 0) continue;
+            market.BetaCarry[type] *= (1f + impact);
+        }
+        else
+        {
+            market.BetaCarry[type] *= (1f - impact);
+        }
 
-            var enemy = GetOpposingGeneral(general);
-            if (enemy != null && enemy.Troops > 0 && IsEngaged(general, enemy))
+        // 限制Beta范围，避免极端值
+        market.BetaCarry[type] = Mathf.Clamp(market.BetaCarry[type], 0.1f, 10f);
+    }
+
+    /// <summary>
+    /// 回合开始时应用动量效应和恐慌效应 (GDD v6.0)
+    /// </summary>
+    public void ApplyMomentumAndPanic()
+    {
+        // 动量效应：上周价格涨跌幅 > 10%
+        foreach (OrderType type in Enum.GetValues(typeof(OrderType)))
+        {
+            float priceChangeRatio = GetPriceChangeRatio(type);
+
+            if (priceChangeRatio > 0.10f)
             {
-                engagedCount++;
+                // 追涨
+                data.Market.BetaCarry[type] *= balanceConfig.BetaMomentumMultiplier;
+            }
+            else if (priceChangeRatio < -0.10f)
+            {
+                // 杀跌
+                data.Market.BetaCarry[type] *= (2f - balanceConfig.BetaMomentumMultiplier);
             }
         }
 
-        // 多条战线接触时加成更高
-        modifier = center * engagedCount;
+        // 恐慌效应：后备役 < 20
+        if (data.Battle.CurrentReserves < balanceConfig.BetaPanicReserveThreshold)
+        {
+            data.Market.BetaCarry[OrderType.ATK] *= 0.6f;  // 抛售进攻资产
+            data.Market.BetaCarry[OrderType.DEF] *= 1.5f;  // 避险
+            data.Market.BetaCarry[OrderType.RET] *= 2.0f;  // 逃命
+        }
 
-        return modifier;
+        // 限制Beta范围
+        foreach (OrderType type in Enum.GetValues(typeof(OrderType)))
+        {
+            data.Market.BetaCarry[type] = Mathf.Clamp(data.Market.BetaCarry[type], 0.1f, 10f);
+        }
     }
 
     /// <summary>获取价格变化率</summary>
@@ -214,6 +284,6 @@ public class PricingEngine
     /// <summary>获取各因子的调试信息</summary>
     public (float alpha, float beta, float gamma) GetFactors(OrderType type)
     {
-        return (CalculateAlpha(type), CalculateBeta(type), CalculateGamma(type));
+        return (CalculateAlpha(type), data.Market.BetaCarry[type], CalculateGamma(type));
     }
 }

@@ -35,11 +35,9 @@ public class BattleGameMode : GameModeBase
             RegisterWindow<GameplayWindow>("Prefabs/WarBroker/UI/GameplayWindow", "GameplayWindow");
         }
         RegisterWindow<MarketPanel>("Prefabs/WarBroker/UI/MarketPanel", "MarketPanel");
-        RegisterWindow<BattlefieldPanel>("Prefabs/WarBroker/UI/BattlefieldPanel", "BattlefieldPanel");
-        RegisterWindow<GeneralPanel>("Prefabs/WarBroker/UI/GeneralPanel", "GeneralPanel");
-        RegisterWindow<IntelPanel>("Prefabs/WarBroker/UI/IntelPanel", "IntelPanel");
-        RegisterWindow<HistoryPanel>("Prefabs/WarBroker/UI/HistoryPanel", "HistoryPanel");
-        RegisterWindow<GameEndWindow>("Prefabs/WarBroker/UI/GameEndWindow", "GameEndWindow");
+        RegisterWindow<InfoPanel>("Prefabs/WarBroker/UI/InfoPanel", "InfoPanel");
+        RegisterWindow<ObjectivePanel>("Prefabs/WarBroker/UI/ObjectivePanel", "ObjectivePanel");
+        RegisterWindow<CampaignEndPopup>("Prefabs/WarBroker/UI/CampaignEndPopup", "CampaignEndPopup");
     }
 
     public override void StartGame()

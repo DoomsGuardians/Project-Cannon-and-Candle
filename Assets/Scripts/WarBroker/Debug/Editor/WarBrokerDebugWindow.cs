@@ -61,7 +61,7 @@ public class WarBrokerDebugWindow : EditorWindow
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("市场", EditorStyles.boldLabel);
         foreach (var kvp in data.Market.CurrentPrices)
-            EditorGUILayout.LabelField($"  {kvp.Key}: {kvp.Value:F2} (库存: {data.Market.MarketInventory[kvp.Key]:F2})");
+            EditorGUILayout.LabelField($"  {kvp.Key}: {kvp.Value:F2} (库存: {data.Market.MarketInventory[kvp.Key]})");
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("战线", EditorStyles.boldLabel);

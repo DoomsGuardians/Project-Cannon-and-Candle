@@ -57,24 +57,17 @@ public class GeneralData
         return (Troops * 5) * 0.4f + Trust * 0.3f + Morale * 0.3f;
     }
 
+    /// <summary>
+    /// 获取将军状态 (GDD v6.0: 纯HP阈值判定)
+    /// HP=0 溃败，HP≤5 危急，HP≤10 受伤，HP≤15 健康，HP>15 满编
+    /// </summary>
     public GeneralStatus GetStatus(GameBalanceConfig balance)
     {
-        // 检查溃败条件
+        // GDD v6.0: 纯HP阈值判定，不再使用综合评分
         if (Troops <= 0) return GeneralStatus.Routed;
-
-        // 兵力过低直接溃败
-        if (Troops <= balance.RoutTroopThreshold)
-            return GeneralStatus.Routed;
-
-        // 综合评分过低也会溃败
-        float compositeScore = CalculateCompositeScore();
-        if (compositeScore < balance.RoutScoreThreshold)
-            return GeneralStatus.Routed;
-
-        // 根据综合评分判断状态
-        if (compositeScore < 50) return GeneralStatus.Critical;
-        if (compositeScore < 70) return GeneralStatus.Wounded;
-        if (compositeScore < 85) return GeneralStatus.Healthy;
+        if (Troops <= 5) return GeneralStatus.Critical;
+        if (Troops <= 10) return GeneralStatus.Wounded;
+        if (Troops <= 15) return GeneralStatus.Healthy;
         return GeneralStatus.FullStrength;
     }
 
