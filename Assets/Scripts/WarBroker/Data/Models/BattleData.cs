@@ -47,6 +47,12 @@ public class BattleResult
     // GDD v6.0: 战术系统
     public string AllyTactic;
     public string EnemyTactic;
+
+    // 位置变化（用于动画）
+    public int AllyOldPosition;
+    public int AllyNewPosition;
+    public int EnemyOldPosition;
+    public int EnemyNewPosition;
 }
 
 /// <summary>战场运行时数据</summary>
@@ -81,6 +87,7 @@ public class BattleData
                     var general = new GeneralData();
                     general.InitFromConfig(configItem, skillConfig);
                     general.Position = assignment.Position;
+                    general.GridPosition = 1;  // 己方大本营
                     AllyGenerals.Add(general);
                 }
             }
@@ -97,6 +104,7 @@ public class BattleData
                     var general = new GeneralData();
                     general.InitFromConfig(configItem, skillConfig);
                     general.Position = assignment.Position;
+                    general.GridPosition = 5;  // 敌方大本营
                     EnemyGenerals.Add(general);
                 }
             }

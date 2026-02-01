@@ -5,14 +5,16 @@ using XCharts.Runtime;
 /// <summary>
 /// K线图视图组件
 /// 封装 XCharts CandlestickChart，提供简单的 API 供 UI 调用
+///
+/// 使用方式：
+/// 1. Prefab 预配置（推荐）：在 Prefab 中预先添加 CandlestickChart，并在 Inspector 中绑定到 chart 字段
+/// 2. 运行时创建（兼容旧用法）：如果未绑定 chart，会自动创建 CandlestickChart 组件
 /// </summary>
 public class KLineChartView : MonoBehaviour
 {
+    [SerializeField] private CandlestickChart chart;  // 可在 Prefab 中预绑定
     [SerializeField] private string chartTitle = "";
-    [SerializeField] private Color32 riseColor = new Color32(235, 84, 84, 255);   // 涨 - 红色
-    [SerializeField] private Color32 fallColor = new Color32(68, 198, 127, 255);  // 跌 - 绿色
 
-    private CandlestickChart chart;
     private OrderType currentOrderType;
 
     /// <summary>
@@ -23,69 +25,23 @@ public class KLineChartView : MonoBehaviour
         if (!string.IsNullOrEmpty(title))
             chartTitle = title;
 
-        CreateChart();
-    }
+        // 优先使用已绑定的 Chart
+        if (chart == null)
+        {
+            chart = GetComponent<CandlestickChart>();
+        }
 
-    private void CreateChart()
-    {
-        chart = GetComponent<CandlestickChart>();
+        // 仅在完全没有时才动态创建（兼容旧用法）
         if (chart == null)
         {
             chart = gameObject.AddComponent<CandlestickChart>();
             chart.Init();
         }
 
-        // 配置图表
-        ConfigureChart();
-    }
-
-    private void ConfigureChart()
-    {
-        if (chart == null) return;
-
-        // 设置标题
-        var title = chart.EnsureChartComponent<Title>();
-        title.show = !string.IsNullOrEmpty(chartTitle);
-        title.text = chartTitle;
-        title.labelStyle.textStyle.fontSize = 14;
-
-        // 配置 X 轴
-        var xAxis = chart.EnsureChartComponent<XAxis>();
-        xAxis.type = Axis.AxisType.Category;
-        xAxis.boundaryGap = true;
-        xAxis.axisLabel.show = true;
-        xAxis.axisLabel.textStyle.fontSize = 10;
-
-        // 配置 Y 轴
-        var yAxis = chart.EnsureChartComponent<YAxis>();
-        yAxis.type = Axis.AxisType.Value;
-        yAxis.axisLabel.show = true;
-        yAxis.axisLabel.textStyle.fontSize = 10;
-        yAxis.splitNumber = 4;
-
-        // 配置网格
-        var grid = chart.EnsureChartComponent<GridCoord>();
-        grid.left = 50;
-        grid.right = 20;
-        grid.top = 30;
-        grid.bottom = 30;
-
-        // 确保有 Candlestick Serie
-        if (chart.GetSerie(0) == null)
+        // 设置标题（如果传入）
+        if (!string.IsNullOrEmpty(chartTitle))
         {
-            var serie = chart.AddSerie<Candlestick>();
-            serie.itemStyle.color = riseColor;
-            serie.itemStyle.color0 = fallColor;
-            serie.itemStyle.borderColor = riseColor;
-            serie.itemStyle.borderColor0 = fallColor;
-        }
-        else
-        {
-            var serie = chart.GetSerie(0);
-            serie.itemStyle.color = riseColor;
-            serie.itemStyle.color0 = fallColor;
-            serie.itemStyle.borderColor = riseColor;
-            serie.itemStyle.borderColor0 = fallColor;
+            SetTitle(chartTitle);
         }
     }
 
@@ -113,7 +69,7 @@ public class KLineChartView : MonoBehaviour
     {
         if (chart == null)
         {
-            CreateChart();
+            Initialize();
         }
 
         chart.ClearData();

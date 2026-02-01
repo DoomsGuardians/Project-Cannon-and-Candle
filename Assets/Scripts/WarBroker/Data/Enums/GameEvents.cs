@@ -16,6 +16,7 @@ public enum WarBrokerEventID
     // 战斗事件
     OnBattleStart,
     OnBattleResult,
+    OnBattleAnimationsComplete,  // 战斗动画播放完成
     OnFrontlineMove,
     OnGeneralStatusChange,
     OnGeneralRouted,

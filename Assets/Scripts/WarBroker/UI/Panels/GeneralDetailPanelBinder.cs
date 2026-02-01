@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 将军详情面板 Binder
+/// 将军详情面板 Binder（简化版）
 /// </summary>
 public class GeneralDetailPanelBinder : UIBinder
 {
@@ -12,29 +12,20 @@ public class GeneralDetailPanelBinder : UIBinder
     public TMP_Text txtPersonality;
     public TMP_Text txtPosition;
 
-    [Header("属性条")]
+    [Header("HP")]
     public Slider sliderHP;
-    public Slider sliderTrust;
-    public Slider sliderMorale;
     public TMP_Text txtHP;
-    public TMP_Text txtTrust;
-    public TMP_Text txtMorale;
-
-    [Header("状态")]
-    public TMP_Text txtStatus;
-    public TMP_Text txtSkills;
 
     [Header("意图显示")]
-    public Image imgIntentBubble;
     public TMP_Text txtIntent;
-    public TMP_Text txtIntentSource;
 
-    [Header("操作按钮")]
+    [Header("强化操作")]
     public Button btnReinforce;
-    public TMP_Text txtReinforceCost;
-    public Button btnOverride;
-    public TMP_Dropdown ddOverrideType;
-    public TMP_Text txtOverrideCost;
+
+    [Header("篡改操作")]
+    public Button btnOverrideATK;
+    public Button btnOverrideDEF;
+    public Button btnOverrideRET;
 
     [Header("关闭按钮")]
     public Button btnClose;

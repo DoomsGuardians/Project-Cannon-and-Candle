@@ -94,14 +94,35 @@ SpotMarketTab / FuturesMarketTab (MonoBehaviour)
 ```
 GameplayWindow (Canvas)
 ├── TopBar (RectTransform)
+│   ├── CashArea (HorizontalLayoutGroup)
+│   │   ├── ImgCashIcon (Image) ← 悬停显示"现金含义"
+│   │   └── TxtCash (TextMeshPro - Text) ← 悬停显示"现金详情"
+│   │
+│   ├── InventoryArea (HorizontalLayoutGroup)
+│   │   ├── ATKArea
+│   │   │   ├── ImgATKIcon (Image)
+│   │   │   └── TxtATK (TextMeshPro - Text)
+│   │   ├── DEFArea
+│   │   │   ├── ImgDEFIcon (Image)
+│   │   │   └── TxtDEF (TextMeshPro - Text)
+│   │   └── RETArea
+│   │       ├── ImgRETIcon (Image)
+│   │       └── TxtRET (TextMeshPro - Text)
+│   │
 │   ├── TxtTurn (TextMeshPro - Text)
 │   ├── TxtPhase (TextMeshPro - Text)
-│   ├── TxtCash (TextMeshPro - Text)
 │   ├── TxtNetWorth (TextMeshPro - Text)
 │   └── TxtAudit (TextMeshPro - Text)
 │
 ├── ContentArea (RectTransform)
 │   └── (用于加载 MarketPanel/InfoPanel 等)
+│
+├── RightPanelArea (RectTransform) - 右侧常驻面板区
+│   ├── 锚点：右侧拉伸（右上到右下）
+│   ├── Pivot：(1, 0.5)
+│   ├── 宽度：260
+│   ├── Top/Bottom：60（为状态栏和底部栏留空间）
+│   └── (运行时加载 ObjectivePanel)
 │
 ├── TabButtons (Horizontal Layout Group)
 │   ├── BtnMarket (Button)
@@ -121,12 +142,20 @@ GameplayWindow (Canvas)
 |---------------|---------|
 | txtTurn | TopBar/TxtTurn |
 | txtPhase | TopBar/TxtPhase |
-| txtCash | TopBar/TxtCash |
+| txtCash | TopBar/CashArea/TxtCash |
 | txtNetWorth | TopBar/TxtNetWorth |
 | txtAudit | TopBar/TxtAudit |
+| imgCashIcon | TopBar/CashArea/ImgCashIcon |
+| txtATK | TopBar/InventoryArea/ATKArea/TxtATK |
+| imgATKIcon | TopBar/InventoryArea/ATKArea/ImgATKIcon |
+| txtDEF | TopBar/InventoryArea/DEFArea/TxtDEF |
+| imgDEFIcon | TopBar/InventoryArea/DEFArea/ImgDEFIcon |
+| txtRET | TopBar/InventoryArea/RETArea/TxtRET |
+| imgRETIcon | TopBar/InventoryArea/RETArea/ImgRETIcon |
 | btnMarket | TabButtons/BtnMarket |
 | btnIntel | TabButtons/BtnIntel |
 | contentArea | ContentArea |
+| rightPanelArea | RightPanelArea |
 | btnEndTurn | BottomBar/BtnEndTurn |
 | txtEventInfo | BottomBar/TxtEventInfo |
 
@@ -255,21 +284,33 @@ MarketPanel (RectTransform)
 │   │   ├── TxtAtkPrice (TMP) - "$42.50"
 │   │   ├── TxtAtkHolding (TMP) - "持有: 0"
 │   │   ├── BtnAtkBuy (Button) - "买入"
-│   │   └── BtnAtkSell (Button) - "卖出"
+│   │   ├── BtnAtkSell (Button) - "卖出"
+│   │   └── BtnAtkChart (Button) - "K线"
 │   │
 │   ├── DefRow (同上结构)
 │   │   ├── TxtDefLabel (TMP) - "DEF"
 │   │   ├── TxtDefPrice (TMP)
 │   │   ├── TxtDefHolding (TMP)
 │   │   ├── BtnDefBuy (Button)
-│   │   └── BtnDefSell (Button)
+│   │   ├── BtnDefSell (Button)
+│   │   └── BtnDefChart (Button) - "K线"
 │   │
 │   └── RetRow (同上结构)
 │       ├── TxtRetLabel (TMP) - "RET"
 │       ├── TxtRetPrice (TMP)
 │       ├── TxtRetStock (TMP)
 │       ├── BtnRetBuy (Button)
-│       └── BtnRetSell (Button)
+│       ├── BtnRetSell (Button)
+│       └── BtnRetChart (Button) - "K线"
+│
+│   └── ChartArea (RectTransform)
+│       │   - Height: 200
+│       │
+│       └── KLineChart (RectTransform)
+│           │   - Stretch to fill ChartArea
+│           │   - 添加组件: CandlestickChart（预先配置样式）
+│           │   - 添加组件: KLineChartView（chart 字段绑定上面的 CandlestickChart）
+│           └── (图表样式在 Prefab 中配置，运行时直接使用)
 │
 ├── FuturesContent (RectTransform) - 期货区域 (默认隐藏)
 │   │   ※ 在此节点添加 FuturesMarketTab 组件
@@ -355,18 +396,25 @@ MarketPanel (RectTransform)
 
 | Inspector 字段 | 拖入对象 |
 |---------------|---------|
-| txtAtkPrice | SpotContent/AtkRow/TxtAtkPrice |
-| txtAtkHolding | SpotContent/AtkRow/TxtAtkHolding |
-| btnAtkBuy | SpotContent/AtkRow/BtnAtkBuy |
-| btnAtkSell | SpotContent/AtkRow/BtnAtkSell |
-| txtDefPrice | SpotContent/DefRow/TxtDefPrice |
-| txtDefHolding | SpotContent/DefRow/TxtDefHolding |
-| btnDefBuy | SpotContent/DefRow/BtnDefBuy |
-| btnDefSell | SpotContent/DefRow/BtnDefSell |
-| txtRetPrice | SpotContent/RetRow/TxtRetPrice |
-| txtRetHolding | SpotContent/RetRow/TxtRetHolding |
-| btnRetBuy | SpotContent/RetRow/BtnRetBuy |
-| btnRetSell | SpotContent/RetRow/BtnRetSell |
+| txtAtkPrice | SpotContent/TableArea/AtkRow/TxtAtkPrice |
+| txtAtkMarketStock | SpotContent/TableArea/AtkRow/TxtAtkMarketStock |
+| txtAtkHolding | SpotContent/TableArea/AtkRow/TxtAtkHolding |
+| btnAtkBuy | SpotContent/TableArea/AtkRow/ActionsArea/BtnAtkBuy |
+| btnAtkSell | SpotContent/TableArea/AtkRow/ActionsArea/BtnAtkSell |
+| btnAtkChart | SpotContent/TableArea/AtkRow/ActionsArea/BtnAtkChart |
+| txtDefPrice | SpotContent/TableArea/DefRow/TxtDefPrice |
+| txtDefMarketStock | SpotContent/TableArea/DefRow/TxtDefMarketStock |
+| txtDefHolding | SpotContent/TableArea/DefRow/TxtDefHolding |
+| btnDefBuy | SpotContent/TableArea/DefRow/ActionsArea/BtnDefBuy |
+| btnDefSell | SpotContent/TableArea/DefRow/ActionsArea/BtnDefSell |
+| btnDefChart | SpotContent/TableArea/DefRow/ActionsArea/BtnDefChart |
+| txtRetPrice | SpotContent/TableArea/RetRow/TxtRetPrice |
+| txtRetMarketStock | SpotContent/TableArea/RetRow/TxtRetMarketStock |
+| txtRetHolding | SpotContent/TableArea/RetRow/TxtRetHolding |
+| btnRetBuy | SpotContent/TableArea/RetRow/ActionsArea/BtnRetBuy |
+| btnRetSell | SpotContent/TableArea/RetRow/ActionsArea/BtnRetSell |
+| btnRetChart | SpotContent/TableArea/RetRow/ActionsArea/BtnRetChart |
+| klineChart | SpotContent/ChartArea/KLineChart (KLineChartView 组件) |
 
 **FuturesMarketTab** (挂在 FuturesContent 节点，负责期货区域)
 
@@ -426,18 +474,21 @@ InfoPanel (RectTransform)
     │
     ├── ChartAtk (RectTransform)
     │   │   - Height: 150
-    │   │   - 添加组件: KLineChartView
-    │   └── (XCharts CandlestickChart 运行时自动创建)
+    │   │   - 添加组件: CandlestickChart（预先配置样式）
+    │   │   - 添加组件: KLineChartView（chart 字段绑定上面的 CandlestickChart）
+    │   └── (图表样式在 Prefab 中配置，运行时直接使用)
     │
     ├── ChartDef (RectTransform)
     │   │   - Height: 150
-    │   │   - 添加组件: KLineChartView
-    │   └── (XCharts CandlestickChart 运行时自动创建)
+    │   │   - 添加组件: CandlestickChart（预先配置样式）
+    │   │   - 添加组件: KLineChartView（chart 字段绑定上面的 CandlestickChart）
+    │   └── (图表样式在 Prefab 中配置，运行时直接使用)
     │
     └── ChartRet (RectTransform)
         │   - Height: 150
-        │   - 添加组件: KLineChartView
-        └── (XCharts CandlestickChart 运行时自动创建)
+        │   - 添加组件: CandlestickChart（预先配置样式）
+        │   - 添加组件: KLineChartView（chart 字段绑定上面的 CandlestickChart）
+        └── (图表样式在 Prefab 中配置，运行时直接使用)
 ```
 
 4. **绑定字段** (在 InfoPanelBinder 组件上)
@@ -455,7 +506,7 @@ InfoPanel (RectTransform)
 
 ---
 
-## 六、GeneralDetailPanel（将军详情面板）
+## 六、GeneralDetailPanel（将军详情面板 - 简化版）
 
 **保存路径**: `Assets/Resources/Prefabs/WarBroker/UI/Panels/GeneralDetailPanel.prefab`
 
@@ -465,7 +516,7 @@ InfoPanel (RectTransform)
 
 2. **配置 RectTransform**
    - Anchor: Right Stretch
-   - Width: `400`
+   - Width: `300`
    - 用于从右侧滑入
 
 3. **添加脚本**
@@ -475,42 +526,29 @@ InfoPanel (RectTransform)
 
 ```
 GeneralDetailPanel (RectTransform)
-├── Header
-│   ├── TxtName (TMP) - "张将军"
-│   ├── TxtPersonality (TMP) - "狂热型"
-│   └── TxtPosition (TMP) - "左翼"
+├── Header (Vertical Layout Group)
+│   ├── TxtName (TMP) - "马塞纳"
+│   └── InfoRow (Horizontal Layout Group)
+│       ├── TxtPersonality (TMP) - "狂热型"
+│       ├── Separator (TMP) - "|"
+│       └── TxtPosition (TMP) - "左翼"
 │
-├── StatsArea (Vertical Layout Group)
-│   ├── HPRow
-│   │   ├── TxtHP (TMP) - "兵力: 16/20"
-│   │   └── SliderHP (Slider)
-│   │
-│   ├── TrustRow
-│   │   ├── TxtTrust (TMP) - "信任: 50"
-│   │   └── SliderTrust (Slider)
-│   │
-│   └── MoraleRow
-│       ├── TxtMorale (TMP) - "士气: 60"
-│       └── SliderMorale (Slider)
+├── HPArea (Vertical Layout Group)
+│   ├── SliderHP (Slider)
+│   └── TxtHP (TMP) - "16/20"
 │
-├── StatusArea
-│   ├── TxtStatus (TMP) - "状态: 正常"
-│   └── TxtSkills (TMP) - "技能: 突击"
+├── IntentArea (Vertical Layout Group)
+│   └── TxtIntent (TMP) - "意图: 🔴 ATK"
 │
-├── IntentArea
-│   ├── ImgIntentBubble (Image) - 意图气泡背景
-│   ├── TxtIntent (TMP) - "ATK"
-│   └── TxtIntentSource (TMP) - "来源: 性格倾向"
-│
-├── ActionArea (Vertical Layout Group)
-│   ├── ReinforceRow
-│   │   ├── BtnReinforce (Button) - "强化"
-│   │   └── TxtReinforceCost (TMP) - "消耗: 1份现货"
-│   │
-│   └── OverrideRow
-│       ├── BtnOverride (Button) - "篡改意图"
-│       ├── DdOverrideType (TMP_Dropdown) - ATK/DEF/RET
-│       └── TxtOverrideCost (TMP) - "消耗: 3份现货"
+├── ActionsArea (Vertical Layout Group)
+│   ├── BtnReinforce (Button)
+│   │   └── Text (TMP) - "强化 🔴×3"
+│   ├── BtnOverrideATK (Button)
+│   │   └── Text (TMP) - "篡改 🔴×2"
+│   ├── BtnOverrideDEF (Button)
+│   │   └── Text (TMP) - "篡改 🔵×3"
+│   └── BtnOverrideRET (Button)
+│       └── Text (TMP) - "篡改 🟡×1"
 │
 └── BtnClose (Button) - "X" 或 "关闭"
     └── Text (TMP)
@@ -521,33 +559,45 @@ GeneralDetailPanel (RectTransform)
 | Inspector 字段 | 拖入对象 |
 |---------------|---------|
 | txtName | Header/TxtName |
-| txtPersonality | Header/TxtPersonality |
-| txtPosition | Header/TxtPosition |
-| sliderHP | StatsArea/HPRow/SliderHP |
-| sliderTrust | StatsArea/TrustRow/SliderTrust |
-| sliderMorale | StatsArea/MoraleRow/SliderMorale |
-| txtHP | StatsArea/HPRow/TxtHP |
-| txtTrust | StatsArea/TrustRow/TxtTrust |
-| txtMorale | StatsArea/MoraleRow/TxtMorale |
-| txtStatus | StatusArea/TxtStatus |
-| txtSkills | StatusArea/TxtSkills |
-| imgIntentBubble | IntentArea/ImgIntentBubble |
+| txtPersonality | Header/InfoRow/TxtPersonality |
+| txtPosition | Header/InfoRow/TxtPosition |
+| sliderHP | HPArea/SliderHP |
+| txtHP | HPArea/TxtHP |
 | txtIntent | IntentArea/TxtIntent |
-| txtIntentSource | IntentArea/TxtIntentSource |
-| btnReinforce | ActionArea/ReinforceRow/BtnReinforce |
-| txtReinforceCost | ActionArea/ReinforceRow/TxtReinforceCost |
-| btnOverride | ActionArea/OverrideRow/BtnOverride |
-| ddOverrideType | ActionArea/OverrideRow/DdOverrideType |
-| txtOverrideCost | ActionArea/OverrideRow/TxtOverrideCost |
+| btnReinforce | ActionsArea/BtnReinforce |
+| btnOverrideATK | ActionsArea/BtnOverrideATK |
+| btnOverrideDEF | ActionsArea/BtnOverrideDEF |
+| btnOverrideRET | ActionsArea/BtnOverrideRET |
 | btnClose | BtnClose |
 
 6. **保存 Prefab**
 
+### 设计说明
+
+**简化内容**:
+- ✅ 移除了 Trust 和 Morale 属性条
+- ✅ 移除了状态和技能文本
+- ✅ 移除了意图来源文本和气泡图片
+- ✅ 移除了消耗文本（固定数值，悬停有 Tooltip）
+- ✅ 将篡改下拉框改为 3 个独立按钮
+- ✅ 按钮文本直接显示指令类型和持有数量
+
+**交互逻辑**:
+- 强化按钮：显示 "强化 🔴×3"（持有数量）或 "强化 🔴×3"（已强化次数）
+- 篡改按钮：显示 "篡改 🔴×2"（持有数量）
+- 运行时只显示与默认意图不同的 2 个篡改按钮（例如默认是 ATK，则只显示 DEF 和 RET）
+- 持有数量不足时按钮自动灰显
+- 已强化或篡改后，对应操作按钮禁用
+
 ---
 
-## 七、ObjectivePanel（目标面板）
+## 七、ObjectivePanel（委托任务面板）
 
 **保存路径**: `Assets/Resources/Prefabs/WarBroker/UI/Panels/ObjectivePanel.prefab`
+
+### 设计说明
+
+ObjectivePanel 采用**动态生成**方式显示委托任务，支持从 `CampaignConfig.Commissions` 配置不同战役的委托列表。
 
 ### 创建步骤
 
@@ -561,35 +611,152 @@ GeneralDetailPanel (RectTransform)
 ```
 ObjectivePanel (RectTransform)
 ├── Header
-│   └── TxtObjectiveTitle (TMP) - "战役目标"
+│   └── TxtTitle (TMP) - "委托任务"
 │
-├── MainObjective
-│   ├── TxtObjectiveDescription (TMP) - "净资产: 1500"
-│   ├── TxtPnL (TMP) - "P&L: +350 (+35%)"
-│   └── TxtProgress (TMP) - "回合 3/12"
-│
-└── CommissionList
-    ├── TxtWinWar (TMP) - "赢下战争 $200 [0%]"
-    ├── TxtShortCountry (TMP) - "做空祖国 $500 [0%]"
-    ├── TxtTraitor (TMP) - "卖国求荣 $300 [未达成]"
-    └── TxtMeatGrinder (TMP) - "绞肉机 $150 [0%]"
+└── CommissionListRoot (Vertical Layout Group)
+    │   - Spacing: 5
+    │   - Child Force Expand: Width=true, Height=false
+    │   - 添加 Content Size Fitter (Vertical Fit: Preferred Size)
+    └── (运行时动态生成 CommissionItem)
 ```
 
 4. **绑定字段** (在 ObjectivePanelBinder 组件上)
 
 | Inspector 字段 | 拖入对象 |
 |---------------|---------|
-| txtObjectiveTitle | Header/TxtObjectiveTitle |
-| txtObjectiveDescription | MainObjective/TxtObjectiveDescription |
-| txtProgress | MainObjective/TxtProgress |
-| txtPnL | MainObjective/TxtPnL |
-| commissionListRoot | CommissionList |
-| txtWinWar | CommissionList/TxtWinWar |
-| txtShortCountry | CommissionList/TxtShortCountry |
-| txtTraitor | CommissionList/TxtTraitor |
-| txtMeatGrinder | CommissionList/TxtMeatGrinder |
+| txtTitle | Header/TxtTitle |
+| commissionListRoot | CommissionListRoot |
+| commissionItemPrefab | CommissionItem.prefab (创建后拖入) |
 
 5. **保存 Prefab**
+
+---
+
+## 七-A、CommissionItem（委托任务项）
+
+**保存路径**: `Assets/Resources/Prefabs/WarBroker/UI/Items/CommissionItem.prefab`
+
+### 创建步骤
+
+1. **创建空对象** → 重命名为 `CommissionItem`
+
+2. **配置 RectTransform**
+   - Width: 拉伸 (Stretch)
+   - Height: 自适应（使用 Layout Element）
+
+3. **添加脚本**
+   - 添加组件: `CommissionItemBinder`
+
+4. **创建子结构**
+
+```
+CommissionItem (RectTransform + Horizontal Layout Group)
+│   - Spacing: 8
+│   - Child Alignment: Middle Left
+│   - Child Force Expand: Width=false, Height=false
+│
+├── ImgAvatar (Image, 可选)
+│   - Width: 32, Height: 32
+│   - 添加 Layout Element (Preferred Width: 32, Preferred Height: 32)
+│   - 用于显示委托人头像（如果配置了）
+│
+└── ContentArea (Vertical Layout Group)
+    │   - Spacing: 2
+    │   - Child Force Expand: Width=true, Height=false
+    │
+    ├── NameRow (Horizontal Layout Group)
+    │   │   - Spacing: 8
+    │   │   - Child Force Expand: Width=false, Height=false
+    │   │
+    │   ├── TxtName (TMP) - "斩首胜利"
+    │   │   - Font Size: 16
+    │   │   - Color: 白色（完成时变绿色）
+    │   │
+    │   └── TxtProgress (TMP) - "[0%]" 或 "[完成]"
+    │       - Font Size: 14
+    │       - Color: 白色（完成时变绿色）
+    │
+    └── TxtDescription (TMP) - "占领敌方大本营，奖金 $200"
+        - Font Size: 12
+        - Color: 浅灰色
+```
+
+5. **绑定字段** (在 CommissionItemBinder 组件上)
+
+| Inspector 字段 | 拖入对象 | 说明 |
+|---------------|---------|------|
+| txtName | ContentArea/NameRow/TxtName | 静态：委托名称 |
+| txtProgress | ContentArea/NameRow/TxtProgress | 动态：进度状态 |
+| txtDescription | ContentArea/TxtDescription | 静态：委托描述 + 奖励 |
+| imgAvatar | ImgAvatar | 静态：委托人头像（可选） |
+
+6. **保存 Prefab**
+
+### 字段分类说明
+
+| 类型 | 字段 | 更新时机 |
+|------|------|---------|
+| 静态 | txtName, txtDescription, imgAvatar | 仅在创建时设置一次 |
+| 动态 | txtProgress | 每次刷新 UI 时更新 |
+
+### 运行时行为
+
+- `ObjectivePanel.OnShow()` 时根据 `CommissionSystem.GetCommissions()` 动态生成
+- 静态字段在 `CreateCommissionItems()` 中设置
+- `txtDescription` 自动拼接描述和奖金：`"{Description}，奖金 ${BonusAmount}"`
+- 动态字段在 `RefreshCommissions()` 中更新
+- 完成时 txtName 和 txtProgress 都变为绿色
+
+---
+
+## 七-B、CommissionConfig 资产创建
+
+**保存路径**: `Assets/Resources/Config/WarBroker/Commissions/`
+
+### 创建默认委托配置
+
+在 Unity 中：Project 窗口 → 右键 → Create → WarBroker → CommissionConfig
+
+创建以下 4 个默认配置：
+
+| 文件名 | CommissionId | DisplayName | Type | TargetValue | SecondaryTargetValue | BonusAmount |
+|--------|--------------|-------------|------|-------------|---------------------|-------------|
+| Commission_WinWar.asset | WinWar | 斩首胜利 | OccupyGrid | 5 | 0 | 200 |
+| Commission_ShortCountry.asset | ShortCountry | 做空国运 | EnemyReachGrid | 2 | 2 | 500 |
+| Commission_Traitor.asset | Traitor | 卖国求荣 | NotOccupyGrid | 5 | 0 | 300 |
+| Commission_MeatGrinder.asset | MeatGrinder | 绞肉机 | TotalCasualties | 100 | 0 | 150 |
+
+### 配置字段说明
+
+| 字段 | 说明 |
+|------|------|
+| CommissionId | 唯一标识符 |
+| DisplayName | UI 显示名称 |
+| Description | 详细描述文案 |
+| CommissionerName | 委托人名称（可选） |
+| CommissionerAvatar | 委托人头像 Sprite（可选） |
+| CommissionerQuote | 委托人台词（可选） |
+| BonusAmount | 完成奖金 |
+| Type | 委托类型（决定检查逻辑） |
+| TargetValue | 主目标值 |
+| SecondaryTargetValue | 次要目标值（如 EnemyReachGrid 需要的敌方数量） |
+| NaninovelScriptName | Naninovel 对话脚本名（TODO） |
+
+### CommissionType 枚举说明
+
+| 类型 | 说明 | TargetValue | SecondaryTargetValue |
+|------|------|-------------|---------------------|
+| OccupyGrid | 己方占领指定 Grid | Grid 位置 (1-5) | 不使用 |
+| EnemyReachGrid | 敌方到达指定 Grid | Grid 位置 (1-5) | 需要的敌方数量 |
+| NotOccupyGrid | 未占领指定 Grid | Grid 位置 (1-5) | 不使用 |
+| TotalCasualties | 总伤亡达到数量 | 伤亡数量 | 不使用 |
+
+### 在 CampaignConfig 中配置
+
+1. 打开 `Campaign_Tutorial.asset`
+2. 找到 `Commissions` 列表
+3. 将创建的 CommissionConfig 资产拖入列表
+4. 不同战役可配置不同的委托组合
 
 ---
 
@@ -857,19 +1024,27 @@ FuturesPositionItem (RectTransform + Horizontal Layout Group)
 1. **基础 Items**（先创建，因为其他 Prefab 需要引用）
    - BattleResultItem
    - FuturesPositionItem
+   - CommissionItem ← 新增
 
-2. **主窗口**
+2. **配置资产**
+   - Commission_WinWar.asset
+   - Commission_ShortCountry.asset
+   - Commission_Traitor.asset
+   - Commission_MeatGrinder.asset
+   - 在 Campaign_Tutorial.asset 中配置 Commissions 列表
+
+3. **主窗口**
    - GameplayWindow
 
-3. **面板**（按使用频率）
+4. **面板**（按使用频率）
    - MarketPanel
    - InfoPanel
    - TopStatusBar
    - BottomBar
    - GeneralDetailPanel
-   - ObjectivePanel
+   - ObjectivePanel（需要先创建 CommissionItem）
 
-4. **弹窗**
+5. **弹窗**
    - EventPopup
    - BattleResultPopup
    - CampaignEndPopup
@@ -882,7 +1057,7 @@ FuturesPositionItem (RectTransform + Horizontal Layout Group)
 
 SpotMarketTab 是一个独立的 MonoBehaviour，需要在 SpotContent 上添加并绑定字段。
 
-### SpotMarketTab Prefab 结构
+### SpotMarketTab Prefab 结构（表格化布局）
 
 ```
 SpotContent (RectTransform)
@@ -890,37 +1065,83 @@ SpotContent (RectTransform)
 │
 ├── Header (TMP) - "现货市场"
 │
-├── AtkRow (Horizontal Layout Group)
-│   ├── TxtAtkLabel (TMP) - "ATK"
-│   ├── TxtAtkPrice (TMP) - 价格
-│   ├── TxtAtkHolding (TMP) - 持有量
-│   ├── BtnAtkBuy (Button) - "买入"
-│   ├── BtnAtkSell (Button) - "卖出"
-│   └── BtnAtkChart (Button) - "K线"  ← 新增
-│
-├── DefRow (Horizontal Layout Group)
-│   ├── TxtDefLabel (TMP) - "DEF"
-│   ├── TxtDefPrice (TMP) - 价格
-│   ├── TxtDefHolding (TMP) - 持有量
-│   ├── BtnDefBuy (Button) - "买入"
-│   ├── BtnDefSell (Button) - "卖出"
-│   └── BtnDefChart (Button) - "K线"  ← 新增
-│
-├── RetRow (Horizontal Layout Group)
-│   ├── TxtRetLabel (TMP) - "RET"
-│   ├── TxtRetPrice (TMP) - 价格
-│   ├── TxtRetHolding (TMP) - 持有量
-│   ├── BtnRetBuy (Button) - "买入"
-│   ├── BtnRetSell (Button) - "卖出"
-│   └── BtnRetChart (Button) - "K线"  ← 新增
+├── TableArea (Vertical Layout Group)
+│   │   - Spacing: 5
+│   │   - Child Force Expand: Width=true, Height=false
+│   │
+│   ├── TableHeader (Horizontal Layout Group)
+│   │   │   - Spacing: 10
+│   │   │   - Child Force Expand: Width=false, Height=false
+│   │   │
+│   │   ├── TxtHeaderType (TMP) - "指令"
+│   │   │   - Layout Element: Preferred Width: 60
+│   │   │   - Font Style: Bold
+│   │   │   - Alignment: Center
+│   │   │
+│   │   ├── TxtHeaderPrice (TMP) - "价格"
+│   │   │   - Layout Element: Preferred Width: 80
+│   │   │   - Font Style: Bold
+│   │   │   - Alignment: Center
+│   │   │
+│   │   ├── TxtHeaderMarketStock (TMP) - "市场库存"
+│   │   │   - Layout Element: Preferred Width: 100
+│   │   │   - Font Style: Bold
+│   │   │   - Alignment: Center
+│   │   │
+│   │   ├── TxtHeaderHolding (TMP) - "持有量"
+│   │   │   - Layout Element: Preferred Width: 80
+│   │   │   - Font Style: Bold
+│   │   │   - Alignment: Center
+│   │   │
+│   │   └── TxtHeaderActions (TMP) - "操作"
+│   │       - Layout Element: Flexible Width: 1
+│   │       - Font Style: Bold
+│   │       - Alignment: Center
+│   │
+│   ├── AtkRow (Horizontal Layout Group)
+│   │   │   - Spacing: 10
+│   │   │   - Child Alignment: Middle Left
+│   │   │
+│   │   ├── TxtAtkLabel (TMP) - "ATK"
+│   │   │   - Layout Element: Preferred Width: 60
+│   │   │   - Alignment: Center
+│   │   │
+│   │   ├── TxtAtkPrice (TMP) - "42.5"
+│   │   │   - Layout Element: Preferred Width: 80
+│   │   │   - Alignment: Center
+│   │   │
+│   │   ├── TxtAtkMarketStock (TMP) - "150"  ← 新增
+│   │   │   - Layout Element: Preferred Width: 100
+│   │   │   - Alignment: Center
+│   │   │
+│   │   ├── TxtAtkHolding (TMP) - "2"
+│   │   │   - Layout Element: Preferred Width: 80
+│   │   │   - Alignment: Center
+│   │   │
+│   │   └── ActionsArea (Horizontal Layout Group)
+│   │       │   - Spacing: 5
+│   │       │   - Layout Element: Flexible Width: 1
+│   │       │
+│   │       ├── BtnAtkBuy (Button) - "买入"
+│   │       ├── BtnAtkSell (Button) - "卖出"
+│   │       └── BtnAtkChart (Button) - "K线"
+│   │
+│   ├── DefRow (同上结构)
+│   │   ├── TxtDefLabel, TxtDefPrice, TxtDefMarketStock, TxtDefHolding
+│   │   └── ActionsArea (BtnDefBuy, BtnDefSell, BtnDefChart)
+│   │
+│   └── RetRow (同上结构)
+│       ├── TxtRetLabel, TxtRetPrice, TxtRetMarketStock, TxtRetHolding
+│       └── ActionsArea (BtnRetBuy, BtnRetSell, BtnRetChart)
 │
 └── ChartArea (RectTransform)
     │   - Height: 200
     │
     └── KLineChart (RectTransform)
-        │   - 添加组件: KLineChartView
         │   - Stretch to fill ChartArea
-        └── (XCharts CandlestickChart 运行时自动创建)
+        │   - 添加组件: CandlestickChart（预先配置样式）
+        │   - 添加组件: KLineChartView（chart 字段绑定上面的 CandlestickChart）
+        └── (图表样式在 Prefab 中配置，运行时直接使用)
 ```
 
 ### SpotMarketTab 需绑定的字段
@@ -928,16 +1149,19 @@ SpotContent (RectTransform)
 | Inspector 字段 | 类型 | 说明 |
 |---------------|------|------|
 | txtAtkPrice | TMP_Text | ATK 价格 |
+| txtAtkMarketStock | TMP_Text | ATK 市场库存（新增） |
 | txtAtkHolding | TMP_Text | ATK 持有量 |
 | btnAtkBuy | Button | ATK 买入 |
 | btnAtkSell | Button | ATK 卖出 |
 | btnAtkChart | Button | ATK K线切换按钮 |
 | txtDefPrice | TMP_Text | DEF 价格 |
+| txtDefMarketStock | TMP_Text | DEF 市场库存（新增） |
 | txtDefHolding | TMP_Text | DEF 持有量 |
 | btnDefBuy | Button | DEF 买入 |
 | btnDefSell | Button | DEF 卖出 |
 | btnDefChart | Button | DEF K线切换按钮 |
 | txtRetPrice | TMP_Text | RET 价格 |
+| txtRetMarketStock | TMP_Text | RET 市场库存（新增） |
 | txtRetHolding | TMP_Text | RET 持有量 |
 | btnRetBuy | Button | RET 买入 |
 | btnRetSell | Button | RET 卖出 |
@@ -952,7 +1176,37 @@ SpotContent (RectTransform)
 
 KLineChartView 是封装 XCharts CandlestickChart 的通用 K 线图组件，用于显示 ATK/DEF/RET 指令的价格走势。
 
-### 创建步骤
+### 创建步骤（Prefab 预配置方式 - 推荐）
+
+1. **创建空 GameObject**
+   - 添加 `RectTransform` 组件（默认已有）
+   - 设置合适的尺寸（建议最小 200x150）
+
+2. **添加 CandlestickChart 组件**
+   - 在 Inspector 中 Add Component → 搜索 `CandlestickChart`
+   - 在 XCharts Inspector 中配置图表样式：
+     - **Title**: 设置标题文字、字体大小
+     - **XAxis**: Category 类型，配置标签样式
+     - **YAxis**: Value 类型，配置标签样式、分割数
+     - **Grid**: 配置边距（left, right, top, bottom）
+     - **Serie - Candlestick**: 配置涨跌颜色
+       - itemStyle.color: 涨色（如红色 #EB5454）
+       - itemStyle.color0: 跌色（如绿色 #44C67F）
+       - itemStyle.borderColor: 涨边框色
+       - itemStyle.borderColor0: 跌边框色
+
+3. **添加 KLineChartView 组件**
+   - 在 Inspector 中 Add Component → 搜索 `KLineChartView`
+   - 将同节点的 `CandlestickChart` 拖入 `chart` 字段
+
+4. **配置 Inspector 属性**（可选）
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| chart | CandlestickChart | 预绑定的图表组件（推荐在 Prefab 中配置） |
+| chartTitle | string | 图表标题（如 "ATK"），也可在 CandlestickChart 中配置 |
+
+### 创建步骤（运行时创建方式 - 兼容旧用法）
 
 1. **创建空 GameObject**
    - 添加 `RectTransform` 组件（默认已有）
@@ -960,15 +1214,9 @@ KLineChartView 是封装 XCharts CandlestickChart 的通用 K 线图组件，用
 
 2. **添加 KLineChartView 组件**
    - 在 Inspector 中 Add Component → 搜索 `KLineChartView`
-   - **不需要**手动添加 CandlestickChart，运行时会自动创建
+   - **不绑定** chart 字段，运行时会自动创建 CandlestickChart
 
-3. **配置 Inspector 属性**（可选）
-
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| chartTitle | string | "" | 图表标题（如 "ATK"） |
-| riseColor | Color32 | 红色 (235,84,84) | 上涨颜色 |
-| fallColor | Color32 | 绿色 (68,198,127) | 下跌颜色 |
+注意：运行时创建方式无法在编辑器中预览图表样式。
 
 ### API 说明
 
@@ -1015,9 +1263,10 @@ klineChart.RefreshData(data.Market.KLineHistory[OrderType.DEF]);
 
 ### 注意事项
 
-1. **RectTransform 尺寸**：确保父容器有足够空间，图表会自动填充 RectTransform 区域
-2. **运行时创建**：CandlestickChart 组件在 `Initialize()` 时自动添加，无需手动添加
-3. **数据格式**：使用 `MarketData.KLineHistory[OrderType]` 中的 `List<KLineData>`
+1. **Prefab 预配置（推荐）**：在 Prefab 中预先添加 CandlestickChart 并配置样式，可在编辑器中预览
+2. **运行时兼容**：如果未绑定 chart 字段，`Initialize()` 时会自动创建 CandlestickChart
+3. **RectTransform 尺寸**：确保父容器有足够空间，图表会自动填充 RectTransform 区域
+4. **数据格式**：使用 `MarketData.KLineHistory[OrderType]` 中的 `List<KLineData>`
 
 ---
 
@@ -1289,3 +1538,96 @@ public class GeneralClickHandler : MonoBehaviour, IPointerClickHandler
 - [ ] 银行借贷功能正常
 - [ ] 回合结束按钮正常
 - [ ] 战斗结算弹窗正常显示
+- [ ] Tooltip 悬停显示正常
+
+---
+
+## 十六、TooltipPanel（轻量 Tooltip 面板）
+
+**保存路径**: `Assets/Resources/Prefabs/WarBroker/UI/Panels/TooltipPanel.prefab`
+
+TooltipPanel 是一个轻量级的 Paradox 风格 Tooltip 系统，利用现有的 UIListener 组件实现悬停显示。
+
+### 创建步骤
+
+1. **创建空对象** → 重命名为 `TooltipPanel`
+
+2. **配置 RectTransform**
+   - Anchor: 左下角 (Left-Bottom)
+   - Pivot: (0, 1) - 左上角为锚点，便于跟随鼠标
+   - Width: 自适应（使用 Content Size Fitter）
+   - Height: 自适应
+
+3. **添加脚本**
+   - 添加组件: `TooltipPanelBinder`（仅 Binder）
+
+4. **创建子结构**
+
+```
+TooltipPanel (RectTransform)
+│   - 添加 Image 组件作为背景
+│   - 添加 Vertical Layout Group
+│     - Padding: 10
+│     - Spacing: 5
+│     - Child Force Expand: Width=true, Height=false
+│   - 添加 Content Size Fitter
+│     - Horizontal Fit: Preferred Size
+│     - Vertical Fit: Preferred Size
+│
+├── TxtTitle (TextMeshPro - Text)
+│   - Font Size: 16
+│   - Font Style: Bold
+│   - Color: 白色或高亮色
+│   - 添加 Layout Element
+│     - Preferred Width: 200 (最小宽度)
+│
+└── TxtContent (TextMeshPro - Text)
+    - Font Size: 14
+    - Color: 浅灰色
+    - Rich Text: true (支持颜色标签)
+    - 添加 Layout Element
+      - Preferred Width: 200
+      - Flexible Width: 1
+```
+
+5. **绑定字段** (在 TooltipPanelBinder 组件上)
+
+| Inspector 字段 | 拖入对象 |
+|---------------|---------|
+| txtTitle | TxtTitle |
+| txtContent | TxtContent |
+| panelRect | TooltipPanel (自身的 RectTransform) |
+
+6. **保存 Prefab**
+
+### 使用方式
+
+TooltipPanel 通过 UIListener 组件的 `onEnter` 和 `onExit` 事件触发。在 GameplayWindow 中已预设以下 Tooltip：
+
+| 目标元素 | Tooltip 内容 |
+|---------|-------------|
+| 现金图标 (ImgCashIcon) | 静态说明："现金含义" |
+| 现金数值 (TxtCash) | 动态内容：下回合固定支出（利息+仓储费） |
+| ATK 图标/数值 | 静态说明："进攻令 (ATK)" |
+| DEF 图标/数值 | 静态说明："防守令 (DEF)" |
+| RET 图标/数值 | 静态说明："撤退令 (RET)" |
+| 结束回合按钮 | 动态内容：预计扣除费用 |
+
+### 添加自定义 Tooltip
+
+在任意 WindowBase 子类中，可以使用以下方式添加 Tooltip：
+
+```csharp
+// 静态内容
+AddTooltip(targetGameObject, "标题", "内容描述");
+
+// 动态内容（每次悬停时重新计算）
+AddTooltip(targetGameObject, "标题", () => GetDynamicContent());
+```
+
+### 注意事项
+
+1. **UILayer**: TooltipPanel 使用 `UILayer.Popup` 确保显示在最上层
+2. **边界检测**: 自动检测屏幕边界，防止 Tooltip 超出屏幕
+3. **跟随鼠标**: 每帧更新位置，跟随鼠标移动
+4. **Rich Text**: 支持 TextMeshPro 富文本标签（如 `<color=#FF6666>红色文字</color>`）

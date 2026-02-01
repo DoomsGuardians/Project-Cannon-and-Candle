@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -12,6 +13,9 @@ public class GameplayManager : ManagerBase
 
     [Header("战役配置")]
     public string CampaignId = "Campaign_Tutorial";
+
+    // 收集本回合的战斗结果
+    private List<BattleResult> pendingBattleResults = new List<BattleResult>();
 
     public override void OnAwake()
     {
@@ -39,6 +43,9 @@ public class GameplayManager : ManagerBase
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnStart, OnTurnStart);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnTurnEnd);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnGameEnd, OnGameEnd);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleResult, OnBattleResult);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleAnimationsComplete, OnBattleAnimationsComplete);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnRandomEvent, OnRandomEvent);
     }
 
     private void UnregisterEvents()
@@ -165,6 +172,9 @@ public class GameplayManager : ManagerBase
     {
         int turn = (int)param1;
         Debug.Log($"回合 {turn} 开始");
+
+        // 清空上回合的战斗结果
+        pendingBattleResults.Clear();
     }
 
     private void OnTurnEnd(object param1, object param2)
@@ -177,6 +187,39 @@ public class GameplayManager : ManagerBase
     {
         bool isVictory = (bool)param1;
         Debug.Log($"游戏结束: {(isVictory ? "胜利" : "失败")}");
+
+        // 显示结算弹窗
+        uiService.ShowWindow<CampaignEndPopup>("CampaignEndPopup");
+    }
+
+    private void OnBattleResult(object param1, object param2)
+    {
+        var result = param1 as BattleResult;
+        if (result != null)
+        {
+            // 收集战斗结果，等动画完成后再显示
+            pendingBattleResults.Add(result);
+        }
+    }
+
+    private void OnBattleAnimationsComplete(object param1, object param2)
+    {
+        // 所有战斗动画播放完成，显示战报弹窗
+        if (pendingBattleResults.Count > 0)
+        {
+            var popup = uiService.ShowWindow<BattleResultPopup>("BattleResultPopup");
+            popup?.SetBattleResults(new List<BattleResult>(pendingBattleResults));
+        }
+    }
+
+    private void OnRandomEvent(object param1, object param2)
+    {
+        var eventConfig = param1 as RandomEventConfig;
+        if (eventConfig != null)
+        {
+            var popup = uiService.ShowWindow<EventPopup>("EventPopup");
+            popup?.SetEventData(eventConfig);
+        }
     }
 
     #endregion

@@ -1,37 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 委托任务面板：显示当前盈亏和委托任务进度
+/// 委托任务面板：动态显示委托任务进度
 /// </summary>
 public class ObjectivePanel : WindowBase
 {
-    private TMP_Text txtObjectiveTitle, txtObjectiveDescription, txtProgress, txtPnL;
-    private TMP_Text txtWinWar, txtShortCountry, txtTraitor, txtMeatGrinder;
+    private TMP_Text txtTitle;
     private Transform commissionListRoot;
+    private GameObject commissionItemPrefab;
 
     private GameplayManager gameplayManager;
     private CommissionSystem commissionSystem;
 
-    // 委托显示名称
-    private static readonly Dictionary<string, string> CommissionNames = new Dictionary<string, string>
-    {
-        { "WinWar", "赢下战争" },
-        { "ShortCountry", "做空祖国" },
-        { "Traitor", "卖国求荣" },
-        { "MeatGrinder", "绞肉机" }
-    };
-
-    // 委托奖金
-    private static readonly Dictionary<string, float> CommissionBonuses = new Dictionary<string, float>
-    {
-        { "WinWar", 200f },
-        { "ShortCountry", 500f },
-        { "Traitor", 300f },
-        { "MeatGrinder", 150f }
-    };
+    private List<CommissionItemBinder> commissionItems = new List<CommissionItemBinder>();
 
     public override void OnAwake()
     {
@@ -41,15 +24,9 @@ public class ObjectivePanel : WindowBase
         var b = gameObject.GetComponent<ObjectivePanelBinder>();
         if (b != null)
         {
-            txtObjectiveTitle = b.txtObjectiveTitle;
-            txtObjectiveDescription = b.txtObjectiveDescription;
-            txtProgress = b.txtProgress;
-            txtPnL = b.txtPnL;
+            txtTitle = b.txtTitle;
             commissionListRoot = b.commissionListRoot;
-            txtWinWar = b.txtWinWar;
-            txtShortCountry = b.txtShortCountry;
-            txtTraitor = b.txtTraitor;
-            txtMeatGrinder = b.txtMeatGrinder;
+            commissionItemPrefab = b.commissionItemPrefab;
         }
     }
 
@@ -61,6 +38,10 @@ public class ObjectivePanel : WindowBase
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnRefresh);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleResult, OnRefresh);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTradeExecuted, OnRefresh);
+
+        // 清理旧项并动态生成委托项
+        ClearCommissionItems();
+        CreateCommissionItems();
         RefreshUI();
     }
 
@@ -69,34 +50,71 @@ public class ObjectivePanel : WindowBase
         eventService.RemoveEventListeningByTarget(this);
     }
 
+    /// <summary>
+    /// 清理所有委托项
+    /// </summary>
+    private void ClearCommissionItems()
+    {
+        foreach (var item in commissionItems)
+        {
+            if (item != null && item.gameObject != null)
+            {
+                Object.Destroy(item.gameObject);
+            }
+        }
+        commissionItems.Clear();
+    }
+
+    /// <summary>
+    /// 根据配置动态生成委托项
+    /// </summary>
+    private void CreateCommissionItems()
+    {
+        if (commissionSystem == null || commissionListRoot == null || commissionItemPrefab == null)
+            return;
+
+        var commissions = commissionSystem.GetCommissions();
+        foreach (var config in commissions)
+        {
+            var itemGO = Object.Instantiate(commissionItemPrefab, commissionListRoot);
+            var binder = itemGO.GetComponent<CommissionItemBinder>();
+            if (binder != null)
+            {
+                binder.Config = config;
+
+                // 设置静态信息（只需设置一次）
+                if (binder.txtName != null)
+                {
+                    binder.txtName.text = config.DisplayName;
+                }
+
+                // 设置描述（含奖励）
+                if (binder.txtDescription != null)
+                {
+                    binder.txtDescription.text = $"{config.Description}，奖金 ${config.BonusAmount:F0}";
+                }
+
+                // 设置委托人头像（如果有）
+                if (binder.imgAvatar != null && config.CommissionerAvatar != null)
+                {
+                    binder.imgAvatar.sprite = config.CommissionerAvatar;
+                    binder.imgAvatar.gameObject.SetActive(true);
+                }
+                else if (binder.imgAvatar != null)
+                {
+                    binder.imgAvatar.gameObject.SetActive(false);
+                }
+
+                commissionItems.Add(binder);
+            }
+        }
+    }
+
     private void RefreshUI()
     {
-        var data = gameplayManager?.GetCampaignData();
-        if (data == null) return;
+        if (txtTitle != null)
+            txtTitle.text = "委托任务";
 
-        // 主目标标题
-        if (txtObjectiveTitle != null)
-            txtObjectiveTitle.text = "战役目标";
-
-        // 当前盈亏
-        float netWorth = data.Player.CalculateNetWorth(data.Market);
-        float profit = netWorth - data.Player.AuditValue;
-        float profitPercent = data.Player.AuditValue > 0 ? (profit / data.Player.AuditValue) * 100f : 0f;
-
-        if (txtObjectiveDescription != null)
-            txtObjectiveDescription.text = $"净资产: {netWorth:F0}";
-
-        if (txtPnL != null)
-        {
-            string sign = profit >= 0 ? "+" : "";
-            txtPnL.text = $"P&L: {sign}{profit:F0} ({sign}{profitPercent:F1}%)";
-            txtPnL.color = profit >= 0 ? new Color(0.2f, 0.8f, 0.2f) : new Color(0.9f, 0.2f, 0.2f);
-        }
-
-        if (txtProgress != null)
-            txtProgress.text = $"回合 {data.CurrentTurn}/{data.MaxTurns}";
-
-        // 更新委托任务进度
         RefreshCommissions();
     }
 
@@ -106,40 +124,42 @@ public class ObjectivePanel : WindowBase
 
         var progress = commissionSystem.GetCommissionProgress();
 
-        // WinWar
-        if (txtWinWar != null)
+        foreach (var item in commissionItems)
         {
-            float p = progress.ContainsKey("WinWar") ? progress["WinWar"] : 0f;
-            string status = p >= 1f ? "[完成]" : $"[{p * 100:F0}%]";
-            txtWinWar.text = $"{CommissionNames["WinWar"]} ${CommissionBonuses["WinWar"]:F0} {status}";
-            txtWinWar.color = p >= 1f ? new Color(0.2f, 0.8f, 0.2f) : Color.white;
-        }
+            if (item == null || item.Config == null) continue;
 
-        // ShortCountry
-        if (txtShortCountry != null)
-        {
-            float p = progress.ContainsKey("ShortCountry") ? progress["ShortCountry"] : 0f;
-            string status = p >= 1f ? "[完成]" : $"[{p * 100:F0}%]";
-            txtShortCountry.text = $"{CommissionNames["ShortCountry"]} ${CommissionBonuses["ShortCountry"]:F0} {status}";
-            txtShortCountry.color = p >= 1f ? new Color(0.2f, 0.8f, 0.2f) : Color.white;
-        }
+            var config = item.Config;
+            float p = progress.ContainsKey(config.CommissionId) ? progress[config.CommissionId] : 0f;
+            bool completed = p >= 1f;
 
-        // Traitor
-        if (txtTraitor != null)
-        {
-            float p = progress.ContainsKey("Traitor") ? progress["Traitor"] : 0f;
-            string status = p >= 1f ? "[完成]" : "[未达成]";
-            txtTraitor.text = $"{CommissionNames["Traitor"]} ${CommissionBonuses["Traitor"]:F0} {status}";
-            txtTraitor.color = p >= 1f ? new Color(0.2f, 0.8f, 0.2f) : Color.white;
-        }
+            // 格式化进度文本
+            string progressText;
+            if (completed)
+            {
+                progressText = "[完成]";
+            }
+            else if (config.Type == CommissionType.NotOccupyGrid)
+            {
+                // NotOccupyGrid 类型显示 [达成] 或 [未达成]
+                progressText = "[未达成]";
+            }
+            else
+            {
+                progressText = $"[{p * 100:F0}%]";
+            }
 
-        // MeatGrinder
-        if (txtMeatGrinder != null)
-        {
-            float p = progress.ContainsKey("MeatGrinder") ? progress["MeatGrinder"] : 0f;
-            string status = p >= 1f ? "[完成]" : $"[{p * 100:F0}%]";
-            txtMeatGrinder.text = $"{CommissionNames["MeatGrinder"]} ${CommissionBonuses["MeatGrinder"]:F0} {status}";
-            txtMeatGrinder.color = p >= 1f ? new Color(0.2f, 0.8f, 0.2f) : Color.white;
+            // 更新进度文本
+            if (item.txtProgress != null)
+            {
+                item.txtProgress.text = progressText;
+                item.txtProgress.color = completed ? new Color(0.2f, 0.8f, 0.2f) : Color.white;
+            }
+
+            // 更新名称颜色（可选，表示完成状态）
+            if (item.txtName != null)
+            {
+                item.txtName.color = completed ? new Color(0.2f, 0.8f, 0.2f) : Color.white;
+            }
         }
     }
 

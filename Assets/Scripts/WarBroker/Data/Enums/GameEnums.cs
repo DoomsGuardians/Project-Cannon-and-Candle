@@ -66,3 +66,12 @@ public enum IntentSource
     Reinforced, // 强化（金色气泡）
     Overridden  // 篡改（红色气泡）
 }
+
+/// <summary>委托任务类型</summary>
+public enum CommissionType
+{
+    OccupyGrid,       // 占领指定 Grid（如 WinWar：占领 Grid 5）
+    EnemyReachGrid,   // 敌方到达指定 Grid 数量（如 ShortCountry：敌方到达 Grid 2）
+    NotOccupyGrid,    // 未占领指定 Grid（如 Traitor：未占领 Grid 5）
+    TotalCasualties   // 总伤亡达到数量（如 MeatGrinder：伤亡 >= 100）
+}

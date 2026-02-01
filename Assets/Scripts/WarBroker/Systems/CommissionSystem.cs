@@ -1,27 +1,36 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 委托任务系统 (GDD v6.0)
-/// 4 种委托：WinWar, ShortCountry, Traitor, MeatGrinder
+/// 委托任务系统 (配置化版本)
+/// 从 CommissionConfig 加载委托定义，支持动态配置
 /// </summary>
 public class CommissionSystem
 {
     private CampaignRuntimeData campaignData;
     private GameBalanceConfig balanceConfig;
-
-    // 委托奖金配置 (GDD v6.0)
-    private const float WinWarBonus = 200f;
-    private const float ShortCountryBonus = 500f;
-    private const float TraitorBonus = 300f;
-    private const float MeatGrinderBonus = 150f;
+    private List<CommissionConfig> commissions;
 
     public void Init(CampaignRuntimeData campaignData, GameBalanceConfig balanceConfig)
     {
         this.campaignData = campaignData;
         this.balanceConfig = balanceConfig;
+        this.commissions = new List<CommissionConfig>();
     }
+
+    /// <summary>
+    /// 从配置加载委托任务列表
+    /// </summary>
+    public void LoadCommissions(List<CommissionConfig> commissionConfigs)
+    {
+        commissions = commissionConfigs ?? new List<CommissionConfig>();
+        Debug.Log($"[CommissionSystem] 加载了 {commissions.Count} 个委托任务");
+    }
+
+    /// <summary>
+    /// 获取当前委托任务列表
+    /// </summary>
+    public List<CommissionConfig> GetCommissions() => commissions;
 
     /// <summary>
     /// 检查并结算所有委托任务
@@ -32,40 +41,15 @@ public class CommissionSystem
         var results = new Dictionary<string, bool>();
         totalBonus = 0f;
 
-        // 检查 WinWar（斩首胜利）
-        bool winWar = CheckWinWar();
-        results["WinWar"] = winWar;
-        if (winWar)
+        foreach (var config in commissions)
         {
-            totalBonus += WinWarBonus;
-            Debug.Log($"[委托达成] WinWar: +${WinWarBonus}");
-        }
-
-        // 检查 ShortCountry（至少 2 条战线敌方到达 Grid 2）
-        bool shortCountry = CheckShortCountry();
-        results["ShortCountry"] = shortCountry;
-        if (shortCountry)
-        {
-            totalBonus += ShortCountryBonus;
-            Debug.Log($"[委托达成] ShortCountry: +${ShortCountryBonus}");
-        }
-
-        // 检查 Traitor（战役结束时 Grid 5 未被占领）
-        bool traitor = CheckTraitor();
-        results["Traitor"] = traitor;
-        if (traitor)
-        {
-            totalBonus += TraitorBonus;
-            Debug.Log($"[委托达成] Traitor: +${TraitorBonus}");
-        }
-
-        // 检查 MeatGrinder（双方总伤亡 ≥ 100）
-        bool meatGrinder = CheckMeatGrinder();
-        results["MeatGrinder"] = meatGrinder;
-        if (meatGrinder)
-        {
-            totalBonus += MeatGrinderBonus;
-            Debug.Log($"[委托达成] MeatGrinder: +${MeatGrinderBonus}");
+            bool achieved = CheckCommission(config);
+            results[config.CommissionId] = achieved;
+            if (achieved)
+            {
+                totalBonus += config.BonusAmount;
+                Debug.Log($"[委托达成] {config.DisplayName}: +${config.BonusAmount}");
+            }
         }
 
         // 将奖金加入玩家现金
@@ -79,14 +63,29 @@ public class CommissionSystem
     }
 
     /// <summary>
-    /// WinWar: 斩首胜利
-    /// 条件：任意一条战线 Grid 5 被占领并保持 1 回合
+    /// 根据配置类型检查委托是否达成
     /// </summary>
-    private bool CheckWinWar()
+    private bool CheckCommission(CommissionConfig config)
+    {
+        return config.Type switch
+        {
+            CommissionType.OccupyGrid => CheckOccupyGrid(config.TargetValue),
+            CommissionType.EnemyReachGrid => CheckEnemyReachGrid(config.TargetValue, config.SecondaryTargetValue),
+            CommissionType.NotOccupyGrid => CheckNotOccupyGrid(config.TargetValue),
+            CommissionType.TotalCasualties => CheckTotalCasualties(config.TargetValue),
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// OccupyGrid: 占领指定 Grid
+    /// 条件：任意一条战线己方将军到达指定 Grid
+    /// </summary>
+    private bool CheckOccupyGrid(int targetGrid)
     {
         foreach (var general in campaignData.Battle.AllyGenerals)
         {
-            if (general.GridPosition == 5)
+            if (general.GridPosition >= targetGrid)
             {
                 return true;
             }
@@ -95,50 +94,59 @@ public class CommissionSystem
     }
 
     /// <summary>
-    /// ShortCountry: 做空国运
-    /// 条件：至少 2 条战线敌方到达 Grid 2
+    /// EnemyReachGrid: 敌方到达指定 Grid
+    /// 条件：至少 N 条战线敌方到达指定 Grid
     /// </summary>
-    private bool CheckShortCountry()
+    private bool CheckEnemyReachGrid(int targetGrid, int requiredCount)
     {
         int count = 0;
         foreach (var general in campaignData.Battle.EnemyGenerals)
         {
-            if (general.GridPosition <= 2)
+            if (general.GridPosition <= targetGrid)
             {
                 count++;
             }
         }
-        return count >= 2;
+        return count >= requiredCount;
     }
 
     /// <summary>
-    /// Traitor: 卖国求荣
-    /// 条件：战役结束时 Grid 5 未被占领（即未达成斩首胜利）
+    /// NotOccupyGrid: 未占领指定 Grid
+    /// 条件：战役结束时指定 Grid 未被己方占领
     /// </summary>
-    private bool CheckTraitor()
+    private bool CheckNotOccupyGrid(int targetGrid)
     {
         foreach (var general in campaignData.Battle.AllyGenerals)
         {
-            if (general.GridPosition == 5)
+            if (general.GridPosition >= targetGrid)
             {
-                return false; // 有人到达 Grid 5，不满足条件
+                return false; // 有人到达目标 Grid，不满足条件
             }
         }
-        return true; // 没有人到达 Grid 5
+        return true; // 没有人到达目标 Grid
     }
 
     /// <summary>
-    /// MeatGrinder: 绞肉机
-    /// 条件：双方总伤亡 ≥ 100
+    /// TotalCasualties: 总伤亡达到数量
+    /// 条件：双方总伤亡 >= 目标值
     /// </summary>
-    private bool CheckMeatGrinder()
+    private bool CheckTotalCasualties(int targetCasualties)
+    {
+        int totalCasualties = CalculateTotalCasualties();
+        return totalCasualties >= targetCasualties;
+    }
+
+    /// <summary>
+    /// 计算双方总伤亡
+    /// </summary>
+    private int CalculateTotalCasualties()
     {
         int totalCasualties = 0;
+        int initialHP = 16; // 假设初始 HP 为 16
 
         // 计算己方伤亡
         foreach (var general in campaignData.Battle.AllyGenerals)
         {
-            int initialHP = 16; // 假设初始 HP 为 16
             int casualties = Mathf.Max(0, initialHP - general.Troops);
             totalCasualties += casualties;
         }
@@ -146,7 +154,6 @@ public class CommissionSystem
         // 计算敌方伤亡
         foreach (var general in campaignData.Battle.EnemyGenerals)
         {
-            int initialHP = 16;
             int casualties = Mathf.Max(0, initialHP - general.Troops);
             totalCasualties += casualties;
         }
@@ -155,22 +162,7 @@ public class CommissionSystem
         int reservesUsed = Mathf.Max(0, 60 - campaignData.Battle.CurrentReserves);
         totalCasualties += reservesUsed;
 
-        Debug.Log($"[MeatGrinder] 总伤亡: {totalCasualties}");
-        return totalCasualties >= 100;
-    }
-
-    /// <summary>
-    /// 获取委托任务描述（用于 UI 显示）
-    /// </summary>
-    public Dictionary<string, string> GetCommissionDescriptions()
-    {
-        return new Dictionary<string, string>
-        {
-            { "WinWar", $"斩首胜利：任意战线占领 Grid 5 并保持 1 回合（奖金 ${WinWarBonus}）" },
-            { "ShortCountry", $"做空国运：至少 2 条战线敌方到达 Grid 2（奖金 ${ShortCountryBonus}）" },
-            { "Traitor", $"卖国求荣：战役结束时 Grid 5 未被占领（奖金 ${TraitorBonus}）" },
-            { "MeatGrinder", $"绞肉机：双方总伤亡 ≥ 100（奖金 ${MeatGrinderBonus}）" }
-        };
+        return totalCasualties;
     }
 
     /// <summary>
@@ -180,38 +172,77 @@ public class CommissionSystem
     {
         var progress = new Dictionary<string, float>();
 
-        // WinWar 进度：最前线位置 / 5
+        foreach (var config in commissions)
+        {
+            progress[config.CommissionId] = GetProgress(config);
+        }
+
+        return progress;
+    }
+
+    /// <summary>
+    /// 获取单个委托的进度
+    /// </summary>
+    private float GetProgress(CommissionConfig config)
+    {
+        return config.Type switch
+        {
+            CommissionType.OccupyGrid => GetOccupyGridProgress(config.TargetValue),
+            CommissionType.EnemyReachGrid => GetEnemyReachGridProgress(config.TargetValue, config.SecondaryTargetValue),
+            CommissionType.NotOccupyGrid => CheckNotOccupyGrid(config.TargetValue) ? 1f : 0f,
+            CommissionType.TotalCasualties => GetTotalCasualtiesProgress(config.TargetValue),
+            _ => 0f
+        };
+    }
+
+    /// <summary>
+    /// OccupyGrid 进度：最前线位置 / 目标位置
+    /// </summary>
+    private float GetOccupyGridProgress(int targetGrid)
+    {
         int maxPosition = 0;
         foreach (var general in campaignData.Battle.AllyGenerals)
         {
             maxPosition = Mathf.Max(maxPosition, general.GridPosition);
         }
-        progress["WinWar"] = maxPosition / 5f;
+        return Mathf.Min(1f, (float)maxPosition / targetGrid);
+    }
 
-        // ShortCountry 进度：敌方到达 Grid 2 的战线数 / 2
-        int shortCount = 0;
+    /// <summary>
+    /// EnemyReachGrid 进度：到达目标 Grid 的敌方数量 / 需要数量
+    /// </summary>
+    private float GetEnemyReachGridProgress(int targetGrid, int requiredCount)
+    {
+        int count = 0;
         foreach (var general in campaignData.Battle.EnemyGenerals)
         {
-            if (general.GridPosition <= 2) shortCount++;
+            if (general.GridPosition <= targetGrid)
+            {
+                count++;
+            }
         }
-        progress["ShortCountry"] = Mathf.Min(1f, shortCount / 2f);
+        return Mathf.Min(1f, (float)count / requiredCount);
+    }
 
-        // Traitor 进度：反向进度（Grid 5 未被占领）
-        progress["Traitor"] = CheckTraitor() ? 1f : 0f;
+    /// <summary>
+    /// TotalCasualties 进度：当前伤亡 / 目标伤亡
+    /// </summary>
+    private float GetTotalCasualtiesProgress(int targetCasualties)
+    {
+        int totalCasualties = CalculateTotalCasualties();
+        return Mathf.Min(1f, (float)totalCasualties / targetCasualties);
+    }
 
-        // MeatGrinder 进度：总伤亡 / 100
-        int totalCasualties = 0;
-        foreach (var general in campaignData.Battle.AllyGenerals)
+    /// <summary>
+    /// 获取委托任务描述（用于 UI 显示）
+    /// </summary>
+    public Dictionary<string, string> GetCommissionDescriptions()
+    {
+        var descriptions = new Dictionary<string, string>();
+        foreach (var config in commissions)
         {
-            totalCasualties += Mathf.Max(0, 16 - general.Troops);
+            descriptions[config.CommissionId] = $"{config.DisplayName}：{config.Description}（奖金 ${config.BonusAmount}）";
         }
-        foreach (var general in campaignData.Battle.EnemyGenerals)
-        {
-            totalCasualties += Mathf.Max(0, 16 - general.Troops);
-        }
-        totalCasualties += Mathf.Max(0, 60 - campaignData.Battle.CurrentReserves);
-        progress["MeatGrinder"] = Mathf.Min(1f, totalCasualties / 100f);
-
-        return progress;
+        return descriptions;
     }
 }

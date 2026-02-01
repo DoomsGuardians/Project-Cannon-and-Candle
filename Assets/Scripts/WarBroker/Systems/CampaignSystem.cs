@@ -21,6 +21,9 @@ public class CampaignSystem : ILogic
 
     public CampaignRuntimeData Data { get; private set; }
 
+    // 是否等待战斗动画完成
+    private bool waitingForBattleAnimations = false;
+
     public void OnInit()
     {
         eventService = GameRoot.Instance.eventService;
@@ -34,11 +37,18 @@ public class CampaignSystem : ILogic
         intentSystem.Init(balanceConfig);
 
         commissionSystem = new CommissionSystem();
+
+        // 监听战斗动画完成事件
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleAnimationsComplete, OnBattleAnimationsComplete);
     }
 
     public void OnEnterState() { }
     public void OnUpdate() { }
-    public void UnInit() { }
+
+    public void UnInit()
+    {
+        eventService?.RemoveEventListeningByTarget(this);
+    }
 
     public void InitNewCampaign(string campaignId, MarketSystem market, BattleSystem battle)
     {
@@ -62,6 +72,9 @@ public class CampaignSystem : ILogic
 
         // 初始化委托系统
         commissionSystem.Init(Data, balanceConfig);
+
+        // 从战役配置加载委托任务
+        commissionSystem.LoadCommissions(campaignConfig.Commissions);
     }
 
     public IntentSystem GetIntentSystem() => intentSystem;
@@ -179,8 +192,26 @@ public class CampaignSystem : ILogic
 
         eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.BattlePhase, null);
 
-        // 自动进入阶段 V：回合结算
-        EnterSettlementPhase();
+        // 等待战斗动画完成后再进入结算阶段
+        // 如果有战斗结果，等待动画；否则直接进入结算
+        if (battleResults.Count > 0)
+        {
+            waitingForBattleAnimations = true;
+        }
+        else
+        {
+            EnterSettlementPhase();
+        }
+    }
+
+    /// <summary>战斗动画完成回调</summary>
+    private void OnBattleAnimationsComplete(object p1, object p2)
+    {
+        if (waitingForBattleAnimations)
+        {
+            waitingForBattleAnimations = false;
+            EnterSettlementPhase();
+        }
     }
 
     /// <summary>
@@ -530,13 +561,6 @@ public class CampaignSystem : ILogic
             }
         }
 
-        // 检查谈判停战（所有战线僵持 3 回合）
-        if (battleSystem.CheckNegotiation())
-        {
-            EndGame(GameResult.Victory, "谈判停战");
-            return;
-        }
-
         // 检查回合数限制
         if (Data.CurrentTurn >= Data.MaxTurns)
         {
@@ -550,6 +574,16 @@ public class CampaignSystem : ILogic
     {
         CurrentGameResult = result;
         GameEndReason = reason;
+
+        // 输出胜负原因到控制台
+        string resultText = result switch
+        {
+            GameResult.Victory => "胜利",
+            GameResult.Defeat => "失败",
+            GameResult.Draw => "平局",
+            _ => result.ToString()
+        };
+        Debug.Log($"[游戏结束] {resultText} - 原因: {reason}");
 
         // 委托任务结算
         if (commissionSystem != null)

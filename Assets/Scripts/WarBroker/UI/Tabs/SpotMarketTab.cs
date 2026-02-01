@@ -10,6 +10,7 @@ public class SpotMarketTab : MonoBehaviour
 {
     [Header("ATK 行")]
     [SerializeField] private TMP_Text txtAtkPrice;
+    [SerializeField] private TMP_Text txtAtkMarketStock;
     [SerializeField] private TMP_Text txtAtkHolding;
     [SerializeField] private Button btnAtkBuy;
     [SerializeField] private Button btnAtkSell;
@@ -17,6 +18,7 @@ public class SpotMarketTab : MonoBehaviour
 
     [Header("DEF 行")]
     [SerializeField] private TMP_Text txtDefPrice;
+    [SerializeField] private TMP_Text txtDefMarketStock;
     [SerializeField] private TMP_Text txtDefHolding;
     [SerializeField] private Button btnDefBuy;
     [SerializeField] private Button btnDefSell;
@@ -24,6 +26,7 @@ public class SpotMarketTab : MonoBehaviour
 
     [Header("RET 行")]
     [SerializeField] private TMP_Text txtRetPrice;
+    [SerializeField] private TMP_Text txtRetMarketStock;
     [SerializeField] private TMP_Text txtRetHolding;
     [SerializeField] private Button btnRetBuy;
     [SerializeField] private Button btnRetSell;
@@ -123,25 +126,47 @@ public class SpotMarketTab : MonoBehaviour
         var data = gameplayManager.GetCampaignData();
         if (data == null) return;
 
-        RefreshOrderRow(OrderType.ATK, txtAtkPrice, txtAtkHolding, data);
-        RefreshOrderRow(OrderType.DEF, txtDefPrice, txtDefHolding, data);
-        RefreshOrderRow(OrderType.RET, txtRetPrice, txtRetHolding, data);
+        RefreshOrderRow(OrderType.ATK, txtAtkPrice, txtAtkMarketStock, txtAtkHolding, data);
+        RefreshOrderRow(OrderType.DEF, txtDefPrice, txtDefMarketStock, txtDefHolding, data);
+        RefreshOrderRow(OrderType.RET, txtRetPrice, txtRetMarketStock, txtRetHolding, data);
 
         RefreshChart();
     }
 
-    private void RefreshOrderRow(OrderType type, TMP_Text priceText, TMP_Text holdingText, CampaignRuntimeData data)
+    private void RefreshOrderRow(OrderType type, TMP_Text priceText, TMP_Text marketStockText, TMP_Text holdingText, CampaignRuntimeData data)
     {
         var prices = data.Market.CurrentPrices;
+        var marketInv = data.Market.MarketInventory;
         var playerInv = data.Player.Inventory;
 
         // 价格
         if (priceText != null)
-            priceText.text = $"{type}: {prices[type]:F1}";
+            priceText.text = $"{prices[type]:F1}";
+
+        // 市场库存
+        if (marketStockText != null)
+        {
+            int stock = marketInv[type];
+            marketStockText.text = $"{stock}";
+
+            // 库存不足时变色提示
+            if (stock <= 0)
+            {
+                marketStockText.color = Color.red;
+            }
+            else if (stock < 50)
+            {
+                marketStockText.color = new Color(1f, 0.6f, 0f); // 橙色
+            }
+            else
+            {
+                marketStockText.color = Color.white;
+            }
+        }
 
         // 持有量
         if (holdingText != null)
-            holdingText.text = $"持有: {playerInv[type]}";
+            holdingText.text = $"{playerInv[type]}";
     }
 
     public void SetActive(bool active)

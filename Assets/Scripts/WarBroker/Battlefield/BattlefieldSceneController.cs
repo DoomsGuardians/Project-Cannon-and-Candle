@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 /// <summary>
 /// 3D 战场场景控制器
@@ -14,11 +15,13 @@ public class BattlefieldSceneController : MonoBehaviour
 
     [Header("单位配置")]
     [SerializeField] private GameObject generalUnitPrefab;
-    [SerializeField] private float unitSpacing = 2f;  // 单位间距
-    [SerializeField] private float laneLength = 10f;  // 战线长度
+    [SerializeField] private float gridGap = 4f;  // Grid间距（Z轴方向）
+
+    [Header("动画配置")]
+    [SerializeField] private float animationDelay = 0.3f;  // 动画间隔
 
     [Header("相机")]
-    [SerializeField] private BattlefieldCamera battlefieldCamera;
+    [SerializeField] private BattlefieldCameraController battlefieldCamera;
 
     private Dictionary<string, GeneralUnit3D> allyUnits = new Dictionary<string, GeneralUnit3D>();
     private Dictionary<string, GeneralUnit3D> enemyUnits = new Dictionary<string, GeneralUnit3D>();
@@ -29,7 +32,13 @@ public class BattlefieldSceneController : MonoBehaviour
     private EventService eventService;
     private UIService uiService;
 
+    // 动画队列
+    private Queue<BattleResult> animationQueue = new Queue<BattleResult>();
+    private bool isPlayingAnimation = false;
+    private Sequence currentSequence;
+
     public System.Action<GeneralData> OnGeneralSelected;
+    public System.Action OnAllAnimationsComplete;  // 所有动画播放完成回调
 
     private void Awake()
     {
@@ -51,6 +60,12 @@ public class BattlefieldSceneController : MonoBehaviour
     }
 
     private void OnDestroy()
+    {
+        Cleanup();
+    }
+
+    /// <summary>清理战场资源</summary>
+    public void Cleanup()
     {
         if (eventService != null)
         {
@@ -108,6 +123,7 @@ public class BattlefieldSceneController : MonoBehaviour
         if (anchor == null) return null;
 
         var go = Instantiate(generalUnitPrefab, anchor);
+        go.name = $"{(isAlly ? "Ally" : "Enemy")}_{general.Name}";
         var unit = go.GetComponent<GeneralUnit3D>();
 
         if (unit != null)
@@ -126,20 +142,16 @@ public class BattlefieldSceneController : MonoBehaviour
     {
         if (unit == null) return;
 
-        // 根据 GridPosition (1-5) 计算位置
-        // 己方从左侧开始，敌方从右侧开始
-        float normalizedPos = (general.GridPosition - 1) / 4f;  // 0-1
-        float xOffset = isAlly
-            ? Mathf.Lerp(-laneLength / 2f, 0, normalizedPos)
-            : Mathf.Lerp(0, laneLength / 2f, normalizedPos);
+        // Grid沿Z轴排列，Grid 1-5 对应 Z: -8, -4, 0, +4, +8
+        // 己方初始Grid1在Z=-8（己方大本营）
+        // 敌方初始Grid5在Z=+8（敌方大本营）
+        // 双方都用同样的公式，GridPosition直接映射到Z坐标
+        float gridZ = (general.GridPosition - 3) * gridGap;
 
-        // 己方和敌方在 Z 轴上有偏移
-        float zOffset = isAlly ? -unitSpacing / 2f : unitSpacing / 2f;
+        unit.transform.localPosition = new Vector3(0, 0, gridZ);
 
-        unit.transform.localPosition = new Vector3(xOffset, 0, zOffset);
-
-        // 面向对方
-        unit.transform.localRotation = Quaternion.Euler(0, isAlly ? 90 : -90, 0);
+        // 面向对方（沿Z轴对峙）
+        unit.transform.localRotation = Quaternion.Euler(0, isAlly ? 0 : 180, 0);
     }
 
     private Transform GetLaneAnchor(FrontlinePosition position)
@@ -225,10 +237,10 @@ public class BattlefieldSceneController : MonoBehaviour
             }
         }
 
-        // 相机聚焦
+        // 相机平滑聚焦
         if (battlefieldCamera != null)
         {
-            battlefieldCamera.FocusOn(unit.transform.position);
+            battlefieldCamera.SmoothFocusOn(unit.transform);
         }
     }
 
@@ -252,7 +264,160 @@ public class BattlefieldSceneController : MonoBehaviour
 
     private void OnBattleResult(object p1, object p2)
     {
-        UpdateAllUnits();
+        var result = p1 as BattleResult;
+        if (result != null)
+        {
+            // 将战斗结果加入队列
+            animationQueue.Enqueue(result);
+
+            // 如果当前没有播放动画，开始播放
+            if (!isPlayingAnimation)
+            {
+                PlayNextAnimation();
+            }
+        }
+        else
+        {
+            UpdateAllUnits();
+        }
+    }
+
+    /// <summary>播放队列中的下一个动画</summary>
+    private void PlayNextAnimation()
+    {
+        if (animationQueue.Count == 0)
+        {
+            isPlayingAnimation = false;
+            OnAllAnimationsComplete?.Invoke();
+
+            // 平滑返回默认视角（保持用户之前的旋转角度）
+            if (battlefieldCamera != null)
+            {
+                battlefieldCamera.SmoothReturnToDefault();
+            }
+
+            // 发送事件通知战斗动画播放完成
+            eventService?.SendMessage((EventID)WarBrokerEventID.OnBattleAnimationsComplete, null, null);
+            return;
+        }
+
+        isPlayingAnimation = true;
+        var result = animationQueue.Dequeue();
+        PlayBattleAnimation(result);
+    }
+
+    /// <summary>播放战斗动画</summary>
+    private void PlayBattleAnimation(BattleResult result)
+    {
+        currentSequence?.Kill();
+        currentSequence = DOTween.Sequence();
+
+        // 通过Position查找参战单位
+        GeneralUnit3D allyUnit = FindUnitByPosition(allyUnits, result.Position);
+        GeneralUnit3D enemyUnit = FindUnitByPosition(enemyUnits, result.Position);
+
+        // 相机跟随到当前战线
+        Transform laneAnchor = GetLaneAnchor(result.Position);
+        if (battlefieldCamera != null && laneAnchor != null)
+        {
+            battlefieldCamera.SmoothFollowBattle(laneAnchor);
+        }
+
+        Debug.Log($"[BattleAnim] {result.Position}: Ally {result.AllyOldPosition}->{result.AllyNewPosition}, Enemy {result.EnemyOldPosition}->{result.EnemyNewPosition}");
+
+        float delay = 0f;
+
+        // 1. 移动动画（使用新的位置信息）
+        bool allyMoved = result.AllyOldPosition != result.AllyNewPosition;
+        bool enemyMoved = result.EnemyOldPosition != result.EnemyNewPosition;
+
+        if (allyMoved || enemyMoved)
+        {
+            if (allyUnit != null && allyMoved)
+            {
+                // 使用本地坐标，与 UpdateUnitPosition 一致
+                float targetZ = (result.AllyNewPosition - 3) * gridGap;
+                Vector3 newLocalPos = new Vector3(0, 0, targetZ);
+                Debug.Log($"[BattleAnim] Ally moving to localPos: {newLocalPos}, current: {allyUnit.transform.localPosition}");
+                currentSequence.Insert(delay, allyUnit.PlayMoveAnimation(newLocalPos));
+            }
+            if (enemyUnit != null && enemyMoved)
+            {
+                float targetZ = (result.EnemyNewPosition - 3) * gridGap;
+                Vector3 newLocalPos = new Vector3(0, 0, targetZ);
+                Debug.Log($"[BattleAnim] Enemy moving to localPos: {newLocalPos}, current: {enemyUnit.transform.localPosition}");
+                currentSequence.Insert(delay, enemyUnit.PlayMoveAnimation(newLocalPos));
+            }
+            delay += 0.6f;
+        }
+
+        // 2. 受击震动
+        if (allyUnit != null && result.AllyTroopChange < 0)
+        {
+            currentSequence.Insert(delay, allyUnit.PlayHitShake());
+        }
+        if (enemyUnit != null && result.EnemyTroopChange < 0)
+        {
+            currentSequence.Insert(delay, enemyUnit.PlayHitShake());
+        }
+        if (result.AllyTroopChange < 0 || result.EnemyTroopChange < 0)
+        {
+            delay += 0.3f;
+        }
+
+        // 3. 锡兵倒下动画
+        if (allyUnit != null && result.AllyTroopChange < 0)
+        {
+            var fallAnim = allyUnit.PlaySoldierFallAnimation(-result.AllyTroopChange);
+            if (fallAnim != null)
+                currentSequence.Insert(delay, fallAnim);
+        }
+        if (enemyUnit != null && result.EnemyTroopChange < 0)
+        {
+            var fallAnim = enemyUnit.PlaySoldierFallAnimation(-result.EnemyTroopChange);
+            if (fallAnim != null)
+                currentSequence.Insert(delay, fallAnim);
+        }
+        if (result.AllyTroopChange < 0 || result.EnemyTroopChange < 0)
+        {
+            delay += 0.5f;
+        }
+
+        // 4. 锡兵增加动画（恢复兵力）
+        if (allyUnit != null && result.AllyTroopChange > 0)
+        {
+            currentSequence.InsertCallback(delay, () => allyUnit.UpdateDisplay());
+        }
+        if (enemyUnit != null && result.EnemyTroopChange > 0)
+        {
+            currentSequence.InsertCallback(delay, () => enemyUnit.UpdateDisplay());
+        }
+
+        // 添加动画间隔
+        currentSequence.AppendInterval(animationDelay);
+
+        // 动画完成后播放下一个
+        currentSequence.OnComplete(() =>
+        {
+            // 更新单位显示
+            if (allyUnit != null) allyUnit.UpdateDisplay();
+            if (enemyUnit != null) enemyUnit.UpdateDisplay();
+
+            // 播放下一个动画
+            PlayNextAnimation();
+        });
+    }
+
+    private GeneralUnit3D FindUnitByPosition(Dictionary<string, GeneralUnit3D> units, FrontlinePosition position)
+    {
+        foreach (var kvp in units)
+        {
+            if (kvp.Value != null && kvp.Value.Data != null && kvp.Value.Data.Position == position)
+            {
+                return kvp.Value;
+            }
+        }
+        return null;
     }
 
     private void OnTurnEnd(object p1, object p2)

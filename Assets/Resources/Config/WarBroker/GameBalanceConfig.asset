@@ -27,9 +27,13 @@ MonoBehaviour:
   CritMultiplier: 1.5
   FumbleChance: 0.05
   FumbleMultiplier: 0.5
-  BaseReinforcement: 10
-  RoutTroopThreshold: 20
-  RoutScoreThreshold: 30
+  BaseReinforcement: 5
+  RespawnHP: 10
+  RespawnReserveCost: 10
+  BaseRecoveryHP: 2
+  BaseRecoveryCost: 2
+  RetHealHP: 1
+  RetHealCost: 1
   ReorganizeTurns: 3
   DisobeyTrustThreshold: 50
   DisobeyChanceLow: 0.2
@@ -50,4 +54,11 @@ MonoBehaviour:
   BetaMomentumMultiplier: 1.2
   BetaPanicReserveThreshold: 20
   BetaPanicMultiplier: 1.3
-  GammaSensitivity: 0.5
+  ImpactCoefficient: 0.05
+  AlphaGrid1Modifier: 0.15
+  AlphaGrid2Modifier: 0.1
+  AlphaGrid3Modifier: 0.05
+  AlphaGrid4Modifier: -0.05
+  AlphaGrid5Modifier: -0.1
+  ProductionFactorMin: 0.9
+  ProductionFactorMax: 1.1

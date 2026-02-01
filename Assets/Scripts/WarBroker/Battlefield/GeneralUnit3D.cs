@@ -1,5 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using TMPro;
+using DG.Tweening;
 
 /// <summary>
 /// 3D 将军单位
@@ -16,7 +19,7 @@ public class GeneralUnit3D : MonoBehaviour
     [Header("意图气泡 (World Space UI)")]
     [SerializeField] private Canvas intentBubbleCanvas;
     [SerializeField] private Image intentBubbleImage;
-    [SerializeField] private Text intentText;
+    [SerializeField] private TMP_Text intentText;
 
     [Header("选中效果")]
     [SerializeField] private GameObject selectionIndicator;
@@ -26,11 +29,17 @@ public class GeneralUnit3D : MonoBehaviour
     [SerializeField] private Color reinforcedIntentColor = new Color(1f, 0.84f, 0f); // 金色
     [SerializeField] private Color overriddenIntentColor = Color.red;
 
+    [Header("动画配置")]
+    [SerializeField] private float soldierFallDuration = 0.3f;
+    [SerializeField] private float soldierFallDelay = 0.05f;
+    [SerializeField] private float moveDuration = 0.5f;
+
     public GeneralData Data { get; private set; }
     public bool IsAlly { get; private set; }
 
     private GameObject[] spawnedSoldiers;
     private int currentSoldierCount = 0;
+    private Sequence currentAnimation;
 
     public System.Action<GeneralUnit3D> OnClicked;
 
@@ -45,13 +54,51 @@ public class GeneralUnit3D : MonoBehaviour
             selectionIndicator.SetActive(false);
     }
 
+    private void LateUpdate()
+    {
+        // 让意图气泡始终朝向相机（Billboard效果）
+        if (intentBubbleCanvas != null && intentBubbleCanvas.gameObject.activeSelf)
+        {
+            var cam = Camera.main;
+            if (cam != null)
+            {
+                intentBubbleCanvas.transform.rotation = cam.transform.rotation;
+            }
+        }
+    }
+
     /// <summary>初始化将军单位</summary>
     public void Initialize(GeneralData data, bool isAlly)
     {
         Data = data;
         IsAlly = isAlly;
 
+        // 给气泡添加点击事件
+        SetupBubbleClick();
+
         UpdateDisplay();
+    }
+
+    /// <summary>设置气泡点击事件</summary>
+    private void SetupBubbleClick()
+    {
+        if (intentBubbleImage == null) return;
+
+        // 添加EventTrigger组件来处理点击
+        var trigger = intentBubbleImage.gameObject.GetComponent<EventTrigger>();
+        if (trigger == null)
+        {
+            trigger = intentBubbleImage.gameObject.AddComponent<EventTrigger>();
+        }
+
+        // 清除旧的事件
+        trigger.triggers.Clear();
+
+        // 添加点击事件
+        var entry = new EventTrigger.Entry();
+        entry.eventID = EventTriggerType.PointerClick;
+        entry.callback.AddListener((data) => { OnClicked?.Invoke(this); });
+        trigger.triggers.Add(entry);
     }
 
     /// <summary>更新显示</summary>
@@ -152,10 +199,82 @@ public class GeneralUnit3D : MonoBehaviour
             selectionIndicator.SetActive(selected);
     }
 
+    /// <summary>播放锡兵倒下动画</summary>
+    public Sequence PlaySoldierFallAnimation(int casualties)
+    {
+        if (spawnedSoldiers == null || casualties <= 0) return null;
+
+        currentAnimation?.Kill();
+        currentAnimation = DOTween.Sequence();
+
+        int startIndex = currentSoldierCount - 1;
+        int endIndex = Mathf.Max(0, currentSoldierCount - casualties);
+
+        for (int i = startIndex; i >= endIndex; i--)
+        {
+            if (i < spawnedSoldiers.Length && spawnedSoldiers[i] != null)
+            {
+                var soldier = spawnedSoldiers[i];
+                int index = i;
+                float delay = (startIndex - i) * soldierFallDelay;
+
+                // 锡兵倒下动画：旋转90度 + 缩小
+                currentAnimation.Insert(delay, soldier.transform
+                    .DORotate(new Vector3(90f, 0f, Random.Range(-30f, 30f)), soldierFallDuration)
+                    .SetEase(Ease.OutQuad));
+                currentAnimation.Insert(delay, soldier.transform
+                    .DOScale(0.5f, soldierFallDuration)
+                    .SetEase(Ease.OutQuad));
+                currentAnimation.InsertCallback(delay + soldierFallDuration, () =>
+                {
+                    if (spawnedSoldiers[index] != null)
+                        spawnedSoldiers[index].SetActive(false);
+                });
+            }
+        }
+
+        currentAnimation.OnComplete(() =>
+        {
+            currentSoldierCount = Mathf.Max(0, currentSoldierCount - casualties);
+        });
+
+        return currentAnimation;
+    }
+
+    /// <summary>播放单位移动动画</summary>
+    public Tween PlayMoveAnimation(Vector3 targetLocalPosition)
+    {
+        currentAnimation?.Kill();
+        return transform.DOLocalMove(targetLocalPosition, moveDuration).SetEase(Ease.InOutQuad);
+    }
+
+    /// <summary>播放单位溃败动画（移出棋盘）</summary>
+    public Sequence PlayRoutAnimation(Vector3 exitDirection)
+    {
+        currentAnimation?.Kill();
+        currentAnimation = DOTween.Sequence();
+
+        Vector3 exitPos = transform.position + exitDirection * 10f;
+
+        // 先震动，然后移出
+        currentAnimation.Append(transform.DOShakePosition(0.3f, 0.2f, 10));
+        currentAnimation.Append(transform.DOMove(exitPos, 0.8f).SetEase(Ease.InQuad));
+        currentAnimation.Join(transform.DOScale(0f, 0.8f).SetEase(Ease.InQuad));
+
+        return currentAnimation;
+    }
+
+    /// <summary>播放受击震动效果</summary>
+    public Tween PlayHitShake()
+    {
+        return transform.DOShakePosition(0.2f, 0.1f, 15);
+    }
+
     private void OnMouseDown()
     {
-        // 检查输入是否被锁定
-        if (!InputRouter.IsEnabled(InputChannel.Gameplay))
+        // 使用InputService检查是否可以进行游戏输入
+        var inputService = GameRoot.Instance?.inputService;
+        if (inputService != null && !inputService.CanStartGameplayInput())
             return;
 
         OnClicked?.Invoke(this);
@@ -163,12 +282,18 @@ public class GeneralUnit3D : MonoBehaviour
 
     private void OnDestroy()
     {
+        currentAnimation?.Kill();
+        transform.DOKill();
+
         if (spawnedSoldiers != null)
         {
             foreach (var soldier in spawnedSoldiers)
             {
                 if (soldier != null)
+                {
+                    soldier.transform.DOKill();
                     Destroy(soldier);
+                }
             }
         }
     }

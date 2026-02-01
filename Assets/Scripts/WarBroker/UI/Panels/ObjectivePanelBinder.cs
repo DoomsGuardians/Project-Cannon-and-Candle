@@ -1,21 +1,20 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// ObjectivePanel UI Binder
+/// 委托任务面板，支持动态生成委托项
+/// </summary>
 public class ObjectivePanelBinder : UIBinder
 {
-    [Header("主目标")]
-    public TMP_Text txtObjectiveTitle;
-    public TMP_Text txtObjectiveDescription;
-    public TMP_Text txtProgress;
-    public TMP_Text txtPnL;
+    [Header("面板标题")]
+    public TMP_Text txtTitle;
 
     [Header("委托任务列表")]
+    [Tooltip("委托项的父容器（Vertical Layout Group）")]
     public Transform commissionListRoot;
 
-    [Header("委托任务项（可选，4 个固定委托）")]
-    public TMP_Text txtWinWar;
-    public TMP_Text txtShortCountry;
-    public TMP_Text txtTraitor;
-    public TMP_Text txtMeatGrinder;
+    [Header("委托项 Prefab")]
+    [Tooltip("CommissionItem.prefab 引用")]
+    public GameObject commissionItemPrefab;
 }

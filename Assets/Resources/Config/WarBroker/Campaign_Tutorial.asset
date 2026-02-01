@@ -70,3 +70,4 @@ MonoBehaviour:
     AllTroopChange: 0
     RandomTrustChange: 10
     Duration: 1
+  Commissions: []

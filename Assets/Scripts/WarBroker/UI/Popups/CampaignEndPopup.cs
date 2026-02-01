@@ -103,11 +103,13 @@ public class CampaignEndPopup : WindowBase
 
     private void OnRestart()
     {
+        uIService.HideWindow(Name);
         GameRoot.Instance.stageSystem.ReloadCurrentStage();
     }
 
     private void OnMainMenu()
     {
+        uIService.HideWindow(Name);
         GameRoot.Instance.stageSystem.LoadStage(1);
     }
 }

@@ -359,5 +359,30 @@ public class UIService : ILogic
         }
     }
 
+    /// <summary>
+    /// 清理所有窗口（场景切换时调用）
+    /// </summary>
+    public void ClearAllWindows()
+    {
+        foreach (var window in windowList)
+        {
+            if (window.isVisible)
+            {
+                window.OnHide();
+            }
+            window.OnDestroy();
+            if (window.gameObject != null)
+            {
+                GameObject.Destroy(window.gameObject);
+            }
+        }
+        windowDic.Clear();
+        windowList.Clear();
+
+        // 清理管理器状态
+        occlusionManager?.Clear();
+        orderManager?.ResetAll();
+    }
+
     #endregion
 }

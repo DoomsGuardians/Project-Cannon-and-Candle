@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -61,6 +62,10 @@ public class CampaignConfig : ScriptableObject
 
     [Header("===== 可用随机事件 =====")]
     public RandomEventConfig[] AvailableEvents;
+
+    [Header("===== 委托任务 =====")]
+    [Tooltip("该战役可用的委托任务列表")]
+    public List<CommissionConfig> Commissions;
 }
 
 /// <summary>

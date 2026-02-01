@@ -1,11 +1,10 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 将军详情面板（侧边栏）
-/// 显示将军属性、意图、强化/篡改操作
+/// 将军详情面板（简化版）
+/// 显示将军基本信息、HP、意图、强化/篡改操作
 /// </summary>
 public class GeneralDetailPanel : WindowBase
 {
@@ -17,29 +16,20 @@ public class GeneralDetailPanel : WindowBase
     private TMP_Text txtPersonality;
     private TMP_Text txtPosition;
 
-    [Header("属性条")]
+    [Header("HP")]
     private Slider sliderHP;
-    private Slider sliderTrust;
-    private Slider sliderMorale;
     private TMP_Text txtHP;
-    private TMP_Text txtTrust;
-    private TMP_Text txtMorale;
-
-    [Header("状态")]
-    private TMP_Text txtStatus;
-    private TMP_Text txtSkills;
 
     [Header("意图显示")]
-    private Image imgIntentBubble;
     private TMP_Text txtIntent;
-    private TMP_Text txtIntentSource;
 
-    [Header("操作按钮")]
+    [Header("强化操作")]
     private Button btnReinforce;
-    private TMP_Text txtReinforceCost;
-    private Button btnOverride;
-    private TMP_Dropdown ddOverrideType;
-    private TMP_Text txtOverrideCost;
+
+    [Header("篡改操作")]
+    private Button btnOverrideATK;
+    private Button btnOverrideDEF;
+    private Button btnOverrideRET;
 
     [Header("关闭按钮")]
     private Button btnClose;
@@ -48,11 +38,6 @@ public class GeneralDetailPanel : WindowBase
     private IntentSystem intentSystem;
     private GameplayManager gameplayManager;
     private GameBalanceConfig balanceConfig;
-
-    // 意图气泡颜色
-    private readonly Color defaultIntentColor = Color.gray;
-    private readonly Color reinforcedIntentColor = new Color(1f, 0.84f, 0f); // 金色
-    private readonly Color overriddenIntentColor = Color.red;
 
     public override void OnAwake()
     {
@@ -75,53 +60,32 @@ public class GeneralDetailPanel : WindowBase
             txtPersonality = b.txtPersonality;
             txtPosition = b.txtPosition;
 
-            // 属性条
+            // HP
             sliderHP = b.sliderHP;
-            sliderTrust = b.sliderTrust;
-            sliderMorale = b.sliderMorale;
             txtHP = b.txtHP;
-            txtTrust = b.txtTrust;
-            txtMorale = b.txtMorale;
-
-            // 状态
-            txtStatus = b.txtStatus;
-            txtSkills = b.txtSkills;
 
             // 意图
-            imgIntentBubble = b.imgIntentBubble;
             txtIntent = b.txtIntent;
-            txtIntentSource = b.txtIntentSource;
 
-            // 操作
+            // 强化操作
             btnReinforce = b.btnReinforce;
-            txtReinforceCost = b.txtReinforceCost;
-            btnOverride = b.btnOverride;
-            ddOverrideType = b.ddOverrideType;
-            txtOverrideCost = b.txtOverrideCost;
+
+            // 篡改操作
+            btnOverrideATK = b.btnOverrideATK;
+            btnOverrideDEF = b.btnOverrideDEF;
+            btnOverrideRET = b.btnOverrideRET;
 
             // 关闭
             btnClose = b.btnClose;
-        }
-
-        SetupDropdown();
-    }
-
-    private void SetupDropdown()
-    {
-        if (ddOverrideType != null)
-        {
-            ddOverrideType.ClearOptions();
-            ddOverrideType.AddOptions(new List<string> { "ATK", "DEF", "RET" });
         }
     }
 
     public override void OnShow()
     {
-        // 获取输入锁
-        InputRouter.Acquire(InputChannel.Gameplay, this);
-
         AddButtonListener(btnReinforce, OnReinforce);
-        AddButtonListener(btnOverride, OnOverride);
+        AddButtonListener(btnOverrideATK, () => OnOverride(OrderType.ATK));
+        AddButtonListener(btnOverrideDEF, () => OnOverride(OrderType.DEF));
+        AddButtonListener(btnOverrideRET, () => OnOverride(OrderType.RET));
         AddButtonListener(btnClose, OnClose);
 
         // 监听意图变化事件
@@ -133,9 +97,6 @@ public class GeneralDetailPanel : WindowBase
 
     public override void OnHide()
     {
-        // 释放输入锁
-        InputRouter.Release(InputChannel.Gameplay, this);
-
         eventService.RemoveEventListeningByTarget(this);
     }
 
@@ -161,12 +122,10 @@ public class GeneralDetailPanel : WindowBase
         }
     }
 
-    private void OnOverride()
+    private void OnOverride(OrderType targetType)
     {
         if (currentGeneral == null || intentSystem == null) return;
-        if (ddOverrideType == null) return;
 
-        var targetType = (OrderType)ddOverrideType.value;
         var player = gameplayManager.GetCampaignData()?.Player;
         if (player == null) return;
 
@@ -180,6 +139,13 @@ public class GeneralDetailPanel : WindowBase
     private void OnClose()
     {
         uIService.HideWindow(Name);
+
+        // 相机平滑返回默认视角
+        var battlefieldCamera = GameObject.FindObjectOfType<BattlefieldCameraController>();
+        if (battlefieldCamera != null)
+        {
+            battlefieldCamera.SmoothReturnToDefault();
+        }
     }
 
     private void RefreshUI()
@@ -187,7 +153,7 @@ public class GeneralDetailPanel : WindowBase
         if (currentGeneral == null) return;
 
         RefreshGeneralInfo();
-        RefreshAttributes();
+        RefreshHP();
         RefreshIntent();
         RefreshButtons();
     }
@@ -202,18 +168,9 @@ public class GeneralDetailPanel : WindowBase
 
         if (txtPosition != null)
             txtPosition.text = GetPositionText(currentGeneral.Position);
-
-        if (txtStatus != null)
-            txtStatus.text = GetStatusText(currentGeneral.GetStatus(balanceConfig));
-
-        if (txtSkills != null && currentGeneral.Skills != null)
-        {
-            var skillNames = currentGeneral.Skills.ConvertAll(s => s.SkillName);
-            txtSkills.text = skillNames.Count > 0 ? string.Join(", ", skillNames) : "无技能";
-        }
     }
 
-    private void RefreshAttributes()
+    private void RefreshHP()
     {
         // HP (Troops)
         if (sliderHP != null)
@@ -222,25 +179,7 @@ public class GeneralDetailPanel : WindowBase
             sliderHP.value = currentGeneral.Troops;
         }
         if (txtHP != null)
-            txtHP.text = $"兵力: {currentGeneral.Troops}/20";
-
-        // Trust
-        if (sliderTrust != null)
-        {
-            sliderTrust.maxValue = 100;
-            sliderTrust.value = currentGeneral.Trust;
-        }
-        if (txtTrust != null)
-            txtTrust.text = $"信任: {currentGeneral.Trust}/100";
-
-        // Morale
-        if (sliderMorale != null)
-        {
-            sliderMorale.maxValue = 100;
-            sliderMorale.value = currentGeneral.Morale;
-        }
-        if (txtMorale != null)
-            txtMorale.text = $"士气: {currentGeneral.Morale}/100";
+            txtHP.text = $"{currentGeneral.Troops}/20";
     }
 
     private void RefreshIntent()
@@ -249,27 +188,8 @@ public class GeneralDetailPanel : WindowBase
 
         if (txtIntent != null)
         {
-            txtIntent.text = intent.HasValue ? intent.Value.ToString() : "未知";
-        }
-
-        if (imgIntentBubble != null)
-        {
-            imgIntentBubble.color = currentGeneral.IntentSource switch
-            {
-                IntentSource.Reinforced => reinforcedIntentColor,
-                IntentSource.Overridden => overriddenIntentColor,
-                _ => defaultIntentColor
-            };
-        }
-
-        if (txtIntentSource != null)
-        {
-            txtIntentSource.text = currentGeneral.IntentSource switch
-            {
-                IntentSource.Reinforced => "已强化",
-                IntentSource.Overridden => "已篡改",
-                _ => "默认意图"
-            };
+            string intentIcon = intent.HasValue ? GetIntentIcon(intent.Value) : "?";
+            txtIntent.text = $"{intentIcon} {(intent.HasValue ? intent.Value.ToString() : "未知")}";
         }
     }
 
@@ -286,28 +206,65 @@ public class GeneralDetailPanel : WindowBase
         {
             bool canReinforce = CanReinforce(player, reinforceCost);
             btnReinforce.interactable = canReinforce;
+
+            // 更新按钮文本
+            if (currentGeneral.DefaultIntent.HasValue)
+            {
+                var btnText = btnReinforce.GetComponentInChildren<TMP_Text>();
+                if (btnText != null)
+                {
+                    var intentType = currentGeneral.DefaultIntent.Value;
+                    int held = player.Inventory.ContainsKey(intentType) ? player.Inventory[intentType] : 0;
+                    string icon = GetIntentIcon(intentType);
+
+                    // 显示持有数量
+                    btnText.text = $"强化 {icon}×{held}";
+                }
+            }
         }
 
-        if (txtReinforceCost != null && currentGeneral.DefaultIntent.HasValue)
+        // 篡改按钮 - 只显示与默认意图不同的两个类型
+        RefreshOverrideButtons(player, overrideCost);
+    }
+
+    private void RefreshOverrideButtons(PlayerData player, int cost)
+    {
+        if (currentGeneral == null || !currentGeneral.DefaultIntent.HasValue)
         {
-            var intentType = currentGeneral.DefaultIntent.Value;
-            int held = player.Inventory.GetValueOrDefault(intentType, 0);
-            txtReinforceCost.text = $"消耗 {reinforceCost} {intentType} (持有: {held})";
+            // 隐藏所有篡改按钮
+            if (btnOverrideATK != null) btnOverrideATK.gameObject.SetActive(false);
+            if (btnOverrideDEF != null) btnOverrideDEF.gameObject.SetActive(false);
+            if (btnOverrideRET != null) btnOverrideRET.gameObject.SetActive(false);
+            return;
         }
 
-        // 篡改按钮
-        if (btnOverride != null && ddOverrideType != null)
-        {
-            var targetType = (OrderType)ddOverrideType.value;
-            bool canOverride = CanOverride(player, targetType, overrideCost);
-            btnOverride.interactable = canOverride;
-        }
+        var defaultIntent = currentGeneral.DefaultIntent.Value;
 
-        if (txtOverrideCost != null && ddOverrideType != null)
+        // 根据默认意图，只显示另外两个类型的按钮
+        RefreshOverrideButton(btnOverrideATK, OrderType.ATK, player, cost, defaultIntent != OrderType.ATK);
+        RefreshOverrideButton(btnOverrideDEF, OrderType.DEF, player, cost, defaultIntent != OrderType.DEF);
+        RefreshOverrideButton(btnOverrideRET, OrderType.RET, player, cost, defaultIntent != OrderType.RET);
+    }
+
+    private void RefreshOverrideButton(Button btn, OrderType type, PlayerData player, int cost, bool shouldShow)
+    {
+        if (btn == null) return;
+
+        // 显示/隐藏按钮
+        btn.gameObject.SetActive(shouldShow);
+
+        if (!shouldShow) return;
+
+        bool canOverride = CanOverride(player, type, cost);
+        btn.interactable = canOverride;
+
+        // 更新按钮文本
+        var btnText = btn.GetComponentInChildren<TMP_Text>();
+        if (btnText != null)
         {
-            var targetType = (OrderType)ddOverrideType.value;
-            int held = player.Inventory.GetValueOrDefault(targetType, 0);
-            txtOverrideCost.text = $"消耗 {overrideCost} {targetType} (持有: {held})";
+            int held = player.Inventory.ContainsKey(type) ? player.Inventory[type] : 0;
+            string icon = GetIntentIcon(type);
+            btnText.text = $"篡改 {icon}×{held}";
         }
     }
 
@@ -321,7 +278,8 @@ public class GeneralDetailPanel : WindowBase
             return false;
 
         var intentType = currentGeneral.DefaultIntent.Value;
-        return player.Inventory.GetValueOrDefault(intentType, 0) >= cost;
+        int held = player.Inventory.ContainsKey(intentType) ? player.Inventory[intentType] : 0;
+        return held >= cost;
     }
 
     private bool CanOverride(PlayerData player, OrderType targetType, int cost)
@@ -337,7 +295,19 @@ public class GeneralDetailPanel : WindowBase
         if (currentGeneral.DefaultIntent.HasValue && currentGeneral.DefaultIntent.Value == targetType)
             return false;
 
-        return player.Inventory.GetValueOrDefault(targetType, 0) >= cost;
+        int held = player.Inventory.ContainsKey(targetType) ? player.Inventory[targetType] : 0;
+        return held >= cost;
+    }
+
+    private string GetIntentIcon(OrderType type)
+    {
+        return type switch
+        {
+            OrderType.ATK => "🔴",
+            OrderType.DEF => "🔵",
+            OrderType.RET => "🟡",
+            _ => "?"
+        };
     }
 
     private string GetPersonalityText(GeneralPersonality personality)
@@ -359,19 +329,6 @@ public class GeneralDetailPanel : WindowBase
             FrontlinePosition.Center => "中军",
             FrontlinePosition.Right => "右翼",
             _ => position.ToString()
-        };
-    }
-
-    private string GetStatusText(GeneralStatus status)
-    {
-        return status switch
-        {
-            GeneralStatus.FullStrength => "满编",
-            GeneralStatus.Healthy => "健康",
-            GeneralStatus.Wounded => "受伤",
-            GeneralStatus.Critical => "濒死",
-            GeneralStatus.Routed => "溃败",
-            _ => status.ToString()
         };
     }
 

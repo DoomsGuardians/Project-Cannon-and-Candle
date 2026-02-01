@@ -5,6 +5,8 @@ using UnityEngine;
 /// </summary>
 public class BattleGameMode : GameModeBase
 {
+    private BattlefieldSceneController battlefieldController;
+
     public BattleGameMode() : base(GameMode.GamePlay) { }
 
     public override void EnterGameMode()
@@ -32,12 +34,40 @@ public class BattleGameMode : GameModeBase
         }
         else
         {
-            RegisterWindow<GameplayWindow>("Prefabs/WarBroker/UI/GameplayWindow", "GameplayWindow");
+            RegisterWindow<GameplayWindow>("Prefabs/WarBroker/UI/Windows/GamePlayWindow", "GameplayWindow");
         }
-        RegisterWindow<MarketPanel>("Prefabs/WarBroker/UI/MarketPanel", "MarketPanel");
-        RegisterWindow<InfoPanel>("Prefabs/WarBroker/UI/InfoPanel", "InfoPanel");
-        RegisterWindow<ObjectivePanel>("Prefabs/WarBroker/UI/ObjectivePanel", "ObjectivePanel");
-        RegisterWindow<CampaignEndPopup>("Prefabs/WarBroker/UI/CampaignEndPopup", "CampaignEndPopup");
+        RegisterWindow<MarketPanel>("Prefabs/WarBroker/UI/Panels/MarketPanel", "MarketPanel");
+        RegisterWindow<InfoPanel>("Prefabs/WarBroker/UI/Panels/InfoPanel", "InfoPanel");
+        RegisterWindow<ObjectivePanel>("Prefabs/WarBroker/UI/Panels/ObjectivePanel", "ObjectivePanel");
+        RegisterWindow<TooltipPanel>("Prefabs/WarBroker/UI/Panels/TooltipPanel", "TooltipPanel");
+        RegisterWindow<GeneralDetailPanel>("Prefabs/WarBroker/UI/Panels/GeneralDetailPanel", "GeneralDetailPanel");
+        RegisterWindow<CampaignEndPopup>("Prefabs/WarBroker/UI/Popups/CampaignEndPopup", "CampaignEndPopup");
+        RegisterWindow<EventPopup>("Prefabs/WarBroker/UI/Popups/EventPopup", "EventPopup");
+        RegisterWindow<BattleResultPopup>("Prefabs/WarBroker/UI/Popups/BattleResultPopup", "BattleResultPopup");
+
+        // 初始化3D战场
+        InitBattlefield();
+    }
+
+    private void InitBattlefield()
+    {
+        // 查找场景中的BattlefieldSceneController
+        battlefieldController = GameObject.FindObjectOfType<BattlefieldSceneController>();
+        if (battlefieldController == null)
+        {
+            // 如果场景中没有，尝试从prefab实例化
+            var prefab = resService.LoadResource<GameObject>("Prefabs/WarBroker/Battlefield/BattlefieldSceneController");
+            if (prefab != null)
+            {
+                var obj = GameObject.Instantiate(prefab);
+                obj.name = "BattlefieldSceneController";
+                battlefieldController = obj.GetComponent<BattlefieldSceneController>();
+            }
+            else
+            {
+                Debug.LogWarning("[BattleGameMode] BattlefieldSceneController not found in scene or prefab.");
+            }
+        }
     }
 
     public override void StartGame()
@@ -47,6 +77,16 @@ public class BattleGameMode : GameModeBase
         if (gameplayManager != null)
         {
             gameplayManager.BeginGame();
+
+            // 初始化3D战场数据
+            if (battlefieldController != null)
+            {
+                var battleData = gameplayManager.GetBattleData();
+                if (battleData != null)
+                {
+                    battlefieldController.Initialize(battleData);
+                }
+            }
         }
     }
 
@@ -54,7 +94,17 @@ public class BattleGameMode : GameModeBase
 
     public override void UnOnInit()
     {
-        managerService.OnSceneExit();
+        // 清理战场
+        if (battlefieldController != null)
+        {
+            battlefieldController.Cleanup();
+        }
+
+        // 清理所有Manager
+        managerService.ClearAllManagers();
+
+        // 清理所有UI窗口
+        uIService.ClearAllWindows();
     }
 
     private void RegisterWindow<T>(string prefabPath, string windowName) where T : WindowBase, new()

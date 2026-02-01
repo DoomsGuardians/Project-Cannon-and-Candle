@@ -42,9 +42,10 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
+    - _Blend: 1
     - _DstBlend: 10
     - _DstBlendAlpha: 10
-    - _SrcBlend: 5
+    - _SrcBlend: 1
     - _Surface: 1
     - _ZWrite: 0
     m_Colors:

@@ -11,6 +11,17 @@ public class GameplayWindowBinder : UIBinder
     public TMP_Text txtNetWorth;
     public TMP_Text txtAudit;
 
+    [Header("现金图标")]
+    public Image imgCashIcon;
+
+    [Header("指令库存")]
+    public TMP_Text txtATK;
+    public Image imgATKIcon;
+    public TMP_Text txtDEF;
+    public Image imgDEFIcon;
+    public TMP_Text txtRET;
+    public Image imgRETIcon;
+
     [Header("Tab 按钮")]
     public Button btnMarket;
     public Button btnIntel;
@@ -21,4 +32,7 @@ public class GameplayWindowBinder : UIBinder
     [Header("底部操作栏")]
     public Button btnEndTurn;
     public TMP_Text txtEventInfo;
+
+    [Header("右侧面板区")]
+    public RectTransform rightPanelArea;
 }

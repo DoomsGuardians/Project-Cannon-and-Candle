@@ -36,8 +36,8 @@ MonoBehaviour:
     gameMode: 2
     stageDescription: 
     GameMangers:
-    - {fileID: 352841085234923356, guid: 0b4c7e4ffbfc58e4e95561530293afc7, type: 3}
-    UIWindowBase: {fileID: 2448644694458295885, guid: 23c498508cdc11a4d93d36d23d2f5c29, type: 3}
+    - {fileID: 5636436451582836242, guid: 0b4c7e4ffbfc58e4e95561530293afc7, type: 3}
+    UIWindowBase: {fileID: 7325804103530451177, guid: dfb2b402863cecb449fbd366b31972ae, type: 3}
     RoleConfig: {fileID: 0}
     preLoadItems: {fileID: 0}
     camera: {fileID: 0}

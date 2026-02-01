@@ -69,6 +69,10 @@ public class BattleSystem : ILogic
             EnemyOrder = enemyOrder
         };
 
+        // 记录战斗前的位置
+        result.AllyOldPosition = ally.GridPosition;
+        result.EnemyOldPosition = enemy.GridPosition;
+
         if (CheckDisobey(ally, allyOrder))
         {
             allyOrder = GetDisobeyOrder(ally);
@@ -90,6 +94,13 @@ public class BattleSystem : ILogic
 
         CheckSkillTrigger(ally, allyOrder, result);
         ApplyBattleResult(ally, enemy, result);
+
+        // 记录战斗后的位置
+        result.AllyNewPosition = ally.GridPosition;
+        result.EnemyNewPosition = enemy.GridPosition;
+
+        // 发送战斗结果事件（在位置信息记录完成后）
+        eventService.SendMessage((EventID)WarBrokerEventID.OnBattleResult, result, null);
 
         return result;
     }
@@ -116,23 +127,62 @@ public class BattleSystem : ILogic
         result.EnemyTroopChange = 0;
         result.LineMovement = 0;
 
-        // 我方行动
+        // 计算双方预期移动后的位置
+        int allyNewPos = ally.GridPosition;
+        int enemyNewPos = enemy.GridPosition;
+
+        // 计算己方预期位置
         switch (allyOrder)
         {
             case OrderType.ATK:
-                // 推进：GridPosition++
-                ally.GridPosition = Mathf.Min(5, ally.GridPosition + 1);
+                allyNewPos = Mathf.Min(5, ally.GridPosition + 1);
+                break;
+            case OrderType.RET:
+                if (ally.GridPosition > 1)
+                    allyNewPos = ally.GridPosition - 1;
+                break;
+        }
+
+        // 计算敌方预期位置
+        switch (enemyOrder)
+        {
+            case OrderType.ATK:
+                enemyNewPos = Mathf.Max(1, enemy.GridPosition - 1);
+                break;
+            case OrderType.RET:
+                if (enemy.GridPosition < 5)
+                    enemyNewPos = enemy.GridPosition + 1;
+                break;
+        }
+
+        // 检查是否会重叠（双方都ATK且相隔一格时）
+        if (allyNewPos >= enemyNewPos)
+        {
+            // 会重叠或交叉，双方在中间位置相遇，进入接触状态
+            // 取两者中间位置，己方在较小位置，敌方在较大位置
+            int meetPoint = (ally.GridPosition + enemy.GridPosition) / 2;
+            allyNewPos = meetPoint;
+            enemyNewPos = meetPoint + 1;
+
+            // 确保边界
+            allyNewPos = Mathf.Clamp(allyNewPos, 1, 4);
+            enemyNewPos = Mathf.Clamp(enemyNewPos, 2, 5);
+        }
+
+        // 应用己方移动
+        switch (allyOrder)
+        {
+            case OrderType.ATK:
+                ally.GridPosition = allyNewPos;
                 result.Description = $"{ally.Name}向前推进";
                 break;
             case OrderType.DEF:
-                // 驻扎：不动
                 result.Description = $"{ally.Name}原地驻扎";
                 break;
             case OrderType.RET:
-                // 后撤+回血：GridPosition--, HP+RetHealHP, 消耗后备役RetHealCost
                 if (ally.GridPosition > 1)
                 {
-                    ally.GridPosition--;
+                    ally.GridPosition = allyNewPos;
                     if (campaignData.Battle.CurrentReserves >= balanceConfig.RetHealCost)
                     {
                         result.AllyTroopChange = balanceConfig.RetHealHP;
@@ -161,11 +211,11 @@ public class BattleSystem : ILogic
                 break;
         }
 
-        // 敌方行动
+        // 应用敌方移动
         switch (enemyOrder)
         {
             case OrderType.ATK:
-                enemy.GridPosition = Mathf.Max(1, enemy.GridPosition - 1);
+                enemy.GridPosition = enemyNewPos;
                 break;
             case OrderType.DEF:
                 // 不动
@@ -173,7 +223,7 @@ public class BattleSystem : ILogic
             case OrderType.RET:
                 if (enemy.GridPosition < 5)
                 {
-                    enemy.GridPosition++;
+                    enemy.GridPosition = enemyNewPos;
                     result.EnemyTroopChange = 1; // 敌方也回血
                 }
                 break;
@@ -411,7 +461,7 @@ public class BattleSystem : ILogic
             eventService.SendMessage((EventID)WarBrokerEventID.OnGeneralRouted, ally, null);
         }
 
-        eventService.SendMessage((EventID)WarBrokerEventID.OnBattleResult, result, null);
+        // 注意：OnBattleResult 事件在 ResolveSingleBattle 中发送，以确保位置信息已记录
     }
 
     #endregion
