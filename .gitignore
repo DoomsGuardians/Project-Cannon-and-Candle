@@ -112,7 +112,6 @@ Assets/NaninovelData/.nani/Transient/Bridging/Server
 # ========== #
 # Docs       #
 # ========== #
-# 忽略除 GDD v7 和架构文档以外的文档
+# 忽略除 GDD v7 以外的文档
 Docs/*
 !Docs/ChartaBellum_GDD_v7.md
-!Docs/WarBroker_Architecture_v2.md
