@@ -27,10 +27,8 @@
 
 | 文档 | 说明 |
 |------|------|
-| [GDD v6](Docs/ChartaBellum_GDD_v6.md) | 系统设计策划案（最终开发标准） |
-| [开发指南 v2](Docs/ChartaBellum_DevGuide_v2.md) | 开发任务规划与实现指导 |
-| [架构文档](Docs/WarBroker_Architecture.md) | 代码架构与模块说明 |
-| [UI Prefab 指南](Docs/UI_Prefab_Creation_Guide.md) | UI Prefab 创建操作手册 |
+| [GDD v7](Docs/ChartaBellum_GDD_v7.md) | 游戏设计文档（最终开发标准） |
+| [架构文档 v2](Docs/WarBroker_Architecture_v2.md) | 代码架构与模块说明 |
 
 ---
 
