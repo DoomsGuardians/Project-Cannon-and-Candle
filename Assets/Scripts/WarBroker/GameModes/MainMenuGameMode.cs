@@ -11,6 +11,7 @@ public class MainMenuGameMode : GameModeBase
     {
         EnsureUILayerSystem();
         RegisterWindow<MainMenuWindow>("Prefabs/WarBroker/UI/Windows/MainMenuWindow", "MainMenuWindow");
+        RegisterWindow<SettingsWindow>("Prefabs/WarBroker/UI/Windows/SettingsWindow", "SettingsWindow");
     }
 
     public override void StartGame()

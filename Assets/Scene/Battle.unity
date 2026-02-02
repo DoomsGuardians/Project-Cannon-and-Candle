@@ -999,7 +999,7 @@ MonoBehaviour:
   vcamBattle: {fileID: 586360559}
   vcamFocusUnit: {fileID: 1203246354}
   battlefieldPivot: {fileID: 1130474869}
-  rotateSpeed: 1
+  rotateSpeed: 0.5
   minPitch: 10
   maxPitch: 80
   zoomSpeed: 0.1

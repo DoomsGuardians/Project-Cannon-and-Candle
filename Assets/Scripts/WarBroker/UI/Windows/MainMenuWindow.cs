@@ -50,7 +50,7 @@ public class MainMenuWindow : WindowBase
 
     private void OnSettings()
     {
-        Debug.Log("[MainMenuWindow] Settings - Not implemented yet");
+        uIService.ShowWindow<SettingsWindow>("SettingsWindow");
     }
 
     private void OnQuit()
