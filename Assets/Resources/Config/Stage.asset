@@ -24,10 +24,10 @@ MonoBehaviour:
   stageConfigList:
   - stageID: 1
     sceneName: MainMenu
-    gameMode: 1
+    gameMode: 5
     stageDescription: 
     GameMangers: []
-    UIWindowBase: {fileID: 0}
+    UIWindowBase: {fileID: 753436792432876775, guid: 22f79c3fbb1aabb4c99054af42c2472c, type: 3}
     RoleConfig: {fileID: 0}
     preLoadItems: {fileID: 0}
     camera: {fileID: 0}
