@@ -49,6 +49,9 @@ public class GameRoot : MonoSingleton<GameRoot>
     public MarketSystem marketSystem;
     public BattleSystem battleSystem;
     public CampaignSystem campaignSystem;
+    public PauseSystem pauseSystem;
+    public SettingsSystem settingsSystem;
+    public SaveSystem saveSystem;
     #endregion
 
 #if NANINOVEL
@@ -159,6 +162,12 @@ public class GameRoot : MonoSingleton<GameRoot>
         systemList.Add(monoItemSystem);
 
         // WarBroker Systems
+        settingsSystem = new SettingsSystem();
+        systemList.Add(settingsSystem);
+        pauseSystem = new PauseSystem();
+        systemList.Add(pauseSystem);
+        saveSystem = new SaveSystem();
+        systemList.Add(saveSystem);
         marketSystem = new MarketSystem();
         systemList.Add(marketSystem);
         battleSystem = new BattleSystem();
@@ -225,6 +234,7 @@ public class GameRoot : MonoSingleton<GameRoot>
         // 注册默认游戏模式（可根据项目扩展）
         RegisterGameMode(new DefaultGameMode());
         RegisterGameMode(new BattleGameMode());
+        RegisterGameMode(new MainMenuGameMode());
 
         if (GameModeDic.TryGetValue(GameMode.GameStart, out var defaultMode))
         {

@@ -44,9 +44,14 @@ public class BattleGameMode : GameModeBase
         RegisterWindow<CampaignEndPopup>("Prefabs/WarBroker/UI/Popups/CampaignEndPopup", "CampaignEndPopup");
         RegisterWindow<EventPopup>("Prefabs/WarBroker/UI/Popups/EventPopup", "EventPopup");
         RegisterWindow<BattleResultPopup>("Prefabs/WarBroker/UI/Popups/BattleResultPopup", "BattleResultPopup");
+        RegisterWindow<PausePopup>("Prefabs/WarBroker/UI/Popups/PausePopup", "PausePopup");
+        RegisterWindow<SettingsWindow>("Prefabs/WarBroker/UI/Windows/SettingsWindow", "SettingsWindow");
 
         // 初始化3D战场
         InitBattlefield();
+
+        // 注册 Update 回调用于监听 ESC 键
+        GameRoot.Instance.AddUpdateAction(HandleEscapeKey);
     }
 
     private void InitBattlefield()
@@ -94,6 +99,9 @@ public class BattleGameMode : GameModeBase
 
     public override void UnOnInit()
     {
+        // 移除 Update 回调
+        GameRoot.Instance.RemoveUpdateAction(HandleEscapeKey);
+
         // 清理战场
         if (battlefieldController != null)
         {
@@ -105,6 +113,20 @@ public class BattleGameMode : GameModeBase
 
         // 清理所有UI窗口
         uIService.ClearAllWindows();
+    }
+
+    /// <summary>处理 ESC 键暂停</summary>
+    private void HandleEscapeKey()
+    {
+        var inputService = GameRoot.Instance.inputService;
+        if (inputService != null && inputService.CancelPressed)
+        {
+            var pauseSystem = GameRoot.Instance.pauseSystem;
+            if (pauseSystem != null)
+            {
+                pauseSystem.TogglePause();
+            }
+        }
     }
 
     private void RegisterWindow<T>(string prefabPath, string windowName) where T : WindowBase, new()

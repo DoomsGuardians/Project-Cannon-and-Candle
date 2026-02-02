@@ -154,7 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameFrameRate: 60
-  TestStageID: 2
+  TestStageID: 1
   EnableGameSave: 1
 --- !u!4 &505429771
 Transform:
