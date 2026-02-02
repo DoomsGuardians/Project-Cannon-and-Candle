@@ -236,6 +236,12 @@ public class GameplayWindow : WindowBase
 
     private void OnEndTurnClicked()
     {
+        // 禁用按钮，防止重复点击
+        if (btnEndTurn != null)
+        {
+            btnEndTurn.interactable = false;
+        }
+
         gameplayManager.EndTurn();
     }
 
@@ -305,7 +311,16 @@ public class GameplayWindow : WindowBase
         }
     }
 
-    private void OnTurnStart(object param1, object param2) => RefreshUI();
+    private void OnTurnStart(object param1, object param2)
+    {
+        // 重新启用结束回合按钮
+        if (btnEndTurn != null)
+        {
+            btnEndTurn.interactable = true;
+        }
+        RefreshUI();
+    }
+
     private void OnTurnEnd(object param1, object param2) => RefreshUI();
     private void OnRandomEvent(object param1, object param2) => RefreshUI();
     private void OnFinanceChanged(object param1, object param2) => RefreshUI();

@@ -23,7 +23,9 @@ public class MarketData
     public List<Dictionary<OrderType, float>> PriceHistory;
     public Dictionary<OrderType, float> BetaCarry;          // Beta累积值（初始值1.0）
     public Dictionary<OrderType, float> LastWeekBurn;       // 上周消耗量（用于需求预测）
+    public Dictionary<OrderType, float> AccumulatedBurn;    // 累计消耗量（三回合累计）
     public Dictionary<OrderType, List<KLineData>> KLineHistory;  // K线历史数据
+    public int LastReplenishTurn;                           // 上次补充的回合
 
     public void InitFromConfig(OrderConfig config)
     {
@@ -33,7 +35,9 @@ public class MarketData
         PriceHistory = new List<Dictionary<OrderType, float>>();
         BetaCarry = new Dictionary<OrderType, float>();
         LastWeekBurn = new Dictionary<OrderType, float>();
+        AccumulatedBurn = new Dictionary<OrderType, float>();
         KLineHistory = new Dictionary<OrderType, List<KLineData>>();
+        LastReplenishTurn = 0;
 
         foreach (var item in config.Orders)
         {
@@ -42,6 +46,7 @@ public class MarketData
             InitialFloat[item.OrderType] = item.InitialStock;
             BetaCarry[item.OrderType] = 1.0f;  // GDD v6.0: Beta初始值为1.0
             LastWeekBurn[item.OrderType] = 0f;
+            AccumulatedBurn[item.OrderType] = 0f;
             KLineHistory[item.OrderType] = new List<KLineData>();
         }
     }

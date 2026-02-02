@@ -38,15 +38,9 @@ public class BattleResult
     public int LineMovement;
     public int AllyTroopChange;
     public int EnemyTroopChange;
-    public bool SkillTriggered;
-    public string SkillName;
     public string Description;
     public bool WasCrit;
     public bool WasFumble;
-
-    // GDD v6.0: 战术系统
-    public string AllyTactic;
-    public string EnemyTactic;
 
     // 位置变化（用于动画）
     public int AllyOldPosition;
@@ -62,11 +56,13 @@ public class BattleData
     public Dictionary<FrontlinePosition, FrontlineData> Frontlines;
     public List<GeneralData> AllyGenerals;
     public List<GeneralData> EnemyGenerals;
-    public int CurrentReserves;  // 当前后备役
+    public int CurrentReserves;  // 玩家后备役
+    public int EnemyReserves;    // 敌方后备役（Victor）
 
-    public void InitFromConfig(CampaignConfig campaignConfig, SkillConfig skillConfig)
+    public void InitFromConfig(CampaignConfig campaignConfig)
     {
         CurrentReserves = campaignConfig.InitialReserves;
+        EnemyReserves = campaignConfig.InitialReserves; // 敌方初始后备役与玩家相同
 
         Frontlines = new Dictionary<FrontlinePosition, FrontlineData>();
         foreach (FrontlinePosition pos in Enum.GetValues(typeof(FrontlinePosition)))
@@ -85,7 +81,7 @@ public class BattleData
                 if (configItem != null)
                 {
                     var general = new GeneralData();
-                    general.InitFromConfig(configItem, skillConfig);
+                    general.InitFromConfig(configItem);
                     general.Position = assignment.Position;
                     general.GridPosition = 1;  // 己方大本营
                     AllyGenerals.Add(general);
@@ -102,7 +98,7 @@ public class BattleData
                 if (configItem != null)
                 {
                     var general = new GeneralData();
-                    general.InitFromConfig(configItem, skillConfig);
+                    general.InitFromConfig(configItem);
                     general.Position = assignment.Position;
                     general.GridPosition = 5;  // 敌方大本营
                     EnemyGenerals.Add(general);

@@ -54,13 +54,13 @@ public class PausePopup : WindowBase
         }
 
         // 注册 Update 监听 Cancel 输入
-        GameRoot.Instance.AddUpdateAction(OnUpdate);
+        GameRoot.Instance.AddUpdateAction(HandleUpdate);
     }
 
     public override void OnHide()
     {
         // 移除 Update 监听
-        GameRoot.Instance.RemoveUpdateAction(OnUpdate);
+        GameRoot.Instance.RemoveUpdateAction(HandleUpdate);
 
         // 释放输入锁
         InputRouter.Release(InputChannel.Gameplay, this);
@@ -68,7 +68,7 @@ public class PausePopup : WindowBase
         eventService.RemoveEventListeningByTarget(this);
     }
 
-    private void OnUpdate()
+    private void HandleUpdate()
     {
         // ESC 键关闭暂停面板
         if (inputService != null && inputService.CancelPressed)

@@ -31,10 +31,6 @@ public class GeneralConfigItem
     [Range(0, 100)]
     public int InitialMorale = 60;
 
-    [Header("技能")]
-    [Tooltip("技能ID列表 (从SkillConfig中选择)")]
-    public string[] SkillIds;
-
     [Header("出价系数")]
     [Tooltip("ATK出价系数")]
     public float AtkBidModifier = 1f;

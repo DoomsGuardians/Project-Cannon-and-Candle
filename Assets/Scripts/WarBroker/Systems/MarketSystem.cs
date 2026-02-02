@@ -85,8 +85,8 @@ public class MarketSystem : ILogic
         player.Inventory[orderType] += quantity;
         market.MarketInventory[orderType] -= quantity;
 
-        // 记录消耗量
-        market.LastWeekBurn[orderType] += quantity;
+        // 记录消耗量（用于三回合补充计算）
+        market.AccumulatedBurn[orderType] += quantity;
 
         // 更新当前价格
         market.CurrentPrices[orderType] = pricingEngine.CalculatePrice(orderType);
@@ -282,6 +282,160 @@ public class MarketSystem : ILogic
 
     #endregion
 
+    #region 维克多期货交易
+
+    /// <summary>维克多开立期货合约</summary>
+    public bool VictorOpenFutures(OrderType orderType, FuturesDirection direction, int quantity, out FuturesContract contract)
+    {
+        contract = null;
+        var market = campaignData.Market;
+        var ledger = campaignData.VictorLedger;
+
+        const int FUTURES_DURATION = 3;
+
+        float openPrice = market.CurrentPrices[orderType];
+        float margin = openPrice * quantity * balanceConfig.FuturesMarginRate;
+
+        if (ledger.Cash < margin)
+        {
+            Debug.Log($"[Victor] 保证金不足: 需要{margin}, 当前{ledger.Cash}");
+            return false;
+        }
+
+        contract = new FuturesContract
+        {
+            ContractId = nextContractId++,
+            TargetOrder = orderType,
+            Direction = direction,
+            OpenPrice = openPrice,
+            Quantity = quantity,
+            ExpirationTurn = campaignData.CurrentTurn + FUTURES_DURATION,
+            Margin = margin
+        };
+
+        ledger.Cash -= margin;
+        ledger.FuturesPositions.Add(contract);
+
+        Debug.Log($"[Victor] 开仓期货: {orderType} {direction} x{quantity} @ {openPrice:F1}");
+        return true;
+    }
+
+    /// <summary>维克多平仓期货合约</summary>
+    public bool VictorCloseFutures(int contractId, out float pnl)
+    {
+        pnl = 0f;
+        var market = campaignData.Market;
+        var ledger = campaignData.VictorLedger;
+
+        var contract = ledger.FuturesPositions.Find(c => c.ContractId == contractId);
+        if (contract == null) return false;
+
+        float currentPrice = market.CurrentPrices[contract.TargetOrder];
+        pnl = contract.CalculatePnL(currentPrice);
+
+        ledger.Cash += contract.Margin + pnl;
+        ledger.FuturesPositions.Remove(contract);
+
+        Debug.Log($"[Victor] 平仓期货: {contract.TargetOrder} PnL={pnl:F1}");
+        return true;
+    }
+
+    /// <summary>检查维克多强制平仓</summary>
+    public void CheckVictorForceLiquidation()
+    {
+        var market = campaignData.Market;
+        var ledger = campaignData.VictorLedger;
+        var toClose = new List<int>();
+
+        foreach (var contract in ledger.FuturesPositions)
+        {
+            float pnl = contract.CalculatePnL(market.CurrentPrices[contract.TargetOrder]);
+            float remainingMargin = contract.Margin + pnl;
+
+            if (remainingMargin < contract.Margin * (1 - balanceConfig.ForceLiquidationRate))
+            {
+                toClose.Add(contract.ContractId);
+            }
+        }
+
+        foreach (var id in toClose)
+        {
+            VictorCloseFutures(id, out float pnl);
+            Debug.Log($"[Victor] 强制平仓: ContractId={id}, PnL={pnl:F1}");
+        }
+    }
+
+    /// <summary>结算维克多到期期货</summary>
+    public void SettleVictorExpiredFutures()
+    {
+        var ledger = campaignData.VictorLedger;
+        var toSettle = ledger.FuturesPositions
+            .FindAll(c => c.ExpirationTurn <= campaignData.CurrentTurn);
+
+        foreach (var contract in toSettle)
+        {
+            VictorCloseFutures(contract.ContractId, out _);
+        }
+    }
+
+    #endregion
+
+    #region 维克多借贷
+
+    /// <summary>计算维克多贷款额度</summary>
+    public float CalculateVictorLoanLimit()
+    {
+        float netWorth = CalculateVictorNetWorth();
+        return Mathf.Max(0, netWorth * balanceConfig.LoanRatio - campaignData.VictorLedger.Debt);
+    }
+
+    /// <summary>计算维克多净资产</summary>
+    public float CalculateVictorNetWorth()
+    {
+        return campaignData.VictorLedger.GetNetWorth(campaignData.Market);
+    }
+
+    /// <summary>维克多借款</summary>
+    public bool VictorBorrow(float amount)
+    {
+        if (amount > CalculateVictorLoanLimit()) return false;
+
+        var ledger = campaignData.VictorLedger;
+        ledger.Cash += amount;
+        ledger.Debt += amount;
+
+        Debug.Log($"[Victor] 借款: {amount:F1}, 总债务: {ledger.Debt:F1}");
+        return true;
+    }
+
+    /// <summary>维克多还款</summary>
+    public bool VictorRepay(float amount)
+    {
+        var ledger = campaignData.VictorLedger;
+        amount = Mathf.Min(amount, ledger.Debt, ledger.Cash);
+        if (amount <= 0) return false;
+
+        ledger.Cash -= amount;
+        ledger.Debt -= amount;
+
+        Debug.Log($"[Victor] 还款: {amount:F1}, 剩余债务: {ledger.Debt:F1}");
+        return true;
+    }
+
+    /// <summary>维克多利息计算</summary>
+    public void ApplyVictorInterest()
+    {
+        var ledger = campaignData.VictorLedger;
+        if (ledger.Debt > 0)
+        {
+            float interest = ledger.Debt * balanceConfig.BankInterestRate;
+            ledger.Debt += interest;
+            Debug.Log($"[Victor] 利息: {interest:F1}, 总债务: {ledger.Debt:F1}");
+        }
+    }
+
+    #endregion
+
     #region 银行借贷
 
     public float CalculateLoanLimit()
@@ -369,34 +523,57 @@ public class MarketSystem : ILogic
     }
 
     /// <summary>
-    /// 军工厂动态产能 (GDD v6.0)
-    /// 本周产能 = 上周总消耗 × 产能系数(0.9~1.1)
-    /// 保底产能 3
+    /// 军工厂动态产能（优化版）
+    /// 每 3 回合补充一次，补充量 = 过去 3 回合的累计消耗量
+    /// 这样供给大致等于需求，给玩家和对手操作空间
     /// </summary>
     private void ReplenishMarketInventory()
     {
         var market = campaignData.Market;
+        int currentTurn = campaignData.CurrentTurn;
+
+        // 每 3 回合补充一次
+        if (currentTurn - market.LastReplenishTurn < 3)
+        {
+            return; // 还没到补充时间
+        }
+
+        market.LastReplenishTurn = currentTurn;
 
         foreach (OrderType orderType in Enum.GetValues(typeof(OrderType)))
         {
-            float lastWeekBurn = market.LastWeekBurn[orderType];
+            float accumulatedBurn = market.AccumulatedBurn[orderType];
 
-            // 产能系数随机 0.9~1.1
+            // 产能系数随机 0.9~1.1，让供给略有波动
             float productionFactor = UnityEngine.Random.Range(
                 balanceConfig.ProductionFactorMin,
                 balanceConfig.ProductionFactorMax);
 
-            // 动态产能 = 上周消耗 × 产能系数
-            float dynamicProduction = lastWeekBurn * productionFactor;
+            // 动态产能 = 累计消耗 × 产能系数
+            float dynamicProduction = accumulatedBurn * productionFactor;
 
-            // 保底产能 3
-            int finalProduction = Mathf.Max(3, Mathf.RoundToInt(dynamicProduction));
+            // 保底产能：每 3 回合至少补充 2 份（防止市场完全枯竭）
+            int finalProduction = Mathf.Max(2, Mathf.RoundToInt(dynamicProduction));
 
-            // 补充库存 (MarketInventory 是 int 类型)
+            // 补充库存
             market.MarketInventory[orderType] += finalProduction;
 
-            // 重置消耗计数
-            market.LastWeekBurn[orderType] = 0f;
+            // 更新 LastWeekBurn（用于其他系统参考）
+            market.LastWeekBurn[orderType] = accumulatedBurn;
+
+            // 重置累计消耗
+            market.AccumulatedBurn[orderType] = 0f;
+        }
+    }
+
+    /// <summary>
+    /// 记录消耗量（在买入/卖出时调用）
+    /// </summary>
+    public void RecordConsumption(OrderType orderType, int quantity)
+    {
+        if (quantity > 0)
+        {
+            campaignData.Market.AccumulatedBurn[orderType] += quantity;
         }
     }
 

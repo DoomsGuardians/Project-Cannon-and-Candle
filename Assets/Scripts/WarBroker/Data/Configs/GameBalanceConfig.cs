@@ -120,28 +120,6 @@ public class GameBalanceConfig : ScriptableObject
     [Range(0f, 1f)]
     public float DisobeyChanceVeryLow = 0.5f;
 
-    [Header("===== 战线联动参数 =====")]
-
-    [Tooltip("侧翼支援战斗力加成")]
-    [Range(0f, 0.5f)]
-    public float FlankSupportBonus = 0.1f;
-
-    [Tooltip("侧翼威胁战斗力惩罚")]
-    [Range(0f, 0.5f)]
-    public float FlankThreatPenalty = 0.1f;
-
-    [Tooltip("侧翼威胁士气惩罚")]
-    [Range(0, 20)]
-    public int FlankThreatMoralePenalty = 5;
-
-    [Tooltip("半包围战斗力加成")]
-    [Range(0f, 0.5f)]
-    public float SurroundBonus = 0.25f;
-
-    [Tooltip("被包围士气惩罚")]
-    [Range(0, 30)]
-    public int SurroundedMoralePenalty = 15;
-
     [Header("===== 审计参数 =====")]
 
     [Tooltip("军需总部补足指令审计值")]
@@ -176,6 +154,10 @@ public class GameBalanceConfig : ScriptableObject
     [Range(0f, 0.2f)]
     public float AlphaLowHPBonus = 0.10f;
 
+    [Tooltip("Alpha战场影响倍率（增强战场对价格的影响）")]
+    [Range(1f, 3f)]
+    public float AlphaMultiplier = 1.5f;
+
     [Tooltip("Beta动量阈值")]
     [Range(0f, 0.3f)]
     public float BetaMomentumThreshold = 0.10f;
@@ -192,9 +174,21 @@ public class GameBalanceConfig : ScriptableObject
     [Range(1f, 2f)]
     public float BetaPanicMultiplier = 1.3f;
 
-    [Tooltip("Beta交易冲击系数")]
+    [Tooltip("Beta交易冲击系数（降低可减少交易对价格的影响）")]
     [Range(0f, 0.2f)]
-    public float ImpactCoefficient = 0.05f;
+    public float ImpactCoefficient = 0.03f;
+
+    [Tooltip("Beta最小值（限制价格下跌幅度）")]
+    [Range(0.1f, 0.5f)]
+    public float BetaMin = 0.3f;
+
+    [Tooltip("Beta最大值（限制价格上涨幅度）")]
+    [Range(2f, 10f)]
+    public float BetaMax = 4f;
+
+    [Tooltip("Gamma最大值（限制流通盘对价格的影响）")]
+    [Range(1f, 5f)]
+    public float GammaMax = 2.5f;
 
     [Header("===== Alpha位置修正表 =====")]
 

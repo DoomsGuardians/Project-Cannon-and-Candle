@@ -28,8 +28,6 @@ public class WarBrokerDebugWindow : EditorWindow
                 SelectAsset("Assets/Resources/Config/WarBroker/GameBalanceConfig.asset");
             if (GUILayout.Button("打开 OrderConfig"))
                 SelectAsset("Assets/Resources/Config/WarBroker/OrderConfig.asset");
-            if (GUILayout.Button("打开 SkillConfig"))
-                SelectAsset("Assets/Resources/Config/WarBroker/SkillConfig.asset");
             if (GUILayout.Button("打开 GeneralConfig"))
                 SelectAsset("Assets/Resources/Config/WarBroker/GeneralConfig.asset");
 

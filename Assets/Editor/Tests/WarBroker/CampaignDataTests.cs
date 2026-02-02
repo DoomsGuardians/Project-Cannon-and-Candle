@@ -29,11 +29,9 @@ public class CampaignDataTests
         campaignConfig.GeneralConfig = generalConfig;
 
         var orderConfig = ScriptableObject.CreateInstance<OrderConfig>();
-        var skillConfig = ScriptableObject.CreateInstance<SkillConfig>();
-        skillConfig.Skills = new SkillConfigItem[0];
 
         var data = new CampaignRuntimeData();
-        data.InitFromConfig(campaignConfig, orderConfig, skillConfig);
+        data.InitFromConfig(campaignConfig, orderConfig);
 
         Assert.AreEqual(1, data.CurrentTurn);
         Assert.AreEqual(TurnPhase.TurnStart, data.CurrentPhase);
@@ -47,7 +45,6 @@ public class CampaignDataTests
         Object.DestroyImmediate(campaignConfig);
         Object.DestroyImmediate(generalConfig);
         Object.DestroyImmediate(orderConfig);
-        Object.DestroyImmediate(skillConfig);
     }
 
     [Test]

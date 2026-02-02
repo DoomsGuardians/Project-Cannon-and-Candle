@@ -32,19 +32,14 @@ public class BattleDataTests
             InitialTroops = troops,
             InitialTrust = trust,
             InitialMorale = morale,
-            SkillIds = new string[0],
             AtkBidModifier = personality == GeneralPersonality.Fanatic ? 1.5f : 1f,
             DefBidModifier = personality == GeneralPersonality.Conservative ? 1.5f : 1f,
             RetBidModifier = 1f
         };
 
-        var skillConfig = ScriptableObject.CreateInstance<SkillConfig>();
-        skillConfig.Skills = new SkillConfigItem[0];
-
         var general = new GeneralData();
-        general.InitFromConfig(config, skillConfig);
+        general.InitFromConfig(config);
 
-        Object.DestroyImmediate(skillConfig);
         return general;
     }
 
@@ -120,7 +115,6 @@ public class BattleDataTests
         Assert.AreEqual(0, result.LineMovement);
         Assert.AreEqual(0, result.AllyTroopChange);
         Assert.AreEqual(0, result.EnemyTroopChange);
-        Assert.IsFalse(result.SkillTriggered);
         Assert.IsFalse(result.WasCrit);
         Assert.IsFalse(result.WasFumble);
     }

@@ -41,8 +41,15 @@ public class CampaignRuntimeData
     public MarketData Market;
     public BattleData Battle;
 
-    public float VictorCash;
-    public Dictionary<OrderType, int> VictorInventory;
+    // 维克多数据 (GDD v7: 使用 VictorLedger 统一管理)
+    public VictorLedger VictorLedger;
+    public VictorMemory VictorMemory;
+
+    // 兼容旧代码的属性访问器
+    public float VictorCash => VictorLedger?.Cash ?? 0f;
+    public Dictionary<OrderType, int> VictorInventory => VictorLedger?.Holdings;
+    public List<FuturesContract> VictorFuturesPositions => VictorLedger?.FuturesPositions;
+    public float VictorBankDebt => VictorLedger?.Debt ?? 0f;
 
     public List<TurnRecord> TurnHistory;
 
@@ -53,7 +60,7 @@ public class CampaignRuntimeData
     public Dictionary<string, bool> CommissionResults;
     public float CommissionTotalBonus;
 
-    public void InitFromConfig(CampaignConfig campaignConfig, OrderConfig orderConfig, SkillConfig skillConfig)
+    public void InitFromConfig(CampaignConfig campaignConfig, OrderConfig orderConfig)
     {
         Config = campaignConfig;
         CurrentTurn = 1;
@@ -66,15 +73,15 @@ public class CampaignRuntimeData
         Market.InitFromConfig(orderConfig);
 
         Battle = new BattleData();
-        Battle.InitFromConfig(campaignConfig, skillConfig);
+        Battle.InitFromConfig(campaignConfig);
 
-        VictorCash = campaignConfig.VictorInitialCash;
-        VictorInventory = new Dictionary<OrderType, int>
-        {
-            { OrderType.ATK, 2 },
-            { OrderType.DEF, 2 },
-            { OrderType.RET, 2 }
-        };
+        // 初始化维克多账本 (GDD v7)
+        VictorLedger = new VictorLedger();
+        VictorLedger.Init(campaignConfig.VictorInitialCash);
+
+        // 初始化维克多记忆
+        VictorMemory = new VictorMemory();
+        VictorMemory.Init();
 
         TurnHistory = new List<TurnRecord>();
     }

@@ -20,6 +20,9 @@ public class BattleResultPopup : WindowBase
     private List<BattleResult> results;
     private List<GameObject> spawnedItems = new List<GameObject>();
 
+    // 关闭回调
+    private System.Action onCloseCallback;
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -51,6 +54,14 @@ public class BattleResultPopup : WindowBase
 
         ClearSpawnedItems();
         eventService.RemoveEventListeningByTarget(this);
+
+        // 执行关闭回调
+        if (onCloseCallback != null)
+        {
+            var callback = onCloseCallback;
+            onCloseCallback = null; // 清除回调，避免重复调用
+            callback.Invoke();
+        }
     }
 
     /// <summary>设置战斗结果数据</summary>
@@ -58,6 +69,12 @@ public class BattleResultPopup : WindowBase
     {
         results = battleResults;
         RefreshUI();
+    }
+
+    /// <summary>设置关闭回调（弹窗关闭后执行）</summary>
+    public void SetOnCloseCallback(System.Action callback)
+    {
+        onCloseCallback = callback;
     }
 
     private void RefreshUI()
@@ -131,12 +148,10 @@ public class BattleResultPopup : WindowBase
             binder.txtTroopChange.text = $"我军: {allyChange} | 敌军: {enemyChange}";
         }
 
-        // 技能触发
+        // 技能系统已移除 (GDD v7.0)
         if (binder.txtSkill != null)
         {
-            binder.txtSkill.gameObject.SetActive(result.SkillTriggered);
-            if (result.SkillTriggered)
-                binder.txtSkill.text = $"技能触发: {result.SkillName}";
+            binder.txtSkill.gameObject.SetActive(false);
         }
 
         // 暴击/失误

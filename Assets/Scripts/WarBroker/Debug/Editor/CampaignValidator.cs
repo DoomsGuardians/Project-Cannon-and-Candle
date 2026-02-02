@@ -160,11 +160,6 @@ public static class CampaignValidator
         {
             result.AddError("维克多初始现金不能为负数");
         }
-
-        if (config.VictorDifficulty < 0 || config.VictorDifficulty > 1)
-        {
-            result.AddError($"维克多 AI 难度 ({config.VictorDifficulty}) 必须在 0-1 之间");
-        }
     }
 
     /// <summary>

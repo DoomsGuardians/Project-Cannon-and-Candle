@@ -9,6 +9,7 @@ using UnityEngine;
 public class IntentSystem
 {
     private GameBalanceConfig balanceConfig;
+    private CampaignRuntimeData campaignData;
 
     // 强化消耗
     private const int ReinforceCost = 1;
@@ -26,6 +27,12 @@ public class IntentSystem
     public void Init(GameBalanceConfig config)
     {
         balanceConfig = config;
+    }
+
+    /// <summary>设置战役数据引用，用于判断交战状态</summary>
+    public void SetCampaignData(CampaignRuntimeData data)
+    {
+        campaignData = data;
     }
 
     /// <summary>生成将军的默认意图</summary>
@@ -102,7 +109,11 @@ public class IntentSystem
     {
         var baseWeights = GetBaseWeights(general.Personality);
         var hpModifier = GetHPModifier(general.Personality, general.Troops);
-        var gridModifier = GetGridModifier(general.GridPosition);
+
+        // 判断是己方还是敌方将军
+        bool isAlly = IsAllyGeneral(general);
+        var gridModifier = GetGridModifier(general.GridPosition, isAlly);
+        var engagementModifier = GetEngagementModifier(general);
 
         var finalWeights = new Dictionary<OrderType, float>();
 
@@ -111,10 +122,19 @@ public class IntentSystem
             float weight = baseWeights[type];
             weight *= hpModifier.GetValueOrDefault(type, 1f);
             weight *= gridModifier.GetValueOrDefault(type, 1f);
+            weight *= engagementModifier.GetValueOrDefault(type, 1f);
             finalWeights[type] = Mathf.Max(0.01f, weight);
         }
 
         return finalWeights;
+    }
+
+    /// <summary>判断将军是否为己方（玩家方）</summary>
+    private bool IsAllyGeneral(GeneralData general)
+    {
+        if (campaignData == null) return true; // 默认假设是己方
+
+        return campaignData.Battle.AllyGenerals.Contains(general);
     }
 
     /// <summary>获取性格基础权重 (GDD v6.0 - 整数权重)</summary>
@@ -250,8 +270,15 @@ public class IntentSystem
         return modifier;
     }
 
-    /// <summary>获取战线位置修正 (GDD v6.0 完整位置修正表)</summary>
-    private Dictionary<OrderType, float> GetGridModifier(int gridPosition)
+    /// <summary>
+    /// 获取战线位置修正 (GDD v7.0)
+    /// 硬性规则：
+    /// - 己方将军在 Grid 1（己方基地）禁止 RET
+    /// - 己方将军在 Grid 5（敌方基地）禁止 ATK（已到头）
+    /// - 敌方将军在 Grid 5（敌方基地=他们的己方基地）禁止 RET
+    /// - 敌方将军在 Grid 1（己方基地=他们的敌方基地）禁止 ATK
+    /// </summary>
+    private Dictionary<OrderType, float> GetGridModifier(int gridPosition, bool isAlly = true)
     {
         var modifier = new Dictionary<OrderType, float>
         {
@@ -260,40 +287,175 @@ public class IntentSystem
             { OrderType.RET, 1f }
         };
 
-        switch (gridPosition)
+        if (isAlly)
         {
-            case 1: // 己方基地（硬性规则：RET禁止）
-                modifier[OrderType.ATK] = 1.5f;
-                modifier[OrderType.DEF] = 2.0f;
-                modifier[OrderType.RET] = 0f; // 硬性规则：退无可退
-                break;
+            // 己方将军视角
+            switch (gridPosition)
+            {
+                case 1: // 己方基地（硬性规则：RET禁止）
+                    modifier[OrderType.ATK] = 1.5f;
+                    modifier[OrderType.DEF] = 2.0f;
+                    modifier[OrderType.RET] = 0f; // 硬性规则：退无可退
+                    break;
 
-            case 2: // 腹地
-                modifier[OrderType.ATK] = 1.0f;
-                modifier[OrderType.DEF] = 1.2f;
-                modifier[OrderType.RET] = 1.5f;
-                break;
+                case 2: // 腹地
+                    modifier[OrderType.ATK] = 1.0f;
+                    modifier[OrderType.DEF] = 1.2f;
+                    modifier[OrderType.RET] = 1.5f;
+                    break;
 
-            case 3: // 中线
-                modifier[OrderType.ATK] = 1.0f;
-                modifier[OrderType.DEF] = 1.0f;
-                modifier[OrderType.RET] = 1.0f;
-                break;
+                case 3: // 中线
+                    modifier[OrderType.ATK] = 1.0f;
+                    modifier[OrderType.DEF] = 1.0f;
+                    modifier[OrderType.RET] = 1.0f;
+                    break;
 
-            case 4: // 敌方腹地
-                modifier[OrderType.ATK] = 1.2f;
-                modifier[OrderType.DEF] = 1.0f;
-                modifier[OrderType.RET] = 0.8f;
-                break;
+                case 4: // 敌方腹地
+                    modifier[OrderType.ATK] = 1.2f;
+                    modifier[OrderType.DEF] = 1.0f;
+                    modifier[OrderType.RET] = 0.8f;
+                    break;
 
-            case 5: // 敌方基地（硬性规则：ATK极大）
-                modifier[OrderType.ATK] = 3.0f; // 硬性规则：试图终结战役
-                modifier[OrderType.DEF] = 1.5f;
-                modifier[OrderType.RET] = 0.1f;
-                break;
+                case 5: // 敌方基地（硬性规则：ATK禁止，已到头）
+                    modifier[OrderType.ATK] = 0f; // 硬性规则：已到敌方大本营，无法再进攻
+                    modifier[OrderType.DEF] = 2.0f;
+                    modifier[OrderType.RET] = 1.0f;
+                    break;
+            }
+        }
+        else
+        {
+            // 敌方将军视角（Grid 坐标相反）
+            switch (gridPosition)
+            {
+                case 5: // 敌方基地（对敌方来说是己方基地，RET禁止）
+                    modifier[OrderType.ATK] = 1.5f;
+                    modifier[OrderType.DEF] = 2.0f;
+                    modifier[OrderType.RET] = 0f; // 硬性规则：退无可退
+                    break;
+
+                case 4: // 敌方腹地（对敌方来说是己方腹地）
+                    modifier[OrderType.ATK] = 1.0f;
+                    modifier[OrderType.DEF] = 1.2f;
+                    modifier[OrderType.RET] = 1.5f;
+                    break;
+
+                case 3: // 中线
+                    modifier[OrderType.ATK] = 1.0f;
+                    modifier[OrderType.DEF] = 1.0f;
+                    modifier[OrderType.RET] = 1.0f;
+                    break;
+
+                case 2: // 己方腹地（对敌方来说是敌方腹地）
+                    modifier[OrderType.ATK] = 1.2f;
+                    modifier[OrderType.DEF] = 1.0f;
+                    modifier[OrderType.RET] = 0.8f;
+                    break;
+
+                case 1: // 己方基地（对敌方来说是敌方基地，ATK禁止）
+                    modifier[OrderType.ATK] = 0f; // 硬性规则：已到敌方大本营，无法再进攻
+                    modifier[OrderType.DEF] = 2.0f;
+                    modifier[OrderType.RET] = 1.0f;
+                    break;
+            }
         }
 
         return modifier;
+    }
+
+    /// <summary>
+    /// 获取交战状态修正
+    /// 未交战时减少防守和撤退的概率，鼓励前进接敌
+    /// </summary>
+    private Dictionary<OrderType, float> GetEngagementModifier(GeneralData general)
+    {
+        var modifier = new Dictionary<OrderType, float>
+        {
+            { OrderType.ATK, 1f },
+            { OrderType.DEF, 1f },
+            { OrderType.RET, 1f }
+        };
+
+        // 如果没有战役数据，无法判断交战状态，返回默认修正
+        if (campaignData == null) return modifier;
+
+        // 判断该将军是否处于交战状态
+        int gap = GetGapToEnemy(general);
+
+        // gap == -1 表示无法计算（对方将军不存在或已溃败）
+        if (gap == -1) return modifier;
+
+        // 已交战 (gap <= 0)：不修正，正常决策
+        if (gap <= 0) return modifier;
+
+        // 未交战：根据间隙距离调整权重
+        // gap 越大，越应该进攻接近敌人，越不应该防守/撤退
+        if (gap >= 3)
+        {
+            // 距离很远：大幅鼓励进攻，大幅抑制防守/撤退
+            modifier[OrderType.ATK] = 2.0f;
+            modifier[OrderType.DEF] = 0.3f;
+            modifier[OrderType.RET] = 0.1f;
+        }
+        else if (gap == 2)
+        {
+            // 距离较远：鼓励进攻，抑制防守/撤退
+            modifier[OrderType.ATK] = 1.5f;
+            modifier[OrderType.DEF] = 0.5f;
+            modifier[OrderType.RET] = 0.3f;
+        }
+        else if (gap == 1)
+        {
+            // 即将交战：轻微鼓励进攻
+            modifier[OrderType.ATK] = 1.2f;
+            modifier[OrderType.DEF] = 0.8f;
+            modifier[OrderType.RET] = 0.6f;
+        }
+
+        return modifier;
+    }
+
+    /// <summary>
+    /// 获取将军与对面敌人的间隙距离
+    /// 返回 -1 表示无法计算
+    /// </summary>
+    private int GetGapToEnemy(GeneralData general)
+    {
+        if (campaignData == null) return -1;
+
+        // 判断这个将军是己方还是敌方
+        bool isAlly = campaignData.Battle.AllyGenerals.Contains(general);
+        bool isEnemy = campaignData.Battle.EnemyGenerals.Contains(general);
+
+        GeneralData opponent = null;
+
+        if (isAlly)
+        {
+            // 己方将军，找对面的敌方将军
+            opponent = campaignData.Battle.EnemyGenerals.Find(g => g.Position == general.Position);
+        }
+        else if (isEnemy)
+        {
+            // 敌方将军，找对面的己方将军
+            opponent = campaignData.Battle.AllyGenerals.Find(g => g.Position == general.Position);
+        }
+
+        if (opponent == null) return -1;
+        if (balanceConfig != null && opponent.GetStatus(balanceConfig) == GeneralStatus.Routed) return -1;
+
+        // 计算间隙：敌方位置 - 己方位置 - 1
+        // 对于己方将军：gap = enemy.GridPosition - ally.GridPosition - 1
+        // 对于敌方将军：gap = ally.GridPosition - enemy.GridPosition - 1 (从敌方视角)
+        // 但实际上敌方的 GridPosition 是从敌方视角的，所以统一用 opponent - general
+        if (isAlly)
+        {
+            return opponent.GridPosition - general.GridPosition - 1;
+        }
+        else
+        {
+            // 敌方将军的视角：己方将军在他的"前方"
+            return general.GridPosition - opponent.GridPosition - 1;
+        }
     }
 
     /// <summary>根据权重随机选择</summary>

@@ -20,7 +20,6 @@ public enum WarBrokerEventID
     OnFrontlineMove,
     OnGeneralStatusChange,
     OnGeneralRouted,
-    OnSkillTriggered,
 
     // 玩家事件
     OnOrderAssigned,

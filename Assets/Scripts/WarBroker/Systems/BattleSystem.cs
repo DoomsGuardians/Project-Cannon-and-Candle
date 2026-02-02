@@ -11,7 +11,6 @@ public class BattleSystem : ILogic
     private ResService resService;
 
     private GameBalanceConfig balanceConfig;
-    private SkillConfig skillConfig;
 
     private CampaignRuntimeData campaignData;
 
@@ -21,7 +20,6 @@ public class BattleSystem : ILogic
         resService = GameRoot.Instance.resService;
 
         balanceConfig = resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
-        skillConfig = resService.LoadResource<SkillConfig>(ConfigPaths.SKILL_CONFIG);
     }
 
     public void OnEnterState() { }
@@ -92,7 +90,6 @@ public class BattleSystem : ILogic
             ProcessDisengaged(ally, enemy, allyOrder, enemyOrder, result);
         }
 
-        CheckSkillTrigger(ally, allyOrder, result);
         ApplyBattleResult(ally, enemy, result);
 
         // 记录战斗后的位置
@@ -224,7 +221,21 @@ public class BattleSystem : ILogic
                 if (enemy.GridPosition < 5)
                 {
                     enemy.GridPosition = enemyNewPos;
-                    result.EnemyTroopChange = 1; // 敌方也回血
+                    // GDD v7.0: 敌方 RET 回血也消耗后备役
+                    if (campaignData.Battle.EnemyReserves >= 1)
+                    {
+                        result.EnemyTroopChange = 1;
+                        campaignData.Battle.EnemyReserves -= 1;
+                    }
+                }
+                else
+                {
+                    // 敌方在 Grid 5（敌方基地）执行基地休整
+                    if (campaignData.Battle.EnemyReserves >= 2)
+                    {
+                        result.EnemyTroopChange = 2;
+                        campaignData.Battle.EnemyReserves -= 2;
+                    }
                 }
                 break;
         }
@@ -236,78 +247,138 @@ public class BattleSystem : ILogic
         }
     }
 
-    /// <summary>处理接触状态战斗（使用对抗表 + 战术系统）(GDD v6.0)</summary>
+    /// <summary>处理接触状态战斗（使用对抗表 + 确定性强化）(GDD v7.0)</summary>
     private void ProcessEngaged(GeneralData ally, GeneralData enemy,
         OrderType allyOrder, OrderType enemyOrder, BattleResult result)
     {
-        // 战术星级抽取
-        bool allyElite = RollTacticTier(ally);
-        bool enemyElite = RollTacticTier(enemy);
-
-        result.AllyTactic = GetTacticName(allyOrder, allyElite);
-        result.EnemyTactic = GetTacticName(enemyOrder, enemyElite);
-
         // 查询对抗表基础值
         (int movement, int allyHPChange, int enemyHPChange) = GetCombatOutcome(allyOrder, enemyOrder, 0, 0);
 
-        // 转换为伤害值（用于战术修正）
-        float allyDamage = -enemyHPChange; // 己方造成的伤害
-        float enemyDamage = -allyHPChange; // 敌方造成的伤害
-
-        // 应用战术效果
-        ApplyTacticEffects(ally, enemy, allyElite, enemyElite, ref allyDamage, ref enemyDamage);
-
-        // 应用士气修正
-        float allyMoraleModifier = ally.Morale / 100f;
-        float enemyMoraleModifier = enemy.Morale / 100f;
-
-        allyDamage *= allyMoraleModifier;
-        enemyDamage *= enemyMoraleModifier;
-
-        // 应用随机修正
-        (allyDamage, result.WasCrit, result.WasFumble) = ApplyRandomModifier(allyDamage);
-        (enemyDamage, _, _) = ApplyRandomModifier(enemyDamage);
-
-        // 最终 HP 变化（负数表示受伤，正数表示回血）
-        result.AllyTroopChange = allyHPChange - Mathf.RoundToInt(enemyDamage);
-        result.EnemyTroopChange = enemyHPChange - Mathf.RoundToInt(allyDamage);
-
-        // 处理 RET 回血时消耗后备役
-        if (allyOrder == OrderType.RET && result.AllyTroopChange > 0)
+        // GDD v7.0: 确定性强化效果
+        // 己方强化效果
+        if (ally.IntentSource == IntentSource.Reinforced)
         {
-            if (campaignData.Battle.CurrentReserves >= result.AllyTroopChange)
+            switch (allyOrder)
             {
-                campaignData.Battle.CurrentReserves -= result.AllyTroopChange;
+                case OrderType.ATK:
+                    enemyHPChange -= 2; // 造成伤害 +2（敌方多扣2血）
+                    break;
+                case OrderType.DEF:
+                    allyHPChange += 2; // 受到伤害 -2（己方少扣2血）
+                    break;
+                case OrderType.RET:
+                    allyHPChange += 2; // 额外回血 +2
+                    break;
+            }
+        }
+
+        // 敌方强化效果
+        if (enemy.IntentSource == IntentSource.Reinforced)
+        {
+            switch (enemyOrder)
+            {
+                case OrderType.ATK:
+                    allyHPChange -= 2; // 敌方造成伤害 +2
+                    break;
+                case OrderType.DEF:
+                    enemyHPChange += 2; // 敌方受到伤害 -2
+                    break;
+                case OrderType.RET:
+                    enemyHPChange += 2; // 敌方额外回血 +2
+                    break;
+            }
+        }
+
+        // GDD v7.0: 士气修正（阶梯式加减法）
+        int allyMoraleDamageBonus = GetMoraleDamageBonus(ally.Morale);
+        int allyMoraleDefenseBonus = GetMoraleDefenseBonus(ally.Morale);
+        int enemyMoraleDamageBonus = GetMoraleDamageBonus(enemy.Morale);
+        int enemyMoraleDefenseBonus = GetMoraleDefenseBonus(enemy.Morale);
+
+        // 应用士气修正到 HP 变化
+        // 己方造成的伤害影响敌方 HP
+        enemyHPChange -= allyMoraleDamageBonus;
+        // 敌方造成的伤害影响己方 HP
+        allyHPChange -= enemyMoraleDamageBonus;
+        // 防御修正
+        allyHPChange += allyMoraleDefenseBonus;
+        enemyHPChange += enemyMoraleDefenseBonus;
+
+        // 应用随机修正（仅对伤害部分）
+        if (allyHPChange < 0)
+        {
+            float damage = -allyHPChange;
+            (damage, _, _) = ApplyRandomModifier(damage);
+            allyHPChange = -Mathf.RoundToInt(damage);
+        }
+        if (enemyHPChange < 0)
+        {
+            float damage = -enemyHPChange;
+            (damage, result.WasCrit, result.WasFumble) = ApplyRandomModifier(damage);
+            enemyHPChange = -Mathf.RoundToInt(damage);
+        }
+
+        // 处理回血时消耗后备役
+        if (allyHPChange > 0)
+        {
+            int healAmount = allyHPChange;
+            if (campaignData.Battle.CurrentReserves >= healAmount)
+            {
+                campaignData.Battle.CurrentReserves -= healAmount;
             }
             else
             {
-                result.AllyTroopChange = campaignData.Battle.CurrentReserves;
+                allyHPChange = campaignData.Battle.CurrentReserves;
                 campaignData.Battle.CurrentReserves = 0;
             }
         }
+
+        // 敌方回血也消耗后备役（从敌方视角，这里简化处理）
+        // 注意：GDD 中敌方有自己的后备役系统，这里暂时不消耗
+        // 如果需要完整实现，需要添加敌方后备役字段
+
+        result.AllyTroopChange = allyHPChange;
+        result.EnemyTroopChange = enemyHPChange;
 
         // 战线移动
         result.LineMovement = movement;
 
         // 更新 GridPosition 基于战斗结果
-        if (result.LineMovement > 0)
-        {
-            // 己方推进
-            ally.GridPosition = Mathf.Min(5, ally.GridPosition + 1);
-            enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
-        }
-        else if (result.LineMovement < 0)
-        {
-            // 己方后撤
-            ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
-            enemy.GridPosition = Mathf.Max(1, enemy.GridPosition - 1);
-        }
-        else if (result.LineMovement == -2)
+        if (movement == -2)
         {
             // RET vs RET：双方拉开（特殊情况）
             ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
             enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
         }
+        else if (movement > 0)
+        {
+            // 己方推进
+            ally.GridPosition = Mathf.Min(5, ally.GridPosition + 1);
+            enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
+        }
+        else if (movement < 0)
+        {
+            // 己方后撤
+            ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
+            enemy.GridPosition = Mathf.Max(1, enemy.GridPosition - 1);
+        }
+    }
+
+    /// <summary>GDD v7.0: 士气造成伤害加成</summary>
+    private int GetMoraleDamageBonus(int morale)
+    {
+        if (morale >= 80) return 1;      // 士气 80-100：造成伤害 +1
+        if (morale >= 50) return 0;      // 士气 50-79：无修正
+        if (morale >= 30) return -1;     // 士气 30-49：造成伤害 -1
+        return -1;                        // 士气 0-29：造成伤害 -1
+    }
+
+    /// <summary>GDD v7.0: 士气防御加成（减少受到的伤害）</summary>
+    private int GetMoraleDefenseBonus(int morale)
+    {
+        if (morale >= 80) return 1;      // 士气 80-100：受到伤害 -1（即 HP 变化 +1）
+        if (morale >= 30) return 0;      // 士气 30-79：无修正
+        return -1;                        // 士气 0-29：受到伤害 +1（即 HP 变化 -1）
     }
 
     private void UpdateConsecutiveOrder(GeneralData general, OrderType order)
@@ -343,38 +414,7 @@ public class BattleSystem : ILogic
             _ => 0.8f
         };
 
-        float flankMod = CalculateFlankModifier(pos);
-
-        return basePower * troopMod * moraleMod * flankMod;
-    }
-
-    private float CalculateFlankModifier(FrontlinePosition pos)
-    {
-        var frontlines = campaignData.Battle.Frontlines;
-        float modifier = 1f;
-
-        if (pos == FrontlinePosition.Center)
-        {
-            int leftPos = frontlines[FrontlinePosition.Left].LinePosition;
-            int rightPos = frontlines[FrontlinePosition.Right].LinePosition;
-
-            if (leftPos >= 4 && rightPos >= 4)
-                modifier += balanceConfig.SurroundBonus;
-            else if (leftPos <= 2 && rightPos <= 2)
-                modifier -= balanceConfig.SurroundedMoralePenalty / 100f;
-        }
-        else
-        {
-            int centerPos = frontlines[FrontlinePosition.Center].LinePosition;
-            int myPos = frontlines[pos].LinePosition;
-
-            if (centerPos >= myPos + 1)
-                modifier += balanceConfig.FlankSupportBonus;
-            else if (centerPos <= myPos - 1)
-                modifier -= balanceConfig.FlankThreatPenalty;
-        }
-
-        return modifier;
+        return basePower * troopMod * moraleMod;
     }
 
     private (float power, bool isCrit, bool isFumble) ApplyRandomModifier(float basePower)
@@ -485,17 +525,7 @@ public class BattleSystem : ILogic
 
     private OrderType GetDisobeyOrder(GeneralData general)
     {
-        foreach (var skill in general.Skills)
-        {
-            if (skill.DisobeyToOrder.HasValue && skill.DisobeyChance > 0)
-            {
-                if (UnityEngine.Random.value < skill.DisobeyChance)
-                {
-                    return skill.DisobeyToOrder.Value;
-                }
-            }
-        }
-
+        // GDD v7.0: 抗命时根据性格决定执行的指令
         return general.Personality switch
         {
             GeneralPersonality.Fanatic => OrderType.ATK,
@@ -506,207 +536,73 @@ public class BattleSystem : ILogic
 
     #endregion
 
-    #region 技能检查
-
-    private void CheckSkillTrigger(GeneralData general, OrderType order, BattleResult result)
-    {
-        foreach (var skill in general.Skills)
-        {
-            if (!CheckSkillCondition(general, order, result, skill)) continue;
-
-            ApplySkillEffect(skill, general, result);
-            result.SkillTriggered = true;
-            result.SkillName = skill.SkillName;
-            eventService.SendMessage((EventID)WarBrokerEventID.OnSkillTriggered, general, skill);
-        }
-    }
-
-    private bool CheckSkillCondition(GeneralData general, OrderType order,
-        BattleResult result, SkillConfigItem skill)
-    {
-        if (skill.TriggerOrder.HasValue && skill.TriggerOrder.Value != order)
-            return false;
-
-        if (skill.TroopThreshold > 0 && general.Troops >= skill.TroopThreshold)
-            return false;
-
-        if (skill.MoraleThreshold > 0 && general.Morale < skill.MoraleThreshold)
-            return false;
-
-        if (skill.FrontlineThreshold > 0)
-        {
-            int linePos = campaignData.Battle.Frontlines[general.Position].LinePosition;
-            if (linePos < skill.FrontlineThreshold)
-                return false;
-        }
-
-        if (skill.RequireConsecutive && general.ConsecutiveOrderCount < 2)
-            return false;
-
-        if (skill.SkillId.Contains("charge") && result.LineMovement <= 0)
-            return false;
-
-        return true;
-    }
-
-    private void ApplySkillEffect(SkillConfigItem skill, GeneralData general, BattleResult result)
-    {
-        result.LineMovement += skill.BonusLineMovement;
-        result.AllyTroopChange += skill.AllyTroopChange;
-        result.EnemyTroopChange += skill.EnemyTroopChange;
-    }
-
-    #endregion
-
     #region 补员
 
+    /// <summary>
+    /// GDD v7.0: 基地休整
+    /// 只有在基地位置的将军才能获得回血，且消耗后备役
+    /// </summary>
     public void ApplyReinforcements()
     {
+        // 玩家方将军（Grid 1 是玩家基地）
         foreach (var general in campaignData.Battle.AllyGenerals)
         {
+            // 溃败将军处理重组倒计时
             if (general.GetStatus(balanceConfig) == GeneralStatus.Routed)
             {
                 general.ReorganizeTurns--;
                 continue;
             }
 
-            int linePos = campaignData.Battle.Frontlines[general.Position].LinePosition;
-            float positionMod = linePos switch
+            // GDD v7.0: 只有在 Grid 1（己方基地）才能获得基地休整
+            if (general.GridPosition == 1)
             {
-                <= 2 => 1f,
-                3 => 0.5f,
-                _ => 0f
-            };
+                int healAmount = 2; // 基地休整 HP +2
 
-            int reinforcement = Mathf.RoundToInt(balanceConfig.BaseReinforcement * positionMod);
-            general.Troops = Mathf.Min(20, general.Troops + reinforcement);
-        }
-    }
-
-    #endregion
-
-    #region 战术系统 (GDD v6.0)
-
-    /// <summary>
-    /// 战术星级抽取 (GDD v6.0)
-    /// 普通 90% / 精锐 10%
-    /// 强化后：普通权重 × 0.5，精锐权重 × 5.0
-    /// </summary>
-    private bool RollTacticTier(GeneralData general)
-    {
-        float normalWeight = 90f;
-        float eliteWeight = 10f;
-
-        // 如果被强化，调整权重
-        if (general.IntentSource == IntentSource.Reinforced)
-        {
-            normalWeight *= 0.5f;
-            eliteWeight *= 5.0f;
-
-            // 性格对战术的影响
-            if (general.FinalIntent == OrderType.ATK)
-            {
-                if (general.Personality == GeneralPersonality.Fanatic)
-                    eliteWeight *= 1.2f; // 额外 +20%
-                else if (general.Personality == GeneralPersonality.Conservative)
-                    eliteWeight *= 0.9f; // -10%
-            }
-            else if (general.FinalIntent == OrderType.DEF)
-            {
-                if (general.Personality == GeneralPersonality.Conservative)
-                    eliteWeight *= 1.2f; // 额外 +20%
-                else if (general.Personality == GeneralPersonality.Fanatic)
-                    eliteWeight *= 0.9f; // -10%
+                // 检查后备役是否足够
+                if (campaignData.Battle.CurrentReserves >= healAmount)
+                {
+                    campaignData.Battle.CurrentReserves -= healAmount;
+                    general.Troops = Mathf.Min(20, general.Troops + healAmount);
+                }
+                else if (campaignData.Battle.CurrentReserves > 0)
+                {
+                    // 后备役不足，只能恢复剩余的量
+                    int actualHeal = campaignData.Battle.CurrentReserves;
+                    campaignData.Battle.CurrentReserves = 0;
+                    general.Troops = Mathf.Min(20, general.Troops + actualHeal);
+                }
+                // 后备役为 0 时无法恢复
             }
         }
 
-        float totalWeight = normalWeight + eliteWeight;
-        float roll = UnityEngine.Random.Range(0f, totalWeight);
-
-        return roll >= normalWeight; // 精锐
-    }
-
-    /// <summary>获取战术名称</summary>
-    private string GetTacticName(OrderType orderType, bool isElite)
-    {
-        return (orderType, isElite) switch
+        // 敌方将军（Grid 5 是敌方基地）
+        foreach (var general in campaignData.Battle.EnemyGenerals)
         {
-            (OrderType.ATK, false) => "步兵冲锋",
-            (OrderType.ATK, true) => "精锐突击",
-            (OrderType.DEF, false) => "坚守阵地",
-            (OrderType.DEF, true) => "战地医院",
-            (OrderType.RET, false) => "有序撤退",
-            (OrderType.RET, true) => "焦土战术",
-            _ => "未知战术"
-        };
-    }
-
-    /// <summary>
-    /// 应用战术效果 (GDD v6.0)
-    /// </summary>
-    private void ApplyTacticEffects(GeneralData ally, GeneralData enemy,
-        bool allyElite, bool enemyElite,
-        ref float allyDamage, ref float enemyDamage)
-    {
-        // 己方战术效果
-        if (allyElite)
-        {
-            switch (ally.FinalIntent)
+            // 溃败将军处理重组倒计时
+            if (general.GetStatus(balanceConfig) == GeneralStatus.Routed)
             {
-                case OrderType.ATK:
-                    // 精锐突击：+2 伤害，无视 DEF 减伤
-                    allyDamage += 2f;
-                    if (enemy.FinalIntent == OrderType.DEF)
-                    {
-                        // 无视 DEF 减伤效果（在对抗表中 ATK vs DEF 是 -4 vs -1）
-                        // 这里可以调整为更激进的伤害
-                        enemyDamage += 2f; // 额外伤害
-                    }
-                    break;
-
-                case OrderType.DEF:
-                    // 战地医院：HP+3（消耗 Reserves 3）
-                    if (campaignData.Battle.CurrentReserves >= 3)
-                    {
-                        ally.Troops += 3;
-                        campaignData.Battle.CurrentReserves -= 3;
-                    }
-                    break;
-
-                case OrderType.RET:
-                    // 焦土战术：HP+1（标准），追击者受伤 -2
-                    if (enemy.FinalIntent == OrderType.ATK)
-                    {
-                        enemyDamage = -2f; // 追击者受伤
-                    }
-                    break;
+                general.ReorganizeTurns--;
+                continue;
             }
-        }
 
-        // 敌方战术效果（镜像逻辑）
-        if (enemyElite)
-        {
-            switch (enemy.FinalIntent)
+            // GDD v7.0: 敌方在 Grid 5（敌方基地）才能获得基地休整
+            if (general.GridPosition == 5)
             {
-                case OrderType.ATK:
-                    enemyDamage += 2f;
-                    if (ally.FinalIntent == OrderType.DEF)
-                    {
-                        allyDamage += 2f;
-                    }
-                    break;
+                int healAmount = 2; // 基地休整 HP +2
 
-                case OrderType.DEF:
-                    // 敌方战地医院（假设敌方也有后备役机制）
-                    enemy.Troops += 3;
-                    break;
-
-                case OrderType.RET:
-                    if (ally.FinalIntent == OrderType.ATK)
-                    {
-                        allyDamage = -2f;
-                    }
-                    break;
+                // 检查敌方后备役是否足够
+                if (campaignData.Battle.EnemyReserves >= healAmount)
+                {
+                    campaignData.Battle.EnemyReserves -= healAmount;
+                    general.Troops = Mathf.Min(20, general.Troops + healAmount);
+                }
+                else if (campaignData.Battle.EnemyReserves > 0)
+                {
+                    int actualHeal = campaignData.Battle.EnemyReserves;
+                    campaignData.Battle.EnemyReserves = 0;
+                    general.Troops = Mathf.Min(20, general.Troops + actualHeal);
+                }
             }
         }
     }

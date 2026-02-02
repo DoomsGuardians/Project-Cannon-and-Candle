@@ -188,8 +188,29 @@ public class GameplayManager : ManagerBase
         bool isVictory = (bool)param1;
         Debug.Log($"游戏结束: {(isVictory ? "胜利" : "失败")}");
 
-        // 显示结算弹窗
-        uiService.ShowWindow<CampaignEndPopup>("CampaignEndPopup");
+        // 缓存结果，等战报显示完毕后再显示结算弹窗
+        pendingGameEndResult = isVictory;
+
+        // 如果没有待显示的战报，直接显示结算弹窗
+        if (pendingBattleResults.Count == 0)
+        {
+            ShowCampaignEndPopup(isVictory);
+            pendingGameEndResult = null;
+        }
+        // 否则等 OnBattleAnimationsComplete 处理完战报后再显示
+    }
+
+    /// <summary>缓存的游戏结束结果</summary>
+    private bool? pendingGameEndResult = null;
+
+    /// <summary>显示战役结束弹窗</summary>
+    private void ShowCampaignEndPopup(bool isVictory)
+    {
+        var popup = uiService.ShowWindow<CampaignEndPopup>("CampaignEndPopup");
+        if (popup != null)
+        {
+            popup.SetResult(isVictory);
+        }
     }
 
     private void OnBattleResult(object param1, object param2)
@@ -208,7 +229,22 @@ public class GameplayManager : ManagerBase
         if (pendingBattleResults.Count > 0)
         {
             var popup = uiService.ShowWindow<BattleResultPopup>("BattleResultPopup");
-            popup?.SetBattleResults(new List<BattleResult>(pendingBattleResults));
+            if (popup != null)
+            {
+                popup.SetBattleResults(new List<BattleResult>(pendingBattleResults));
+
+                // 如果有待显示的结算弹窗，设置回调
+                if (pendingGameEndResult.HasValue)
+                {
+                    bool isVictory = pendingGameEndResult.Value;
+                    popup.SetOnCloseCallback(() =>
+                    {
+                        ShowCampaignEndPopup(isVictory);
+                    });
+                    pendingGameEndResult = null;
+                }
+            }
+            pendingBattleResults.Clear();
         }
     }
 

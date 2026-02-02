@@ -14,10 +14,11 @@ public class CampaignSystem : ILogic
 
     private GameBalanceConfig balanceConfig;
     private OrderConfig orderConfig;
-    private SkillConfig skillConfig;
 
     private IntentSystem intentSystem;
     private CommissionSystem commissionSystem;
+    private VictorAISystem victorAISystem;
+    private VictorProfile victorProfile;
 
     public CampaignRuntimeData Data { get; private set; }
 
@@ -31,7 +32,6 @@ public class CampaignSystem : ILogic
 
         balanceConfig = resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
         orderConfig = resService.LoadResource<OrderConfig>(ConfigPaths.ORDER_CONFIG);
-        skillConfig = resService.LoadResource<SkillConfig>(ConfigPaths.SKILL_CONFIG);
 
         intentSystem = new IntentSystem();
         intentSystem.Init(balanceConfig);
@@ -65,7 +65,10 @@ public class CampaignSystem : ILogic
         }
 
         Data = new CampaignRuntimeData();
-        Data.InitFromConfig(campaignConfig, orderConfig, skillConfig);
+        Data.InitFromConfig(campaignConfig, orderConfig);
+
+        // 设置意图系统的战役数据引用（用于判断交战状态）
+        intentSystem.SetCampaignData(Data);
 
         marketSystem.SetRuntimeData(Data);
         battleSystem.SetRuntimeData(Data);
@@ -75,10 +78,27 @@ public class CampaignSystem : ILogic
 
         // 从战役配置加载委托任务
         commissionSystem.LoadCommissions(campaignConfig.Commissions);
+
+        // 从战役配置加载维克多性格，没有则用默认
+        victorProfile = campaignConfig.VictorProfile;
+        if (victorProfile == null)
+        {
+            victorProfile = resService.LoadResource<VictorProfile>(ConfigPaths.VICTOR_PROFILE);
+            if (victorProfile == null)
+            {
+                Debug.LogWarning("VictorProfile not found, using default values");
+                victorProfile = ScriptableObject.CreateInstance<VictorProfile>();
+            }
+        }
+
+        // 初始化维克多AI系统 (GDD v7)
+        victorAISystem = new VictorAISystem();
+        victorAISystem.Init(victorProfile, Data, marketSystem, intentSystem, balanceConfig, orderConfig);
     }
 
     public IntentSystem GetIntentSystem() => intentSystem;
     public CommissionSystem GetCommissionSystem() => commissionSystem;
+    public VictorAISystem GetVictorAISystem() => victorAISystem;
 
     #region 回合流程
 
@@ -197,6 +217,14 @@ public class CampaignSystem : ILogic
         if (battleResults.Count > 0)
         {
             waitingForBattleAnimations = true;
+
+            // 检查是否有 3D 战场场景，如果没有则直接发送动画完成事件
+            var battlefieldController = UnityEngine.Object.FindObjectOfType<BattlefieldSceneController>();
+            if (battlefieldController == null)
+            {
+                // 没有 3D 战场，直接触发动画完成事件（让战报弹窗显示）
+                eventService.SendMessage((EventID)WarBrokerEventID.OnBattleAnimationsComplete, null, null);
+            }
         }
         else
         {
@@ -399,67 +427,38 @@ public class CampaignSystem : ILogic
 
     #region 维克多AI
 
+    /// <summary>
+    /// 执行维克多AI回合 (GDD v7)
+    /// 新的 VictorAISystem 内部处理所有金融操作和将军管理
+    /// </summary>
     private Dictionary<string, OrderType> ExecuteVictorAI()
     {
         var orders = new Dictionary<string, OrderType>();
-        var pricingEngine = marketSystem.GetPricingEngine();
 
+        // 执行维克多回合（内部处理策略选择、金融操作、将军管理）
+        var plan = victorAISystem.ExecuteTurn();
+
+        Debug.Log($"[Victor] 策略: {plan.MainStrategy}, 原因: {plan.StrategyReason}");
+        Debug.Log(victorAISystem.GetDebugInfo());
+
+        // 从将军数据中提取最终意图
         foreach (var general in Data.Battle.EnemyGenerals)
         {
             if (general.GetStatus(balanceConfig) == GeneralStatus.Routed) continue;
-
-            // Step 1: 生成默认意图
-            var defaultIntent = intentSystem.GenerateDefaultIntent(general);
-            general.DefaultIntent = defaultIntent;
-
-            // Step 2: 尝试强化（需要从市场购买1份指令）
-            bool canReinforce = TryVictorPurchase(pricingEngine, defaultIntent, 1);
-
-            if (canReinforce)
+            if (general.FinalIntent.HasValue)
             {
-                general.FinalIntent = defaultIntent;
-                general.IntentSource = IntentSource.Reinforced;
+                orders[general.GeneralId] = general.FinalIntent.Value;
+                general.AssignedOrder = general.FinalIntent.Value;
             }
-            else
-            {
-                general.FinalIntent = defaultIntent;
-                general.IntentSource = IntentSource.Default;
-            }
-
-            orders[general.GeneralId] = general.FinalIntent.Value;
-            general.AssignedOrder = general.FinalIntent.Value;
         }
 
         return orders;
     }
 
-    /// <summary>
-    /// 维克多尝试从市场购买指令
-    /// </summary>
-    private bool TryVictorPurchase(PricingEngine pricingEngine, OrderType type, int quantity)
+    /// <summary>维克多回合间结算（利息、仓储费、期货到期）</summary>
+    public void ApplyVictorTurnSettlement()
     {
-        var market = Data.Market;
-
-        // 检查流通盘
-        if (market.MarketInventory[type] < quantity)
-        {
-            return false;
-        }
-
-        // 检查资金
-        float price = pricingEngine.CalculatePrice(type);
-        float totalCost = price * quantity * (1 + balanceConfig.CommissionRate);
-
-        if (Data.VictorCash < totalCost)
-        {
-            return false;
-        }
-
-        // 执行购买
-        Data.VictorCash -= totalCost;
-        market.MarketInventory[type] -= quantity;
-
-        return true;
+        victorAISystem.ApplyTurnSettlement();
     }
 
     #endregion

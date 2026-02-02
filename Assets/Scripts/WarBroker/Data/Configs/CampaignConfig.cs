@@ -56,9 +56,8 @@ public class CampaignConfig : ScriptableObject
     [Tooltip("维克多初始现金")]
     public float VictorInitialCash = 500f;
 
-    [Tooltip("维克多AI难度 (0-1)")]
-    [Range(0f, 1f)]
-    public float VictorDifficulty = 0.5f;
+    [Tooltip("维克多性格配置（不设置则使用默认 VictorProfile_Default）")]
+    public VictorProfile VictorProfile;
 
     [Header("===== 可用随机事件 =====")]
     public RandomEventConfig[] AvailableEvents;

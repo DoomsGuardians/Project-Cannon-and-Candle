@@ -75,3 +75,14 @@ public enum CommissionType
     NotOccupyGrid,    // 未占领指定 Grid（如 Traitor：未占领 Grid 5）
     TotalCasualties   // 总伤亡达到数量（如 MeatGrinder：伤亡 >= 100）
 }
+
+// VictorStrategy 已移至 VictorAISystem.cs
+
+/// <summary>交易方向</summary>
+public enum TradeDirection
+{
+    Buy,   // 买入
+    Sell   // 卖出
+}
+
+// DeceptionType 已移至 VictorMemory.cs (DeceptionPlanType)

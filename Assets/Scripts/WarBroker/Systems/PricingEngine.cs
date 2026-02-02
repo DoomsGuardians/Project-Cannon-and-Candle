@@ -26,7 +26,7 @@ public class PricingEngine
     public float CalculatePrice(OrderType type)
     {
         var basePrice = orderConfig.GetConfig(type).BasePrice;
-        var alpha = CalculateAlpha(type);
+        var alpha = CalculateAlpha(type) * balanceConfig.AlphaMultiplier; // 应用战场影响倍率
         var beta = data.Market.BetaCarry[type]; // Beta从市场数据中读取
         var gamma = CalculateGamma(type);
 
@@ -165,6 +165,7 @@ public class PricingEngine
     /// Gamma因子：流通盘 (GDD v6.0)
     /// Gamma = InitialFloat / Max(CurrentFloat, 1)
     /// 流通盘越少，价格越高（逼空效应）
+    /// 增加上限以避免极端价格
     /// </summary>
     private float CalculateGamma(OrderType type)
     {
@@ -176,6 +177,9 @@ public class PricingEngine
 
         // Gamma = InitialFloat / Max(CurrentFloat, 1)
         float gamma = (float)initialFloat / Mathf.Max(currentFloat, 1);
+
+        // 应用上限，避免流通盘过低导致价格暴涨
+        gamma = Mathf.Min(gamma, balanceConfig.GammaMax);
 
         return gamma;
     }
@@ -204,8 +208,8 @@ public class PricingEngine
             market.BetaCarry[type] *= (1f - impact);
         }
 
-        // 限制Beta范围，避免极端值
-        market.BetaCarry[type] = Mathf.Clamp(market.BetaCarry[type], 0.1f, 10f);
+        // 限制Beta范围，使用配置参数
+        market.BetaCarry[type] = Mathf.Clamp(market.BetaCarry[type], balanceConfig.BetaMin, balanceConfig.BetaMax);
     }
 
     /// <summary>
@@ -238,10 +242,10 @@ public class PricingEngine
             data.Market.BetaCarry[OrderType.RET] *= 2.0f;  // 逃命
         }
 
-        // 限制Beta范围
+        // 限制Beta范围，使用配置参数
         foreach (OrderType type in Enum.GetValues(typeof(OrderType)))
         {
-            data.Market.BetaCarry[type] = Mathf.Clamp(data.Market.BetaCarry[type], 0.1f, 10f);
+            data.Market.BetaCarry[type] = Mathf.Clamp(data.Market.BetaCarry[type], balanceConfig.BetaMin, balanceConfig.BetaMax);
         }
     }
 
@@ -285,5 +289,35 @@ public class PricingEngine
     public (float alpha, float beta, float gamma) GetFactors(OrderType type)
     {
         return (CalculateAlpha(type), data.Market.BetaCarry[type], CalculateGamma(type));
+    }
+
+    /// <summary>获取完整的市场因子数据（用于日志）</summary>
+    public MarketFactors GetMarketFactors(OrderType type)
+    {
+        float alpha = CalculateAlpha(type) * balanceConfig.AlphaMultiplier;
+        float beta = data.Market.BetaCarry[type];
+        float gamma = CalculateGamma(type);
+        float basePrice = orderConfig.GetConfig(type)?.BasePrice ?? 30f;
+        float finalPrice = basePrice * (1f + alpha) * beta * gamma;
+
+        return new MarketFactors
+        {
+            Alpha = alpha,
+            Beta = beta,
+            Gamma = gamma,
+            BasePrice = basePrice,
+            FinalPrice = finalPrice
+        };
+    }
+
+    /// <summary>获取所有指令类型的市场因子</summary>
+    public Dictionary<OrderType, MarketFactors> GetAllMarketFactors()
+    {
+        var result = new Dictionary<OrderType, MarketFactors>();
+        foreach (OrderType type in Enum.GetValues(typeof(OrderType)))
+        {
+            result[type] = GetMarketFactors(type);
+        }
+        return result;
     }
 }

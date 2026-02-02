@@ -19,8 +19,6 @@ public class GeneralData
     public int Trust;
     public int Morale;
 
-    public List<SkillConfigItem> Skills;
-
     public OrderType? AssignedOrder;
 
     // 意图系统
@@ -33,22 +31,12 @@ public class GeneralData
     public OrderType? LastOrder;
     public int ConsecutiveOrderCount;
 
-    public void InitFromConfig(GeneralConfigItem config, SkillConfig skillConfig)
+    public void InitFromConfig(GeneralConfigItem config)
     {
         Config = config;
         Troops = config.InitialTroops;
         Trust = config.InitialTrust;
         Morale = config.InitialMorale;
-
-        Skills = new List<SkillConfigItem>();
-        if (config.SkillIds != null)
-        {
-            foreach (var skillId in config.SkillIds)
-            {
-                var skill = skillConfig.GetSkill(skillId);
-                if (skill != null) Skills.Add(skill);
-            }
-        }
     }
 
     public float CalculateCompositeScore()

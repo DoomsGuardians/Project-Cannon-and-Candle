@@ -27,6 +27,9 @@ public class CampaignEndPopup : WindowBase
         { "MeatGrinder", 150f }
     };
 
+    // 缓存的结果数据
+    private bool? cachedIsVictory = null;
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -47,26 +50,53 @@ public class CampaignEndPopup : WindowBase
     {
         AddButtonListener(btnRestart, OnRestart);
         AddButtonListener(btnMainMenu, OnMainMenu);
-        eventService.AddEventListening((EventID)WarBrokerEventID.OnGameEnd, OnGameEnd);
+
+        // 如果有缓存的结果，立即更新UI
+        if (cachedIsVictory.HasValue)
+        {
+            UpdateUI(cachedIsVictory.Value);
+        }
     }
 
     public override void OnHide()
     {
-        eventService.RemoveEventListeningByTarget(this);
+        cachedIsVictory = null;
     }
 
-    private void OnGameEnd(object param1, object param2)
+    /// <summary>
+    /// 设置战役结果（由外部调用）
+    /// </summary>
+    public void SetResult(bool isVictory)
     {
-        bool isVictory = (bool)param1;
-        gameObject.SetActive(true);
+        cachedIsVictory = isVictory;
 
+        // 如果弹窗已经显示，立即更新UI
+        if (gameObject.activeInHierarchy)
+        {
+            UpdateUI(isVictory);
+        }
+    }
+
+    private void UpdateUI(bool isVictory)
+    {
         var manager = GameRoot.Instance.managerService.GetManager<GameplayManager>();
         var data = manager?.GetCampaignData();
-        if (data == null) return;
+        if (data == null)
+        {
+            Debug.LogWarning("[CampaignEndPopup] 无法获取战役数据");
+            return;
+        }
 
         // 标题
         if (txtTitle != null)
+        {
             txtTitle.text = isVictory ? "胜利！" : "失败";
+            Debug.Log($"[CampaignEndPopup] 设置标题: {txtTitle.text}, isVictory={isVictory}");
+        }
+        else
+        {
+            Debug.LogWarning("[CampaignEndPopup] txtTitle 为空");
+        }
 
         // 财务统计
         if (txtStats != null)
