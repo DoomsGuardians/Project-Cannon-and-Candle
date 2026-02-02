@@ -10,7 +10,8 @@ public enum GameMode
     GameStart,
     GamePlay,
     Training,
-    Narrative
+    Narrative,
+    MainMenu
 }
 
 /// <summary>
