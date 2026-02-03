@@ -3,8 +3,11 @@ using Cinemachine;
 using DG.Tweening;
 
 /// <summary>
-/// 战场相机控制器 - 使用 Cinemachine 实现平滑相机过渡
-/// 支持手动旋转/缩放，以及平滑聚焦和返回
+/// 战场相机控制器 - 使用 Cinemachine 多相机切换实现平滑相机过渡
+/// 三个 VirtualCamera 的职责：
+/// - vcamBattlefield: 战场总览，支持玩家旋转/缩放/平移
+/// - vcamBattle: 战斗视角，跟随战线锚点，固定角度
+/// - vcamFocusUnit: 聚焦单位，跟随目标单位，特写距离
 /// </summary>
 public class BattlefieldCameraController : MonoBehaviour
 {
@@ -15,6 +18,11 @@ public class BattlefieldCameraController : MonoBehaviour
     [SerializeField] private CinemachineVirtualCamera vcamBattle;
     [SerializeField] private CinemachineVirtualCamera vcamFocusUnit;
     [SerializeField] private Transform battlefieldPivot;
+
+    [Header("多目标设置")]
+    [SerializeField] private CinemachineTargetGroup battleTargetGroup;
+    [SerializeField] private float targetWeight = 1f;
+    [SerializeField] private float targetRadius = 2f;
 
     [Header("旋转设置")]
     [SerializeField] private float rotateSpeed = 5f;
@@ -37,15 +45,9 @@ public class BattlefieldCameraController : MonoBehaviour
 
     [Header("优先级设置")]
     [SerializeField] private int priorityActive = 20;
-    [SerializeField] private int priorityBattle = 15;
-    [SerializeField] private int priorityDefault = 10;
     [SerializeField] private int priorityInactive = 0;
 
-    [Header("初始视角设置")]
-    [SerializeField] private float initialYaw = 180f;    // 初始水平角度（180=面向敌方）
-    [SerializeField] private float initialPitch = 45f;   // 初始俯仰角度
-    [SerializeField] private float initialDistance = 15f; // 初始距离
-
+    // 战场视角的轨道参数（运行时从 vcamBattlefield 初始化）
     private float currentYaw;
     private float currentPitch;
     private float currentDistance;
@@ -59,35 +61,65 @@ public class BattlefieldCameraController : MonoBehaviour
     private CinemachineTransposer battlefieldTransposer;
     private Tweener panTweener;  // 当前平移动画
 
+    // 战斗前位置记录
+    private Vector3 preBattlePivotPosition;
+
     private void Start()
     {
-        // 使用 Inspector 中配置的初始值
-        currentYaw = initialYaw;
-        currentPitch = initialPitch;
-        currentDistance = Mathf.Clamp(initialDistance, minZoom, maxZoom);
-
         if (GameRoot.Instance != null)
         {
             inputService = GameRoot.Instance.inputService;
         }
 
-        // 获取 Battlefield 相机的 Transposer
+        // 获取 Battlefield 相机的 Transposer 并从中初始化轨道参数
         if (vcamBattlefield != null)
         {
             battlefieldTransposer = vcamBattlefield.GetCinemachineComponent<CinemachineTransposer>();
 
-            // 禁用阻尼，避免手动控制时抖动
             if (battlefieldTransposer != null)
             {
+                // 从 Cinemachine 配置初始化轨道参数
+                InitializeFromVcamOffset(battlefieldTransposer.m_FollowOffset);
+
+                // 禁用阻尼，避免手动控制时抖动
                 battlefieldTransposer.m_XDamping = 0f;
                 battlefieldTransposer.m_YDamping = 0f;
                 battlefieldTransposer.m_ZDamping = 0f;
             }
         }
 
-        // 初始化相机位置
-        UpdateOrbitalCamera();
         SetMode(CameraMode.Battlefield);
+    }
+
+    /// <summary>
+    /// 从 Cinemachine FollowOffset 反推轨道参数
+    /// </summary>
+    private void InitializeFromVcamOffset(Vector3 offset)
+    {
+        currentDistance = offset.magnitude;
+        currentDistance = Mathf.Clamp(currentDistance, minZoom, maxZoom);
+
+        if (currentDistance > 0.01f)
+        {
+            currentPitch = Mathf.Asin(offset.y / currentDistance) * Mathf.Rad2Deg;
+            currentPitch = Mathf.Clamp(currentPitch, minPitch, maxPitch);
+
+            float horizontalDist = Mathf.Sqrt(offset.x * offset.x + offset.z * offset.z);
+            if (horizontalDist > 0.01f)
+            {
+                currentYaw = Mathf.Atan2(offset.x, offset.z) * Mathf.Rad2Deg;
+            }
+            else
+            {
+                currentYaw = 180f;
+            }
+        }
+        else
+        {
+            currentYaw = 180f;
+            currentPitch = 45f;
+            currentDistance = (minZoom + maxZoom) / 2f;
+        }
     }
 
     private void LateUpdate()
@@ -204,59 +236,78 @@ public class BattlefieldCameraController : MonoBehaviour
     }
 
     /// <summary>
-    /// 平滑聚焦到指定目标（将军单位）- 使用平移而非旋转
+    /// 平滑聚焦到指定目标（将军单位）- 靠近单位但保持相同视角角度
     /// </summary>
     public void SmoothFocusOn(Transform target)
     {
-        if (battlefieldPivot == null || target == null) return;
+        if (vcamFocusUnit == null || target == null) return;
 
-        // 取消之前的平移动画
-        panTweener?.Kill();
+        // 设置 vcamFocusUnit 的 Follow 和 LookAt
+        vcamFocusUnit.Follow = target;
+        vcamFocusUnit.LookAt = target;
 
-        // 平移 pivot 到目标位置，保持当前视角
-        panTweener = battlefieldPivot.DOMove(target.position, panDuration)
-            .SetEase(panEase);
-
-        // 保持在 Battlefield 模式，不切换相机
-        SetMode(CameraMode.Battlefield);
+        // 切换到 FocusUnit 模式
+        // vcamFocusUnit 在 Inspector 中配置：
+        // - Body: Transposer，Follow Offset 与 vcamBattlefield 相同角度但距离更近
+        // - Aim: Composer 或 Do Nothing 保持角度
+        SetMode(CameraMode.FocusUnit);
     }
 
     /// <summary>
-    /// 平滑跟随战斗（跟随战线锚点）- 使用平移而非旋转
+    /// 平滑跟随战斗目标（双方将军单位）- 使用 CinemachineTargetGroup 框定双方
     /// </summary>
-    /// <returns>返回平移动画的 Tweener，可用于等待完成</returns>
+    public void SmoothFollowBattle(Transform allyUnit, Transform enemyUnit)
+    {
+        if (vcamBattle == null || battleTargetGroup == null) return;
+        if (allyUnit == null && enemyUnit == null) return;
+
+        // 清空目标组
+        while (battleTargetGroup.m_Targets.Length > 0)
+        {
+            battleTargetGroup.RemoveMember(battleTargetGroup.m_Targets[0].target);
+        }
+
+        // 添加参战单位作为目标
+        if (allyUnit != null)
+            battleTargetGroup.AddMember(allyUnit, targetWeight, targetRadius);
+        if (enemyUnit != null)
+            battleTargetGroup.AddMember(enemyUnit, targetWeight, targetRadius);
+
+        // vcamBattle 的 Follow/LookAt 在 Inspector 中设为 battleTargetGroup
+        SetMode(CameraMode.Battle);
+    }
+
+    /// <summary>
+    /// 平滑跟随战斗（跟随战线锚点）- 兼容旧接口
+    /// </summary>
     public Tweener SmoothFollowBattle(Transform laneAnchor)
     {
-        if (battlefieldPivot == null || laneAnchor == null) return null;
+        if (vcamBattle == null || laneAnchor == null) return null;
 
-        // 取消之前的平移动画
-        panTweener?.Kill();
+        // 使用单目标版本
+        SmoothFollowBattle(laneAnchor, null);
 
-        // 平移 pivot 到战线锚点位置，保持当前视角
-        panTweener = battlefieldPivot.DOMove(laneAnchor.position, panDuration)
-            .SetEase(panEase);
-
-        // 保持在 Battlefield 模式，不切换相机
-        SetMode(CameraMode.Battlefield);
-
-        return panTweener;
+        return null;
     }
 
     /// <summary>
-    /// 平滑返回默认视角（保持用户之前的旋转角度）
+    /// 平滑返回默认视角 - 切换回 Battlefield 模式
     /// </summary>
-    public void SmoothReturnToDefault()
+    /// <param name="restorePreBattlePosition">是否恢复战斗前的 pivot 位置</param>
+    public void SmoothReturnToDefault(bool restorePreBattlePosition = false)
     {
         // 取消之前的平移动画
         panTweener?.Kill();
 
-        // 平移回原点，不重置 Yaw/Pitch/Distance
-        if (battlefieldPivot != null)
+        // 切换回 Battlefield 模式
+        SetMode(CameraMode.Battlefield);
+
+        // 如果需要恢复战斗前位置
+        if (restorePreBattlePosition && battlefieldPivot != null)
         {
-            panTweener = battlefieldPivot.DOMove(Vector3.zero, panDuration)
+            panTweener = battlefieldPivot.DOMove(preBattlePivotPosition, panDuration)
                 .SetEase(panEase);
         }
-        SetMode(CameraMode.Battlefield);
     }
 
     /// <summary>
@@ -308,14 +359,39 @@ public class BattlefieldCameraController : MonoBehaviour
     {
         currentMode = mode;
 
+        // 设置优先级 - 只有当前模式的相机有高优先级
         if (vcamBattlefield != null)
-            vcamBattlefield.Priority = (mode == CameraMode.Battlefield) ? priorityActive : priorityDefault;
+            vcamBattlefield.Priority = (mode == CameraMode.Battlefield) ? priorityActive : priorityInactive;
 
         if (vcamBattle != null)
-            vcamBattle.Priority = (mode == CameraMode.Battle) ? priorityBattle : priorityInactive;
+            vcamBattle.Priority = (mode == CameraMode.Battle) ? priorityActive : priorityInactive;
 
         if (vcamFocusUnit != null)
             vcamFocusUnit.Priority = (mode == CameraMode.FocusUnit) ? priorityActive : priorityInactive;
+    }
+
+    /// <summary>
+    /// 保存战斗前的 pivot 位置，用于战斗结束后恢复
+    /// </summary>
+    public void SavePreBattlePosition()
+    {
+        if (battlefieldPivot != null)
+        {
+            preBattlePivotPosition = battlefieldPivot.position;
+        }
+    }
+
+    /// <summary>
+    /// 获取 Cinemachine Brain 的默认混合时间
+    /// </summary>
+    public float GetBlendDuration()
+    {
+        var brain = Camera.main?.GetComponent<CinemachineBrain>();
+        if (brain != null)
+        {
+            return brain.m_DefaultBlend.m_Time;
+        }
+        return 0.5f; // 默认值
     }
 
     /// <summary>

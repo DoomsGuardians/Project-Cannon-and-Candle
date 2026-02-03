@@ -37,6 +37,8 @@ public class BattlefieldSceneController : MonoBehaviour
     private Queue<BattleResult> animationQueue = new Queue<BattleResult>();
     private bool isPlayingAnimation = false;
     private Sequence currentSequence;
+    private int totalBattlesInQueue = 0;  // 当前批次的战斗总数
+    private int currentBattleIndex = 0;   // 当前播放的战斗索引
 
     public System.Action<GeneralData> OnGeneralSelected;
     public System.Action OnAllAnimationsComplete;  // 所有动画播放完成回调
@@ -270,6 +272,7 @@ public class BattlefieldSceneController : MonoBehaviour
         {
             // 将战斗结果加入队列
             animationQueue.Enqueue(result);
+            totalBattlesInQueue++;
 
             // 如果当前没有播放动画，开始播放
             if (!isPlayingAnimation)
@@ -289,12 +292,14 @@ public class BattlefieldSceneController : MonoBehaviour
         if (animationQueue.Count == 0)
         {
             isPlayingAnimation = false;
+            totalBattlesInQueue = 0;
+            currentBattleIndex = 0;
             OnAllAnimationsComplete?.Invoke();
 
-            // 平滑返回默认视角（保持用户之前的旋转角度）
+            // 平滑返回默认视角，恢复战斗前位置
             if (battlefieldCamera != null)
             {
-                battlefieldCamera.SmoothReturnToDefault();
+                battlefieldCamera.SmoothReturnToDefault(restorePreBattlePosition: true);
             }
 
             // 发送事件通知战斗动画播放完成
@@ -303,32 +308,43 @@ public class BattlefieldSceneController : MonoBehaviour
         }
 
         isPlayingAnimation = true;
+        currentBattleIndex++;
         var result = animationQueue.Dequeue();
-        PlayBattleAnimation(result);
+
+        bool isFirstBattle = (currentBattleIndex == 1);
+        bool isLastBattle = (animationQueue.Count == 0);
+
+        PlayBattleAnimation(result, isFirstBattle, isLastBattle);
     }
 
     /// <summary>播放战斗动画</summary>
-    private void PlayBattleAnimation(BattleResult result)
+    private void PlayBattleAnimation(BattleResult result, bool isFirstBattle, bool isLastBattle)
     {
         currentSequence?.Kill();
         currentSequence = DOTween.Sequence();
+
+        // 第一个战斗：保存战斗前位置
+        if (isFirstBattle && battlefieldCamera != null)
+        {
+            battlefieldCamera.SavePreBattlePosition();
+        }
 
         // 通过Position查找参战单位
         GeneralUnit3D allyUnit = FindUnitByPosition(allyUnits, result.Position);
         GeneralUnit3D enemyUnit = FindUnitByPosition(enemyUnits, result.Position);
 
-        // 相机跟随到当前战线
-        Transform laneAnchor = GetLaneAnchor(result.Position);
-        Tweener cameraTweener = null;
-        if (battlefieldCamera != null && laneAnchor != null)
+        // 相机跟随双方将军单位
+        if (battlefieldCamera != null)
         {
-            cameraTweener = battlefieldCamera.SmoothFollowBattle(laneAnchor);
+            Transform allyTransform = allyUnit?.transform;
+            Transform enemyTransform = enemyUnit?.transform;
+            battlefieldCamera.SmoothFollowBattle(allyTransform, enemyTransform);
         }
 
         Debug.Log($"[BattleAnim] {result.Position}: Ally {result.AllyOldPosition}->{result.AllyNewPosition}, Enemy {result.EnemyOldPosition}->{result.EnemyNewPosition}");
 
-        // 等待相机聚焦完成后再开始战斗动画
-        float cameraDelay = cameraTweener != null ? cameraTweener.Duration() : 0f;
+        // 等待 Cinemachine 过渡完成后再开始战斗动画
+        float cameraDelay = battlefieldCamera != null ? battlefieldCamera.GetBlendDuration() : 0.5f;
 
         float delay = cameraDelay;
 
