@@ -9,4 +9,5 @@ public static class ConfigPaths
     public const string CAMPAIGN_PREFIX = "Config/WarBroker/";
     public const string VICTOR_PROFILE = "Config/WarBroker/VictorProfile_Default";
     public const string UI_TEXT = "Config/WarBroker/UITextConfig";
+    public const string MUSIC_CONFIG = "Config/WarBroker/MusicConfig";
 }

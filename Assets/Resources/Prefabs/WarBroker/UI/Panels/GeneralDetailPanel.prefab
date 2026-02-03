@@ -3325,6 +3325,10 @@ MonoBehaviour:
   txtPosition: {fileID: 2673908375604538110}
   sliderHP: {fileID: 8652265761646360674}
   txtHP: {fileID: 7672809124236953509}
+  txtStatus: {fileID: 0}
+  txtTrust: {fileID: 0}
+  txtMorale: {fileID: 0}
+  txtGridPosition: {fileID: 0}
   txtIntent: {fileID: 2120516604346212285}
   btnReinforce: {fileID: 1201450235805598078}
   btnOverrideATK: {fileID: 7967169510756303615}

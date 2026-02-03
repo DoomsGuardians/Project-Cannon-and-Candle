@@ -38,6 +38,7 @@ public class BattlefieldCameraController : MonoBehaviour
     [SerializeField] private float panSpeed = 15f;
     [SerializeField] private Vector2 panLimitX = new Vector2(-30f, 30f);
     [SerializeField] private Vector2 panLimitZ = new Vector2(-30f, 30f);
+    [SerializeField] [Range(0f, 1f)] private float softBoundaryRatio = 0.2f;  // 软边界占总范围的比例（20%）
 
     [Header("平移聚焦设置")]
     [SerializeField] private float panDuration = 0.5f;  // 平移动画时长
@@ -85,6 +86,10 @@ public class BattlefieldCameraController : MonoBehaviour
                 battlefieldTransposer.m_XDamping = 0f;
                 battlefieldTransposer.m_YDamping = 0f;
                 battlefieldTransposer.m_ZDamping = 0f;
+
+                // 立即同步一次，确保轨道参数和 vcam offset 完全一致
+                // 避免 banner 消失后第一次更新时出现瞬间跳动
+                UpdateOrbitalCamera();
             }
         }
 
@@ -166,14 +171,152 @@ public class BattlefieldCameraController : MonoBehaviour
         // 根据相机朝向计算移动方向
         Vector3 moveDirection = (cameraForward * moveInput.y + cameraRight * moveInput.x);
 
-        // 计算新位置
-        Vector3 newPosition = battlefieldPivot.position + moveDirection * panSpeed * Time.deltaTime;
+        // 计算相机相对于 pivot 的 offset（使用当前的轨道参数）
+        Vector3 cameraOffset = CalculateCameraOffset();
 
-        // 限制在范围内
-        newPosition.x = Mathf.Clamp(newPosition.x, panLimitX.x, panLimitX.y);
-        newPosition.z = Mathf.Clamp(newPosition.z, panLimitZ.x, panLimitZ.y);
+        // 计算当前相机位置
+        Vector3 currentCameraPosition = battlefieldPivot.position + cameraOffset;
 
-        battlefieldPivot.position = newPosition;
+        // 使用方向性减速：只减速朝向边界的移动分量
+        Vector3 adjustedMoveDirection = ApplyDirectionalDamping(currentCameraPosition, moveDirection);
+
+        // 计算新的 pivot 位置
+        Vector3 newPivotPosition = battlefieldPivot.position + adjustedMoveDirection * panSpeed * Time.deltaTime;
+
+        // 计算相机的实际位置
+        Vector3 newCameraPosition = newPivotPosition + cameraOffset;
+
+        // 使用硬限制作为最终保险（防止完全超出边界）
+        newCameraPosition = ClampToEllipse(newCameraPosition);
+
+        // 反推 pivot 的最终位置（相机位置 - offset）
+        Vector3 finalPivotPosition = newCameraPosition - cameraOffset;
+
+        battlefieldPivot.position = finalPivotPosition;
+    }
+
+    /// <summary>
+    /// 应用方向性减速：只减速朝向边界的移动分量，平行于边界的移动不受影响
+    /// 这样在边界附近仍然可以流畅地沿着边界移动
+    /// </summary>
+    private Vector3 ApplyDirectionalDamping(Vector3 cameraPosition, Vector3 moveDirection)
+    {
+        // 计算椭圆的半径和中心
+        float radiusX = (panLimitX.y - panLimitX.x) / 2f;
+        float radiusZ = (panLimitZ.y - panLimitZ.x) / 2f;
+        float centerX = (panLimitX.x + panLimitX.y) / 2f;
+        float centerZ = (panLimitZ.x + panLimitZ.y) / 2f;
+
+        // 计算相对于中心的偏移
+        float offsetX = cameraPosition.x - centerX;
+        float offsetZ = cameraPosition.z - centerZ;
+
+        // 计算归一化距离（椭圆公式）
+        float normalizedDistance = Mathf.Sqrt(
+            (offsetX * offsetX) / (radiusX * radiusX) +
+            (offsetZ * offsetZ) / (radiusZ * radiusZ)
+        );
+
+        // 如果在核心区域内，不做任何处理
+        float softBoundaryStart = 1f - softBoundaryRatio;
+        if (normalizedDistance < softBoundaryStart)
+        {
+            return moveDirection;
+        }
+
+        // 计算从中心指向相机的方向（归一化）
+        Vector3 directionFromCenter = new Vector3(
+            offsetX / (radiusX * radiusX),
+            0,
+            offsetZ / (radiusZ * radiusZ)
+        );
+
+        if (directionFromCenter.sqrMagnitude > 0.001f)
+        {
+            directionFromCenter.Normalize();
+        }
+        else
+        {
+            return moveDirection;  // 在中心点，不做处理
+        }
+
+        // 计算移动方向在"朝向边界"方向上的投影
+        float projectionOnBoundary = Vector3.Dot(moveDirection, directionFromCenter);
+
+        // 如果是朝向中心移动（负投影），不做限制
+        if (projectionOnBoundary <= 0)
+        {
+            return moveDirection;
+        }
+
+        // 计算减速系数（只影响朝向边界的分量）
+        float t = (normalizedDistance - softBoundaryStart) / softBoundaryRatio;
+        t = Mathf.Clamp01(t);
+
+        // 使用更柔和的曲线（三次方）
+        float dampingFactor = 1f - (t * t * t);
+
+        // 分解移动方向：朝向边界的分量 + 平行于边界的分量
+        Vector3 boundaryComponent = directionFromCenter * projectionOnBoundary;
+        Vector3 tangentComponent = moveDirection - boundaryComponent;
+
+        // 只对朝向边界的分量应用减速
+        Vector3 dampedBoundaryComponent = boundaryComponent * dampingFactor;
+
+        // 重新组合
+        return dampedBoundaryComponent + tangentComponent;
+    }
+
+    /// <summary>
+    /// 将相机位置限制在椭圆形范围内（支持圆形和椭圆形）
+    /// </summary>
+    private Vector3 ClampToEllipse(Vector3 position)
+    {
+        // 计算椭圆的半径（从 panLimit 的范围计算）
+        float radiusX = (panLimitX.y - panLimitX.x) / 2f;
+        float radiusZ = (panLimitZ.y - panLimitZ.x) / 2f;
+
+        // 椭圆的中心点
+        float centerX = (panLimitX.x + panLimitX.y) / 2f;
+        float centerZ = (panLimitZ.x + panLimitZ.y) / 2f;
+
+        // 计算相对于中心的偏移
+        float offsetX = position.x - centerX;
+        float offsetZ = position.z - centerZ;
+
+        // 计算归一化距离（椭圆公式）
+        float normalizedDistance = Mathf.Sqrt(
+            (offsetX * offsetX) / (radiusX * radiusX) +
+            (offsetZ * offsetZ) / (radiusZ * radiusZ)
+        );
+
+        // 如果在椭圆内，直接返回
+        if (normalizedDistance <= 1f)
+        {
+            return position;
+        }
+
+        // 如果超出椭圆，将位置投影到椭圆边界上
+        float scale = 1f / normalizedDistance;
+        position.x = centerX + offsetX * scale;
+        position.z = centerZ + offsetZ * scale;
+
+        return position;
+    }
+
+    /// <summary>
+    /// 根据当前轨道参数计算相机相对于 pivot 的 offset
+    /// </summary>
+    private Vector3 CalculateCameraOffset()
+    {
+        float pitchRad = currentPitch * Mathf.Deg2Rad;
+        float yawRad = currentYaw * Mathf.Deg2Rad;
+
+        return new Vector3(
+            currentDistance * Mathf.Sin(yawRad) * Mathf.Cos(pitchRad),
+            currentDistance * Mathf.Sin(pitchRad),
+            currentDistance * Mathf.Cos(yawRad) * Mathf.Cos(pitchRad)
+        );
     }
 
     private void HandleRotation()

@@ -38,11 +38,6 @@ MonoBehaviour:
   DisobeyTrustThreshold: 50
   DisobeyChanceLow: 0.2
   DisobeyChanceVeryLow: 0.5
-  FlankSupportBonus: 0.1
-  FlankThreatPenalty: 0.1
-  FlankThreatMoralePenalty: 5
-  SurroundBonus: 0.25
-  SurroundedMoralePenalty: 15
   AuditSupplyShortage: 30
   AuditGeneralRouted: 20
   AuditFailureThreshold: 100
@@ -50,11 +45,15 @@ MonoBehaviour:
   AlphaContactBase: 0.2
   AlphaCriticalBonus: 0.15
   AlphaLowHPBonus: 0.1
+  AlphaMultiplier: 1.5
   BetaMomentumThreshold: 0.1
   BetaMomentumMultiplier: 1.2
   BetaPanicReserveThreshold: 20
   BetaPanicMultiplier: 1.3
   ImpactCoefficient: 0.05
+  BetaMin: 0.3
+  BetaMax: 4
+  GammaMax: 2.5
   AlphaGrid1Modifier: 0.15
   AlphaGrid2Modifier: 0.1
   AlphaGrid3Modifier: 0.05
@@ -62,3 +61,12 @@ MonoBehaviour:
   AlphaGrid5Modifier: -0.1
   ProductionFactorMin: 0.9
   ProductionFactorMax: 1.1
+  Combat_ATK_ATK: {x: -2, y: -2}
+  Combat_ATK_DEF: {x: -3, y: -1}
+  Combat_ATK_RET: {x: 0, y: 1}
+  Combat_DEF_ATK: {x: -1, y: -3}
+  Combat_DEF_DEF: {x: 0, y: 0}
+  Combat_DEF_RET: {x: 0, y: 1}
+  Combat_RET_ATK: {x: 1, y: 0}
+  Combat_RET_DEF: {x: 1, y: 0}
+  Combat_RET_RET: {x: 1, y: 1}

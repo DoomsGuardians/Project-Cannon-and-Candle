@@ -22,6 +22,7 @@ public class GameplayWindow : WindowBase
     private RectTransform rightPanelArea;
     private ObjectivePanel objectivePanel;
     private PhaseBanner phaseBanner;
+    private MusicPlayerPanel musicPlayerPanel;
 
     private GameplayManager gameplayManager;
     private GameBalanceConfig balanceConfig;
@@ -74,6 +75,7 @@ public class GameplayWindow : WindowBase
             contentArea = b.contentArea;
             rightPanelArea = b.rightPanelArea;
             phaseBanner = b.phaseBanner;
+            musicPlayerPanel = b.musicPlayerPanel;
         }
     }
 

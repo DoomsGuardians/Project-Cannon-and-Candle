@@ -11,8 +11,8 @@ using DG.Tweening;
 public class GeneralUnit3D : MonoBehaviour
 {
     [Header("锡兵显示")]
-    [SerializeField] private Transform[] soldierSlots;  // 20个锡兵位置
-    [SerializeField] private GameObject soldierPrefab;
+    [SerializeField] private Transform[] soldierSlots;  // 20个锡兵Transform（Prefab中已有实例）
+    [SerializeField] private GameObject soldierPrefab;  // 备用，动态创建时使用
     [SerializeField] private Material allySoldierMaterial;
     [SerializeField] private Material enemySoldierMaterial;
 
@@ -33,6 +33,8 @@ public class GeneralUnit3D : MonoBehaviour
     [Header("动画配置")]
     [SerializeField] private float soldierFallDuration = 0.3f;
     [SerializeField] private float soldierFallDelay = 0.05f;
+    [SerializeField] private float soldierRiseDuration = 0.4f;
+    [SerializeField] private float soldierRiseDelay = 0.08f;
     [SerializeField] private float moveDuration = 0.5f;
 
     [Header("意图气泡渐隐")]
@@ -42,7 +44,6 @@ public class GeneralUnit3D : MonoBehaviour
     public GeneralData Data { get; private set; }
     public bool IsAlly { get; private set; }
 
-    private GameObject[] spawnedSoldiers;
     private int currentSoldierCount = 0;
     private Sequence currentAnimation;
 
@@ -50,13 +51,18 @@ public class GeneralUnit3D : MonoBehaviour
 
     private void Awake()
     {
-        if (soldierSlots != null && soldierSlots.Length > 0)
-        {
-            spawnedSoldiers = new GameObject[soldierSlots.Length];
-        }
-
         if (selectionIndicator != null)
             selectionIndicator.SetActive(false);
+
+        // 初始化时隐藏所有锡兵
+        if (soldierSlots != null)
+        {
+            foreach (var slot in soldierSlots)
+            {
+                if (slot != null)
+                    slot.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void LateUpdate()
@@ -123,21 +129,26 @@ public class GeneralUnit3D : MonoBehaviour
         UpdateIntentBubble();
     }
 
-    /// <summary>更新锡兵数量显示</summary>
+    /// <summary>更新锡兵数量显示（直接使用Prefab中的锡兵实例）</summary>
     private void UpdateSoldierCount(int troops)
     {
-        if (soldierSlots == null || soldierPrefab == null) return;
+        if (soldierSlots == null) return;
 
         int targetCount = Mathf.Clamp(troops, 0, soldierSlots.Length);
 
-        // 增加锡兵
-        while (currentSoldierCount < targetCount)
+        for (int i = 0; i < soldierSlots.Length; i++)
         {
-            if (currentSoldierCount < spawnedSoldiers.Length && spawnedSoldiers[currentSoldierCount] == null)
+            if (soldierSlots[i] == null) continue;
+
+            var soldier = soldierSlots[i].gameObject;
+            bool shouldBeActive = i < targetCount;
+
+            if (shouldBeActive && !soldier.activeSelf)
             {
-                var soldier = Instantiate(soldierPrefab, soldierSlots[currentSoldierCount]);
-                soldier.transform.localPosition = Vector3.zero;
+                // 显示锡兵，重置状态
                 soldier.transform.localRotation = Quaternion.identity;
+                soldier.transform.localScale = Vector3.one;
+                soldier.SetActive(true);
 
                 // 设置材质
                 var renderer = soldier.GetComponentInChildren<Renderer>();
@@ -145,25 +156,14 @@ public class GeneralUnit3D : MonoBehaviour
                 {
                     renderer.material = IsAlly ? allySoldierMaterial : enemySoldierMaterial;
                 }
-
-                spawnedSoldiers[currentSoldierCount] = soldier;
             }
-            else if (currentSoldierCount < spawnedSoldiers.Length && spawnedSoldiers[currentSoldierCount] != null)
+            else if (!shouldBeActive && soldier.activeSelf)
             {
-                spawnedSoldiers[currentSoldierCount].SetActive(true);
+                soldier.SetActive(false);
             }
-            currentSoldierCount++;
         }
 
-        // 减少锡兵
-        while (currentSoldierCount > targetCount)
-        {
-            currentSoldierCount--;
-            if (currentSoldierCount < spawnedSoldiers.Length && spawnedSoldiers[currentSoldierCount] != null)
-            {
-                spawnedSoldiers[currentSoldierCount].SetActive(false);
-            }
-        }
+        currentSoldierCount = targetCount;
     }
 
     /// <summary>更新意图气泡</summary>
@@ -212,46 +212,125 @@ public class GeneralUnit3D : MonoBehaviour
             selectionIndicator.SetActive(selected);
     }
 
-    /// <summary>播放锡兵倒下动画</summary>
+    /// <summary>播放锡兵倒下动画（随机选择锡兵倒下）</summary>
     public Sequence PlaySoldierFallAnimation(int casualties)
     {
-        if (spawnedSoldiers == null || casualties <= 0) return null;
+        if (soldierSlots == null || casualties <= 0) return null;
+
+        // 收集当前存活的锡兵索引
+        var aliveIndices = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < soldierSlots.Length; i++)
+        {
+            if (soldierSlots[i] != null && soldierSlots[i].gameObject.activeSelf)
+                aliveIndices.Add(i);
+        }
+
+        // 随机打乱
+        Shuffle(aliveIndices);
+
+        int actualCasualties = Mathf.Min(casualties, aliveIndices.Count);
+        if (actualCasualties <= 0) return null;
 
         currentAnimation?.Kill();
         currentAnimation = DOTween.Sequence();
 
-        int startIndex = currentSoldierCount - 1;
-        int endIndex = Mathf.Max(0, currentSoldierCount - casualties);
-
-        for (int i = startIndex; i >= endIndex; i--)
+        for (int i = 0; i < actualCasualties; i++)
         {
-            if (i < spawnedSoldiers.Length && spawnedSoldiers[i] != null)
-            {
-                var soldier = spawnedSoldiers[i];
-                int index = i;
-                float delay = (startIndex - i) * soldierFallDelay;
+            int idx = aliveIndices[i];
+            var soldier = soldierSlots[idx].gameObject;
+            float delay = i * soldierFallDelay;
 
-                // 锡兵倒下动画：旋转90度 + 缩小
-                currentAnimation.Insert(delay, soldier.transform
-                    .DORotate(new Vector3(90f, 0f, Random.Range(-30f, 30f)), soldierFallDuration)
-                    .SetEase(Ease.OutQuad));
-                currentAnimation.Insert(delay, soldier.transform
-                    .DOScale(0.5f, soldierFallDuration)
-                    .SetEase(Ease.OutQuad));
-                currentAnimation.InsertCallback(delay + soldierFallDuration, () =>
-                {
-                    if (spawnedSoldiers[index] != null)
-                        spawnedSoldiers[index].SetActive(false);
-                });
-            }
+            // 锡兵倒下动画：旋转90度 + 缩小
+            currentAnimation.Insert(delay, soldier.transform
+                .DORotate(new Vector3(90f, 0f, Random.Range(-30f, 30f)), soldierFallDuration)
+                .SetEase(Ease.OutQuad));
+            currentAnimation.Insert(delay, soldier.transform
+                .DOScale(0.5f, soldierFallDuration)
+                .SetEase(Ease.OutQuad));
+
+            int capturedIdx = idx;
+            currentAnimation.InsertCallback(delay + soldierFallDuration, () =>
+            {
+                if (soldierSlots[capturedIdx] != null)
+                    soldierSlots[capturedIdx].gameObject.SetActive(false);
+            });
         }
 
         currentAnimation.OnComplete(() =>
         {
-            currentSoldierCount = Mathf.Max(0, currentSoldierCount - casualties);
+            currentSoldierCount = Mathf.Max(0, currentSoldierCount - actualCasualties);
         });
 
         return currentAnimation;
+    }
+
+    /// <summary>随机打乱列表</summary>
+    private void Shuffle<T>(System.Collections.Generic.List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+    }
+
+    /// <summary>播放锡兵恢复动画（锡兵从地面弹出）</summary>
+    public Sequence PlaySoldierRiseAnimation(int reinforcements)
+    {
+        if (soldierSlots == null || reinforcements <= 0) return null;
+
+        // 找出当前未显示但需要显示的锡兵索引
+        var inactiveIndices = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < soldierSlots.Length; i++)
+        {
+            if (soldierSlots[i] != null && !soldierSlots[i].gameObject.activeSelf)
+                inactiveIndices.Add(i);
+        }
+
+        int actualReinforcements = Mathf.Min(reinforcements, inactiveIndices.Count);
+        if (actualReinforcements <= 0) return null;
+
+        // 取前 actualReinforcements 个（按顺序填充）
+        var toActivate = inactiveIndices.GetRange(0, actualReinforcements);
+
+        var seq = DOTween.Sequence();
+
+        for (int i = 0; i < toActivate.Count; i++)
+        {
+            int idx = toActivate[i];
+            var soldier = soldierSlots[idx].gameObject;
+            float delay = i * soldierRiseDelay;
+
+            // 先设置初始状态：缩小 + 稍微下沉
+            soldier.transform.localScale = Vector3.zero;
+            soldier.transform.localRotation = Quaternion.identity;
+
+            // 设置材质
+            var renderer = soldier.GetComponentInChildren<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material = IsAlly ? allySoldierMaterial : enemySoldierMaterial;
+            }
+
+            // 立即显示
+            int capturedIdx = idx;
+            seq.InsertCallback(delay, () =>
+            {
+                soldierSlots[capturedIdx].gameObject.SetActive(true);
+            });
+
+            // 弹出动画：从0放大到1，带弹性效果
+            seq.Insert(delay, soldier.transform
+                .DOScale(Vector3.one, soldierRiseDuration)
+                .SetEase(Ease.OutBack));
+        }
+
+        seq.OnComplete(() =>
+        {
+            currentSoldierCount = Mathf.Min(soldierSlots.Length, currentSoldierCount + actualReinforcements);
+        });
+
+        return seq;
     }
 
     /// <summary>播放单位移动动画</summary>
@@ -283,6 +362,41 @@ public class GeneralUnit3D : MonoBehaviour
         return transform.DOShakePosition(0.2f, 0.1f, 15);
     }
 
+    /// <summary>隐藏整个单位（溃败时调用）</summary>
+    public void Hide()
+    {
+        gameObject.SetActive(false);
+    }
+
+    /// <summary>显示单位（复活时调用）</summary>
+    public void Show()
+    {
+        gameObject.SetActive(true);
+        // 重置变换状态
+        transform.localScale = Vector3.one;
+    }
+
+    /// <summary>重置锡兵显示（复活后重新填充）</summary>
+    public void ResetSoldiers(int troops)
+    {
+        if (soldierSlots == null) return;
+
+        // 重置所有锡兵状态
+        for (int i = 0; i < soldierSlots.Length; i++)
+        {
+            if (soldierSlots[i] != null)
+            {
+                soldierSlots[i].localRotation = Quaternion.identity;
+                soldierSlots[i].localScale = Vector3.one;
+                soldierSlots[i].gameObject.SetActive(false);
+            }
+        }
+        currentSoldierCount = 0;
+
+        // 重新填充
+        UpdateSoldierCount(troops);
+    }
+
     private void OnMouseDown()
     {
         // 使用InputService检查是否可以进行游戏输入
@@ -298,14 +412,14 @@ public class GeneralUnit3D : MonoBehaviour
         currentAnimation?.Kill();
         transform.DOKill();
 
-        if (spawnedSoldiers != null)
+        // 停止所有锡兵的动画
+        if (soldierSlots != null)
         {
-            foreach (var soldier in spawnedSoldiers)
+            foreach (var slot in soldierSlots)
             {
-                if (soldier != null)
+                if (slot != null)
                 {
-                    soldier.transform.DOKill();
-                    Destroy(soldier);
+                    slot.DOKill();
                 }
             }
         }

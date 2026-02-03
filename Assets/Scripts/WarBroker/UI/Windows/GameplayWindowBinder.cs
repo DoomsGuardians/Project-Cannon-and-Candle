@@ -50,4 +50,7 @@ public class GameplayWindowBinder : UIBinder
 
     [Header("===== 阶段横幅 =====")]
     public PhaseBanner phaseBanner;
+
+    [Header("===== 音乐播放器 =====")]
+    public MusicPlayerPanel musicPlayerPanel;
 }

@@ -216,4 +216,52 @@ public class GameBalanceConfig : ScriptableObject
     [Tooltip("产能系数最大值")]
     [Range(1f, 1.5f)]
     public float ProductionFactorMax = 1.1f;
+
+    [Header("===== 战斗对抗表 (己方HP, 敌方HP) =====")]
+
+    [Tooltip("ATK vs ATK: 遭遇战")]
+    public Vector2Int Combat_ATK_ATK = new Vector2Int(-2, -2);
+
+    [Tooltip("ATK vs DEF: 攻坚战")]
+    public Vector2Int Combat_ATK_DEF = new Vector2Int(-4, -1);
+
+    [Tooltip("ATK vs RET: 追击")]
+    public Vector2Int Combat_ATK_RET = new Vector2Int(0, -2);
+
+    [Tooltip("DEF vs ATK: 阻击")]
+    public Vector2Int Combat_DEF_ATK = new Vector2Int(-1, -4);
+
+    [Tooltip("DEF vs DEF: 静坐")]
+    public Vector2Int Combat_DEF_DEF = new Vector2Int(0, 0);
+
+    [Tooltip("DEF vs RET: 目送")]
+    public Vector2Int Combat_DEF_RET = new Vector2Int(0, 1);
+
+    [Tooltip("RET vs ATK: 被追击")]
+    public Vector2Int Combat_RET_ATK = new Vector2Int(-2, 0);
+
+    [Tooltip("RET vs DEF: 安全撤退")]
+    public Vector2Int Combat_RET_DEF = new Vector2Int(1, 0);
+
+    [Tooltip("RET vs RET: 双方脱离")]
+    public Vector2Int Combat_RET_RET = new Vector2Int(1, 1);
+
+    /// <summary>获取对抗表结果</summary>
+    public (int allyHP, int enemyHP) GetCombatOutcome(OrderType ally, OrderType enemy)
+    {
+        var result = (ally, enemy) switch
+        {
+            (OrderType.ATK, OrderType.ATK) => Combat_ATK_ATK,
+            (OrderType.ATK, OrderType.DEF) => Combat_ATK_DEF,
+            (OrderType.ATK, OrderType.RET) => Combat_ATK_RET,
+            (OrderType.DEF, OrderType.ATK) => Combat_DEF_ATK,
+            (OrderType.DEF, OrderType.DEF) => Combat_DEF_DEF,
+            (OrderType.DEF, OrderType.RET) => Combat_DEF_RET,
+            (OrderType.RET, OrderType.ATK) => Combat_RET_ATK,
+            (OrderType.RET, OrderType.DEF) => Combat_RET_DEF,
+            (OrderType.RET, OrderType.RET) => Combat_RET_RET,
+            _ => Vector2Int.zero
+        };
+        return (result.x, result.y);
+    }
 }

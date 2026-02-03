@@ -15,13 +15,13 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
   m_Fog: 1
-  m_FogColor: {r: 0.5754717, g: 0.53708744, b: 0.45874867, a: 1}
+  m_FogColor: {r: 0.8113208, g: 0.72588855, b: 0.5383291, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.05
+  m_FogDensity: 0.025
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.7058824, g: 0.47058824, b: 0.3529412, a: 1}
-  m_AmbientEquatorColor: {r: 0.15686275, g: 0.039215688, b: 0.039215688, a: 1}
+  m_AmbientSkyColor: {r: 1, g: 0.77160674, b: 0.62578607, a: 1}
+  m_AmbientEquatorColor: {r: 0.47798735, g: 0.16274351, b: 0.09168931, a: 1}
   m_AmbientGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 1
@@ -1060,8 +1060,9 @@ MonoBehaviour:
   minZoom: 2
   maxZoom: 15
   panSpeed: 10
-  panLimitX: {x: -10, y: 10}
-  panLimitZ: {x: -10, y: 10}
+  panLimitX: {x: -20, y: 20}
+  panLimitZ: {x: -20, y: 20}
+  softBoundaryRatio: 0.3
   panDuration: 0.3
   panEase: 7
   priorityActive: 20

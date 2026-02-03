@@ -26,6 +26,11 @@ public class BattleGameMode : GameModeBase
             Debug.LogError("[BattleGameMode] GameplayManager prefab not found!");
         }
 
+        // 实例化 MusicPlayerManager
+        var musicObj = new GameObject("MusicPlayerManager");
+        var musicManager = musicObj.AddComponent<MusicPlayerManager>();
+        managerService.RegisterManager(musicManager);
+
         // 注册所有 UI 窗口
         var stageConfig = GameRoot.Instance.stageSystem?.currentStageConfig;
         if (stageConfig != null && stageConfig.UIWindowBase != null)

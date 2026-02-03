@@ -183,7 +183,24 @@ public class BattleSystem : ILogic
                 }
                 break;
             case OrderType.DEF:
-                result.Description = $"{ally.Name}原地驻扎";
+                // DEF 在大本营可以获得基地休整
+                if (ally.GridPosition == 1)
+                {
+                    if (campaignData.Battle.CurrentReserves >= balanceConfig.BaseRecoveryCost)
+                    {
+                        result.AllyTroopChange = balanceConfig.BaseRecoveryHP;
+                        campaignData.Battle.CurrentReserves -= balanceConfig.BaseRecoveryCost;
+                        result.Description = $"{ally.Name}在基地驻扎休整，恢复{balanceConfig.BaseRecoveryHP}点兵力";
+                    }
+                    else
+                    {
+                        result.Description = $"{ally.Name}在基地驻扎，后备役不足无法休整";
+                    }
+                }
+                else
+                {
+                    result.Description = $"{ally.Name}原地驻扎";
+                }
                 break;
             case OrderType.RET:
                 if (ally.GridPosition > 1)
@@ -230,7 +247,15 @@ public class BattleSystem : ILogic
                 }
                 break;
             case OrderType.DEF:
-                // 不动
+                // DEF 在敌方基地（Grid 5）可以获得基地休整
+                if (enemy.GridPosition == 5)
+                {
+                    if (campaignData.Battle.EnemyReserves >= 2)
+                    {
+                        result.EnemyTroopChange = 2;
+                        campaignData.Battle.EnemyReserves -= 2;
+                    }
+                }
                 break;
             case OrderType.RET:
                 if (enemy.GridPosition < 5)
@@ -267,7 +292,7 @@ public class BattleSystem : ILogic
         OrderType allyOrder, OrderType enemyOrder, BattleResult result)
     {
         // 查询对抗表基础值
-        (int movement, int allyHPChange, int enemyHPChange) = GetCombatOutcome(allyOrder, enemyOrder, 0, 0);
+        (int allyHPChange, int enemyHPChange) = GetCombatOutcome(allyOrder, enemyOrder);
 
         // GDD v7.0: 确定性强化效果
         // 己方强化效果
@@ -354,9 +379,6 @@ public class BattleSystem : ILogic
 
         result.AllyTroopChange = allyHPChange;
         result.EnemyTroopChange = enemyHPChange;
-
-        // 保留 LineMovement 用于兼容（但不再用于计算位置）
-        result.LineMovement = movement;
 
         // 新领土系统：追踪是否占领了新格子
         bool bothATK = (allyOrder == OrderType.ATK && enemyOrder == OrderType.ATK);
@@ -492,35 +514,11 @@ public class BattleSystem : ILogic
     }
 
     /// <summary>
-    /// 获取战斗结果 (GDD v6.0 完整 9 格对抗表)
-    /// 返回：(战线移动, 己方HP变化, 敌方HP变化)
+    /// 获取战斗结果 - HP 变化（从配置读取）
     /// </summary>
-    private (int movement, int allyHP, int enemyHP) GetCombatOutcome(
-        OrderType ally, OrderType enemy, float allyCombat, float enemyCombat)
+    private (int allyHP, int enemyHP) GetCombatOutcome(OrderType ally, OrderType enemy)
     {
-        // GDD v6.0 完整对抗表（基础值）
-        var baseOutcome = (ally, enemy) switch
-        {
-            // 己方 ATK
-            (OrderType.ATK, OrderType.ATK) => (0, -2, -2),   // 遭遇战
-            (OrderType.ATK, OrderType.DEF) => (0, -4, -1),   // 攻坚战
-            (OrderType.ATK, OrderType.RET) => (1, 0, 0),     // 追击（双方都推进）
-
-            // 己方 DEF
-            (OrderType.DEF, OrderType.ATK) => (0, -1, -4),   // 阻击
-            (OrderType.DEF, OrderType.DEF) => (0, 0, 0),     // 静坐
-            (OrderType.DEF, OrderType.RET) => (0, 0, 1),     // 目送（敌方回血）
-
-            // 己方 RET
-            (OrderType.RET, OrderType.ATK) => (-1, 1, 0),    // 撤离（己方回血）
-            (OrderType.RET, OrderType.DEF) => (-1, 1, 0),    // 休整（己方回血）
-            (OrderType.RET, OrderType.RET) => (0, 1, 1),     // 脱离（双方回血，战线不动）
-
-            _ => (0, 0, 0)
-        };
-
-        // 注意：这里返回的是 HP 变化，负数表示受伤，正数表示回血
-        return baseOutcome;
+        return balanceConfig.GetCombatOutcome(ally, enemy);
     }
 
     private void ApplyBattleResult(GeneralData ally, GeneralData enemy, BattleResult result)
@@ -611,72 +609,73 @@ public class BattleSystem : ILogic
     #region 补员
 
     /// <summary>
-    /// GDD v7.0: 基地休整
-    /// 只有在基地位置的将军才能获得回血，且消耗后备役
+    /// GDD v7.0: 处理溃败将军的重组
+    /// 基地休整已移至战斗结算阶段（ProcessDisengaged/ProcessEngaged）
     /// </summary>
     public void ApplyReinforcements()
     {
-        // 玩家方将军（Grid 1 是玩家基地）
+        // 玩家方将军
         foreach (var general in campaignData.Battle.AllyGenerals)
         {
             // 溃败将军处理重组倒计时
             if (general.GetStatus(balanceConfig) == GeneralStatus.Routed)
             {
                 general.ReorganizeTurns--;
-                continue;
-            }
 
-            // GDD v7.0: 只有在 Grid 1（己方基地）才能获得基地休整
-            if (general.GridPosition == 1)
-            {
-                int healAmount = 2; // 基地休整 HP +2
-
-                // 检查后备役是否足够
-                if (campaignData.Battle.CurrentReserves >= healAmount)
+                // 重整完成，复活将军
+                if (general.ReorganizeTurns <= 0)
                 {
-                    campaignData.Battle.CurrentReserves -= healAmount;
-                    general.Troops = Mathf.Min(20, general.Troops + healAmount);
+                    RespawnGeneral(general, isAlly: true);
                 }
-                else if (campaignData.Battle.CurrentReserves > 0)
-                {
-                    // 后备役不足，只能恢复剩余的量
-                    int actualHeal = campaignData.Battle.CurrentReserves;
-                    campaignData.Battle.CurrentReserves = 0;
-                    general.Troops = Mathf.Min(20, general.Troops + actualHeal);
-                }
-                // 后备役为 0 时无法恢复
             }
         }
 
-        // 敌方将军（Grid 5 是敌方基地）
+        // 敌方将军
         foreach (var general in campaignData.Battle.EnemyGenerals)
         {
             // 溃败将军处理重组倒计时
             if (general.GetStatus(balanceConfig) == GeneralStatus.Routed)
             {
                 general.ReorganizeTurns--;
-                continue;
-            }
 
-            // GDD v7.0: 敌方在 Grid 5（敌方基地）才能获得基地休整
-            if (general.GridPosition == 5)
-            {
-                int healAmount = 2; // 基地休整 HP +2
-
-                // 检查敌方后备役是否足够
-                if (campaignData.Battle.EnemyReserves >= healAmount)
+                // 重整完成，复活将军
+                if (general.ReorganizeTurns <= 0)
                 {
-                    campaignData.Battle.EnemyReserves -= healAmount;
-                    general.Troops = Mathf.Min(20, general.Troops + healAmount);
-                }
-                else if (campaignData.Battle.EnemyReserves > 0)
-                {
-                    int actualHeal = campaignData.Battle.EnemyReserves;
-                    campaignData.Battle.EnemyReserves = 0;
-                    general.Troops = Mathf.Min(20, general.Troops + actualHeal);
+                    RespawnGeneral(general, isAlly: false);
                 }
             }
         }
+    }
+
+    /// <summary>复活将军</summary>
+    private void RespawnGeneral(GeneralData general, bool isAlly)
+    {
+        // 设置初始兵力（从配置读取）
+        int respawnHP = balanceConfig.RespawnHP;
+        int respawnCost = balanceConfig.RespawnReserveCost;
+
+        // 检查后备役是否足够
+        int reserves = isAlly ? campaignData.Battle.CurrentReserves : campaignData.Battle.EnemyReserves;
+        if (reserves < respawnCost)
+        {
+            // 后备役不足，继续等待
+            general.ReorganizeTurns = 1;
+            return;
+        }
+
+        // 扣除后备役
+        if (isAlly)
+            campaignData.Battle.CurrentReserves -= respawnCost;
+        else
+            campaignData.Battle.EnemyReserves -= respawnCost;
+
+        // 复活在大本营
+        general.Troops = respawnHP;
+        general.GridPosition = isAlly ? 1 : 5;
+        general.ReorganizeTurns = 0;
+
+        // 发送复活事件
+        eventService.SendMessage((EventID)WarBrokerEventID.OnGeneralRespawned, general, isAlly);
     }
 
     #endregion

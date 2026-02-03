@@ -26,6 +26,29 @@ public class GeneralClickHandler : MonoBehaviour, IPointerClickHandler
             return;
         }
 
+        // 获取将军数据
+        var gameplayManager = GameRoot.Instance?.managerService?.GetManager<GameplayManager>();
+        if (gameplayManager == null)
+        {
+            Debug.LogError("[GeneralClickHandler] GameplayManager 未找到");
+            return;
+        }
+
+        var campaignData = gameplayManager.GetCampaignData();
+        if (campaignData == null)
+        {
+            Debug.LogError("[GeneralClickHandler] CampaignData 未找到");
+            return;
+        }
+
+        // 只在对手阶段（IntentPhase）和战斗阶段（BattlePhase）允许点击
+        if (campaignData.CurrentPhase != TurnPhase.IntentPhase &&
+            campaignData.CurrentPhase != TurnPhase.BattlePhase)
+        {
+            Debug.Log($"[GeneralClickHandler] 当前阶段 {campaignData.CurrentPhase} 不允许查看将军详情");
+            return;
+        }
+
         var uiService = GameRoot.Instance?.uIService;
         if (uiService == null)
         {
@@ -38,14 +61,6 @@ public class GeneralClickHandler : MonoBehaviour, IPointerClickHandler
         if (panel == null)
         {
             Debug.LogWarning("[GeneralClickHandler] GeneralDetailPanel 未注册");
-            return;
-        }
-
-        // 获取将军数据
-        var gameplayManager = GameRoot.Instance?.managerService?.GetManager<GameplayManager>();
-        if (gameplayManager == null)
-        {
-            Debug.LogError("[GeneralClickHandler] GameplayManager 未找到");
             return;
         }
 

@@ -66,9 +66,12 @@ public class IntentSystem
         // 执行强化
         player.Inventory[orderType] -= ReinforceCost;
         general.FinalIntent = orderType;
+        general.AssignedOrder = orderType;  // 同步更新AssignedOrder，战斗系统使用此字段
         general.IntentSource = IntentSource.Reinforced;
         general.Trust = Mathf.Clamp(general.Trust + ReinforceTrustChange, 0, 100);
         general.Morale = Mathf.Clamp(general.Morale + ReinforceMoraleChange, 0, 100);
+
+        Debug.Log($"[IntentSystem] 强化成功: {general.Name} -> {orderType}, AssignedOrder={general.AssignedOrder}");
 
         return true;
     }
@@ -97,9 +100,12 @@ public class IntentSystem
         // 执行篡改
         player.Inventory[orderType] -= OverrideCost;
         general.FinalIntent = orderType;
+        general.AssignedOrder = orderType;  // 同步更新AssignedOrder，战斗系统使用此字段
         general.IntentSource = IntentSource.Overridden;
         general.Trust = Mathf.Clamp(general.Trust + OverrideTrustChange, 0, 100);
         general.Morale = Mathf.Clamp(general.Morale + OverrideMoraleChange, 0, 100);
+
+        Debug.Log($"[IntentSystem] 篡改成功: {general.Name} -> {orderType}, AssignedOrder={general.AssignedOrder}");
 
         return true;
     }

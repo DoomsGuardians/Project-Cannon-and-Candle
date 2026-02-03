@@ -20,6 +20,7 @@ public enum WarBrokerEventID
     OnFrontlineMove,
     OnGeneralStatusChange,
     OnGeneralRouted,
+    OnGeneralRespawned,  // 将军复活
 
     // 玩家事件
     OnOrderAssigned,
@@ -44,5 +45,9 @@ public enum WarBrokerEventID
     // 暂停/设置事件
     OnGamePaused,
     OnGameResumed,
-    OnSettingsChanged
+    OnSettingsChanged,
+
+    // === 新增事件（放在末尾避免影响已有 ID）===
+    OnReinforcementsComplete = 1100,  // 基地休整动画播放完成
+    OnGeneralReinforced,              // 将军获得基地休整 (param1=GeneralData, param2=int恢复量)
 }

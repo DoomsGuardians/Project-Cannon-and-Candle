@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using DG.Tweening;
 
 /// <summary>
@@ -32,6 +33,8 @@ public class BattlefieldSceneController : MonoBehaviour
 
     private EventService eventService;
     private UIService uiService;
+    private ResService resService;
+    private GameBalanceConfig balanceConfig;
 
     // 动画队列
     private Queue<BattleResult> animationQueue = new Queue<BattleResult>();
@@ -49,6 +52,8 @@ public class BattlefieldSceneController : MonoBehaviour
         {
             eventService = GameRoot.Instance.eventService;
             uiService = GameRoot.Instance.uIService;
+            resService = GameRoot.Instance.resService;
+            balanceConfig = resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
         }
     }
 
@@ -59,6 +64,7 @@ public class BattlefieldSceneController : MonoBehaviour
             eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleResult, OnBattleResult);
             eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnTurnEnd);
             eventService.AddEventListening((EventID)WarBrokerEventID.OnIntentChanged, OnIntentChanged);
+            eventService.AddEventListening((EventID)WarBrokerEventID.OnGeneralRespawned, OnGeneralRespawned);
         }
     }
 
@@ -404,14 +410,22 @@ public class BattlefieldSceneController : MonoBehaviour
             delay += 0.5f;
         }
 
-        // 4. 锡兵增加动画（恢复兵力）
+        // 4. 锡兵恢复动画（兵力增加时播放弹出效果）
         if (allyUnit != null && result.AllyTroopChange > 0)
         {
-            currentSequence.InsertCallback(delay, () => allyUnit.UpdateDisplay());
+            var riseAnim = allyUnit.PlaySoldierRiseAnimation(result.AllyTroopChange);
+            if (riseAnim != null)
+                currentSequence.Insert(delay, riseAnim);
         }
         if (enemyUnit != null && result.EnemyTroopChange > 0)
         {
-            currentSequence.InsertCallback(delay, () => enemyUnit.UpdateDisplay());
+            var riseAnim = enemyUnit.PlaySoldierRiseAnimation(result.EnemyTroopChange);
+            if (riseAnim != null)
+                currentSequence.Insert(delay, riseAnim);
+        }
+        if (result.AllyTroopChange > 0 || result.EnemyTroopChange > 0)
+        {
+            delay += 0.5f;
         }
 
         // 添加动画间隔
@@ -427,9 +441,26 @@ public class BattlefieldSceneController : MonoBehaviour
             if (allyUnit != null) allyUnit.UpdateDisplay();
             if (enemyUnit != null) enemyUnit.UpdateDisplay();
 
+            // 检查溃败，播放溃败动画并隐藏单位
+            CheckAndPlayRoutAnimation(allyUnit, true);
+            CheckAndPlayRoutAnimation(enemyUnit, false);
+
             // 播放下一个动画
             PlayNextAnimation();
         });
+    }
+
+    /// <summary>检查溃败并播放溃败动画</summary>
+    private void CheckAndPlayRoutAnimation(GeneralUnit3D unit, bool isAlly)
+    {
+        if (unit == null || unit.Data == null || balanceConfig == null) return;
+
+        if (unit.Data.GetStatus(balanceConfig) == GeneralStatus.Routed)
+        {
+            Vector3 exitDir = isAlly ? Vector3.back : Vector3.forward;
+            var seq = unit.PlayRoutAnimation(exitDir);
+            seq.OnComplete(() => unit.Hide());
+        }
     }
 
     private GeneralUnit3D FindUnitByPosition(Dictionary<string, GeneralUnit3D> units, FrontlinePosition position)
@@ -455,6 +486,26 @@ public class BattlefieldSceneController : MonoBehaviour
         foreach (var kvp in allyUnits)
         {
             kvp.Value?.UpdateIntentBubble();
+        }
+    }
+
+    /// <summary>将军复活事件处理</summary>
+    private void OnGeneralRespawned(object p1, object p2)
+    {
+        var general = p1 as GeneralData;
+        if (general == null) return;
+
+        bool isAlly = (bool)p2;
+        var units = isAlly ? allyUnits : enemyUnits;
+
+        if (units.TryGetValue(general.GeneralId, out var unit))
+        {
+            // 重置位置到大本营
+            UpdateUnitPosition(unit, general, isAlly);
+
+            // 重置锡兵并显示
+            unit.ResetSoldiers(general.Troops);
+            unit.Show();
         }
     }
 

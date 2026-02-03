@@ -18,6 +18,18 @@ public class MainMenuGameMode : GameModeBase
     {
         base.StartGame();
         uIService.ShowWindow<MainMenuWindow>("MainMenuWindow");
+
+        // 播放主题曲
+        PlayTitleTheme();
+    }
+
+    private void PlayTitleTheme()
+    {
+        var musicConfig = resService.LoadResource<MusicConfig>(ConfigPaths.MUSIC_CONFIG);
+        if (musicConfig?.TitleTheme != null)
+        {
+            GameRoot.Instance.audioService.PlayBGM(musicConfig.TitleTheme);
+        }
     }
 
     public override void OnUpdate() { }
