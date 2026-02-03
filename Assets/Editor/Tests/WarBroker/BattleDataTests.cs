@@ -52,42 +52,44 @@ public class BattleDataTests
     }
 
     [Test]
-    public void Status_HighStats_Healthy()
+    public void Status_FullStrength_WhenTroopsAbove15()
     {
         var g = CreateGeneral(16, 80, 80);
-        // composite = (16*5)*0.4 + 80*0.3 + 80*0.3 = 80*0.4 + 24 + 24 = 32 + 48 = 80 => Healthy (70-85)
+        // GDD v6.0: Troops > 15 => FullStrength
+        Assert.AreEqual(GeneralStatus.FullStrength, g.GetStatus(balanceConfig));
+    }
+
+    [Test]
+    public void Status_Healthy_WhenTroops11To15()
+    {
+        var g = CreateGeneral(15, 80, 80);
+        // GDD v6.0: 10 < Troops <= 15 => Healthy
         Assert.AreEqual(GeneralStatus.Healthy, g.GetStatus(balanceConfig));
     }
 
     [Test]
-    public void Status_LowTroops_Routed()
+    public void Status_Wounded_WhenTroops6To10()
     {
-        var g = CreateGeneral(3, 80, 80); // Troops=3 <= RoutTroopThreshold(4)
-        Assert.AreEqual(GeneralStatus.Routed, g.GetStatus(balanceConfig));
+        var g = CreateGeneral(8, 50, 50);
+        // GDD v6.0: 5 < Troops <= 10 => Wounded
+        Assert.AreEqual(GeneralStatus.Wounded, g.GetStatus(balanceConfig));
     }
 
     [Test]
-    public void Status_LowComposite_Routed()
+    public void Status_Critical_WhenTroops1To5()
     {
-        var g = CreateGeneral(5, 10, 10);
-        // composite = (5*5)*0.4 + 10*0.3 + 10*0.3 = 25*0.4 + 3 + 3 = 10 + 6 = 16 < RoutScoreThreshold(20)
-        Assert.AreEqual(GeneralStatus.Routed, g.GetStatus(balanceConfig));
-    }
-
-    [Test]
-    public void Status_MediumComposite_Critical()
-    {
-        var g = CreateGeneral(8, 30, 40);
-        // composite = (8*5)*0.4 + 30*0.3 + 40*0.3 = 40*0.4 + 9 + 12 = 16 + 21 = 37 => Critical (20-50)
+        var g = CreateGeneral(3, 80, 80);
+        // GDD v6.0: 0 < Troops <= 5 => Critical
         Assert.AreEqual(GeneralStatus.Critical, g.GetStatus(balanceConfig));
     }
 
     [Test]
-    public void Status_ModerateComposite_Wounded()
+    public void Status_Routed_WhenTroopsZero()
     {
-        var g = CreateGeneral(12, 50, 50);
-        // composite = (12*5)*0.4 + 50*0.3 + 50*0.3 = 60*0.4 + 15 + 15 = 24 + 30 = 54 => Wounded (50-70)
-        Assert.AreEqual(GeneralStatus.Wounded, g.GetStatus(balanceConfig));
+        var g = CreateGeneral(5, 10, 10);
+        g.Troops = 0; // 强制设为0
+        // GDD v6.0: Troops <= 0 => Routed
+        Assert.AreEqual(GeneralStatus.Routed, g.GetStatus(balanceConfig));
     }
 
     [Test]
@@ -128,7 +130,8 @@ public class BattleDataTests
         var frontline = new FrontlineData { Position = FrontlinePosition.Center };
         frontline.InitFromConfig(campaignConfig);
 
-        Assert.AreEqual(3, frontline.LinePosition);
+        // LinePosition 现在是计算属性，初始状态 [A,A,N,E,E] => 3.0f
+        Assert.AreEqual(3f, frontline.LinePosition);
         Assert.AreEqual(0, frontline.StagnantTurns);
 
         Object.DestroyImmediate(campaignConfig);

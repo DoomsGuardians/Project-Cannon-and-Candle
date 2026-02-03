@@ -16,6 +16,12 @@ public class GeneralDetailPanelBinder : UIBinder
     public Slider sliderHP;
     public TMP_Text txtHP;
 
+    [Header("状态属性")]
+    public TMP_Text txtStatus;
+    public TMP_Text txtTrust;
+    public TMP_Text txtMorale;
+    public TMP_Text txtGridPosition;
+
     [Header("意图显示")]
     public TMP_Text txtIntent;
 

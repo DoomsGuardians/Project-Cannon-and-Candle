@@ -68,9 +68,10 @@ public class GameplayManager : ManagerBase
             return;
         }
 
-        campaignSystem.StartTurn();
-
+        // 先注册事件，确保能接收到战斗结果
         RegisterEvents();
+
+        campaignSystem.StartTurn();
 
         // 打开主界面
         uiService.ShowWindow<GameplayWindow>("GameplayWindow");

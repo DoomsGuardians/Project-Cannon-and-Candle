@@ -128,6 +128,9 @@ public class BattleSystem : ILogic
         int allyNewPos = ally.GridPosition;
         int enemyNewPos = enemy.GridPosition;
 
+        // 新领土系统：追踪是否占领了新格子
+        bool bothATK = (allyOrder == OrderType.ATK && enemyOrder == OrderType.ATK);
+
         // 计算己方预期位置
         switch (allyOrder)
         {
@@ -170,8 +173,14 @@ public class BattleSystem : ILogic
         switch (allyOrder)
         {
             case OrderType.ATK:
+                int allyTargetGrid = allyNewPos;
                 ally.GridPosition = allyNewPos;
                 result.Description = $"{ally.Name}向前推进";
+                // 只有对方不是 ATK 时才能占领
+                if (!bothATK && allyTargetGrid > ally.GridPosition - 1)
+                {
+                    result.AllyCapturedGrid = allyTargetGrid;
+                }
                 break;
             case OrderType.DEF:
                 result.Description = $"{ally.Name}原地驻扎";
@@ -212,7 +221,13 @@ public class BattleSystem : ILogic
         switch (enemyOrder)
         {
             case OrderType.ATK:
+                int enemyTargetGrid = enemyNewPos;
                 enemy.GridPosition = enemyNewPos;
+                // 只有对方不是 ATK 时才能占领
+                if (!bothATK && enemyTargetGrid < enemy.GridPosition + 1)
+                {
+                    result.EnemyCapturedGrid = enemyTargetGrid;
+                }
                 break;
             case OrderType.DEF:
                 // 不动
@@ -340,27 +355,67 @@ public class BattleSystem : ILogic
         result.AllyTroopChange = allyHPChange;
         result.EnemyTroopChange = enemyHPChange;
 
-        // 战线移动
+        // 保留 LineMovement 用于兼容（但不再用于计算位置）
         result.LineMovement = movement;
 
-        // 更新 GridPosition 基于战斗结果
-        if (movement == -2)
+        // 新领土系统：追踪是否占领了新格子
+        bool bothATK = (allyOrder == OrderType.ATK && enemyOrder == OrderType.ATK);
+
+        // 更新 GridPosition 并处理领土占领
+        if (allyOrder == OrderType.RET && enemyOrder == OrderType.RET)
         {
-            // RET vs RET：双方拉开（特殊情况）
+            // RET vs RET：双方各自后撤一格，不占领任何格子
             ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
             enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
         }
-        else if (movement > 0)
+        else if (bothATK)
         {
-            // 己方推进
-            ally.GridPosition = Mathf.Min(5, ally.GridPosition + 1);
-            enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
+            // ATK vs ATK：双方僵持，都不移动，只交换伤害
+            // 不改变任何位置，不占领任何格子
         }
-        else if (movement < 0)
+        else
         {
-            // 己方后撤
-            ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
-            enemy.GridPosition = Mathf.Max(1, enemy.GridPosition - 1);
+            // 处理己方移动和占领
+            if (allyOrder == OrderType.ATK)
+            {
+                int allyTargetGrid = Mathf.Min(5, ally.GridPosition + 1);
+                // 确保不会越过敌方
+                if (allyTargetGrid < enemy.GridPosition)
+                {
+                    ally.GridPosition = allyTargetGrid;
+                    result.AllyCapturedGrid = allyTargetGrid;
+                    // 敌方被推回
+                    enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
+                }
+            }
+            else if (allyOrder == OrderType.RET)
+            {
+                // RET 只移动，不丢失领土
+                ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
+            }
+            // DEF: 不移动，不变化
+
+            // 处理敌方移动和占领
+            if (enemyOrder == OrderType.ATK)
+            {
+                int enemyTargetGrid = Mathf.Max(1, enemy.GridPosition - 1);
+                // 确保不会越过己方
+                if (enemyTargetGrid > ally.GridPosition)
+                {
+                    enemy.GridPosition = enemyTargetGrid;
+                    result.EnemyCapturedGrid = enemyTargetGrid;
+                    // 己方被推回（如果己方不是ATK）
+                    if (allyOrder != OrderType.ATK)
+                    {
+                        ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
+                    }
+                }
+            }
+            else if (enemyOrder == OrderType.RET)
+            {
+                // RET 只移动，不丢失领土
+                enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
+            }
         }
     }
 
@@ -459,7 +514,7 @@ public class BattleSystem : ILogic
             // 己方 RET
             (OrderType.RET, OrderType.ATK) => (-1, 1, 0),    // 撤离（己方回血）
             (OrderType.RET, OrderType.DEF) => (-1, 1, 0),    // 休整（己方回血）
-            (OrderType.RET, OrderType.RET) => (-2, 1, 1),    // 脱离（双方回血，战线拉开）
+            (OrderType.RET, OrderType.RET) => (0, 1, 1),     // 脱离（双方回血，战线不动）
 
             _ => (0, 0, 0)
         };
@@ -471,24 +526,41 @@ public class BattleSystem : ILogic
     private void ApplyBattleResult(GeneralData ally, GeneralData enemy, BattleResult result)
     {
         var frontline = campaignData.Battle.Frontlines[result.Position];
-        int newPos = Mathf.Clamp(frontline.LinePosition + result.LineMovement, 1, 5);
 
-        if (newPos == frontline.LinePosition)
+        // 应用领土变化
+        if (result.AllyCapturedGrid.HasValue)
+        {
+            frontline.GridOwners[result.AllyCapturedGrid.Value - 1] = GridOwner.Ally;
+        }
+        if (result.EnemyCapturedGrid.HasValue)
+        {
+            frontline.GridOwners[result.EnemyCapturedGrid.Value - 1] = GridOwner.Enemy;
+        }
+
+        // 计算新的战线位置用于停滞检查
+        float newLinePos = frontline.LinePosition;
+        float oldLinePos = newLinePos; // 已经在上面更新过了，这里简化处理
+
+        // 停滞检查（基于是否有领土变化）
+        bool territoryChanged = result.AllyCapturedGrid.HasValue || result.EnemyCapturedGrid.HasValue;
+        if (!territoryChanged)
             frontline.StagnantTurns++;
         else
             frontline.StagnantTurns = 0;
 
-        frontline.LinePosition = newPos;
-
         ally.Troops = Mathf.Clamp(ally.Troops + result.AllyTroopChange, 0, 20);
         enemy.Troops = Mathf.Clamp(enemy.Troops + result.EnemyTroopChange, 0, 20);
 
-        if (result.LineMovement > 0)
+        // 士气变化基于是否占领了新格子
+        bool allyAdvanced = result.AllyCapturedGrid.HasValue;
+        bool enemyAdvanced = result.EnemyCapturedGrid.HasValue;
+
+        if (allyAdvanced && !enemyAdvanced)
         {
             ally.Morale = Mathf.Clamp(ally.Morale + 10, 0, 100);
             enemy.Morale = Mathf.Clamp(enemy.Morale - 10, 0, 100);
         }
-        else if (result.LineMovement < 0)
+        else if (enemyAdvanced && !allyAdvanced)
         {
             ally.Morale = Mathf.Clamp(ally.Morale - 10, 0, 100);
             enemy.Morale = Mathf.Clamp(enemy.Morale + 10, 0, 100);
@@ -615,7 +687,7 @@ public class BattleSystem : ILogic
     {
         foreach (var frontline in campaignData.Battle.Frontlines.Values)
         {
-            if (frontline.LinePosition < 5) return false;
+            if (!frontline.IsAtEnemyBase) return false;  // 使用新属性：己方占领格5
         }
         return true;
     }
@@ -624,7 +696,7 @@ public class BattleSystem : ILogic
     {
         foreach (var frontline in campaignData.Battle.Frontlines.Values)
         {
-            if (frontline.LinePosition > 1) return false;
+            if (!frontline.IsAtAllyBase) return false;  // 使用新属性：敌方占领格1
         }
         return true;
     }

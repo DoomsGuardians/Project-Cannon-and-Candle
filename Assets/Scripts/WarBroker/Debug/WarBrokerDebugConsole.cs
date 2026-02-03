@@ -100,8 +100,25 @@ public class WarBrokerDebugConsole : MonoBehaviour
         GUILayout.Label("--- 战线 ---");
         foreach (var kvp in data.Battle.Frontlines)
         {
-            string bar = new string('>', kvp.Value.LinePosition) + new string('.', 5 - kvp.Value.LinePosition);
-            GUILayout.Label($"  {kvp.Key}: [{bar}] pos={kvp.Value.LinePosition} stag={kvp.Value.StagnantTurns}");
+            // 显示格子归属状态
+            string gridStr = "";
+            if (kvp.Value.GridOwners != null)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    gridStr += kvp.Value.GridOwners[i] switch
+                    {
+                        GridOwner.Ally => "A",
+                        GridOwner.Enemy => "E",
+                        _ => "."
+                    };
+                }
+            }
+            else
+            {
+                gridStr = ".....";
+            }
+            GUILayout.Label($"  {kvp.Key}: [{gridStr}] pos={kvp.Value.LinePosition:F1} stag={kvp.Value.StagnantTurns}");
         }
 
         GUILayout.Label("--- 己方将军 ---");
@@ -337,7 +354,12 @@ public class WarBrokerDebugConsole : MonoBehaviour
         {
             foreach (var f in data.Battle.Frontlines.Values)
             {
-                f.LinePosition = 5;
+                // 所有格子归己方占领
+                if (f.GridOwners != null)
+                {
+                    for (int i = 0; i < 5; i++)
+                        f.GridOwners[i] = GridOwner.Ally;
+                }
             }
         }
 
@@ -345,7 +367,12 @@ public class WarBrokerDebugConsole : MonoBehaviour
         {
             foreach (var f in data.Battle.Frontlines.Values)
             {
-                f.LinePosition = 1;
+                // 所有格子归敌方占领
+                if (f.GridOwners != null)
+                {
+                    for (int i = 0; i < 5; i++)
+                        f.GridOwners[i] = GridOwner.Enemy;
+                }
             }
         }
     }
@@ -381,7 +408,13 @@ public class WarBrokerDebugConsole : MonoBehaviour
         es.AddEventListening((EventID)WarBrokerEventID.OnBattleResult, (p1, p2) =>
         {
             var r = p1 as BattleResult;
-            if (r != null) AddLog($"战斗: {r.Position} {r.AllyOrder}vs{r.EnemyOrder} 移动:{r.LineMovement}");
+            if (r != null)
+            {
+                string captureInfo = "";
+                if (r.AllyCapturedGrid.HasValue) captureInfo += $" 占格{r.AllyCapturedGrid.Value}";
+                if (r.EnemyCapturedGrid.HasValue) captureInfo += $" 敌占格{r.EnemyCapturedGrid.Value}";
+                AddLog($"战斗: {r.Position} {r.AllyOrder}vs{r.EnemyOrder}{captureInfo}");
+            }
         });
         es.AddEventListening((EventID)WarBrokerEventID.OnGeneralRouted, (p1, p2) =>
         {

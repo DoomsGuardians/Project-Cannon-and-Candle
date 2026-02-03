@@ -40,6 +40,9 @@ public class CampaignSystem : ILogic
 
         // 监听战斗动画完成事件
         eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleAnimationsComplete, OnBattleAnimationsComplete);
+
+        // 监听阶段横幅动画完成事件
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnPhaseBannerComplete, OnPhaseBannerComplete);
     }
 
     public void OnEnterState() { }
@@ -201,6 +204,16 @@ public class CampaignSystem : ILogic
 
         Data.CurrentPhase = TurnPhase.BattlePhase;
 
+        // 先发送阶段切换事件（触发横幅动画）
+        // 战斗结算将在横幅动画完成后执行
+        eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.BattlePhase, null);
+    }
+
+    /// <summary>
+    /// 执行战斗结算（在横幅动画完成后调用）
+    /// </summary>
+    private void ExecuteBattleResolution()
+    {
         // 战斗结算（包含抗命检查、战术揭示、伤害计算、战线移动）
         var victorOrders = new Dictionary<string, OrderType>();
         foreach (var enemy in Data.Battle.EnemyGenerals)
@@ -209,8 +222,6 @@ public class CampaignSystem : ILogic
         }
 
         var battleResults = battleSystem.ResolveBattles(victorOrders);
-
-        eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.BattlePhase, null);
 
         // 等待战斗动画完成后再进入结算阶段
         // 如果有战斗结果，等待动画；否则直接进入结算
@@ -242,6 +253,19 @@ public class CampaignSystem : ILogic
         }
     }
 
+    /// <summary>阶段横幅动画完成回调</summary>
+    private void OnPhaseBannerComplete(object p1, object p2)
+    {
+        if (p1 is TurnPhase phase)
+        {
+            // 战斗阶段横幅完成后，执行战斗结算
+            if (phase == TurnPhase.BattlePhase && Data.CurrentPhase == TurnPhase.BattlePhase)
+            {
+                ExecuteBattleResolution();
+            }
+        }
+    }
+
     /// <summary>
     /// 阶段 V：回合结算 (GDD v6.0)
     /// 记录 Close → 基地恢复 → 溃败重组 → 军工厂产出 → 期货到期 → 胜负检查
@@ -266,7 +290,10 @@ public class CampaignSystem : ILogic
         marketSystem.SettleExpiredFutures();
         marketSystem.CheckForceLiquidation();
 
-        // Step 6: 胜负检查
+        // Step 6: 委托任务检查（新完成的委托立即发放奖励）
+        commissionSystem.CheckCommissionsThisTurn();
+
+        // Step 7: 胜负检查
         UpdateOccupationStatus();
         CheckVictoryConditions();
 
@@ -403,11 +430,11 @@ public class CampaignSystem : ILogic
 
         foreach (var frontline in Data.Battle.Frontlines.Values)
         {
-            if (frontline.LinePosition <= 2)
+            if (frontline.LinePosition <= 2.5f)
             {
                 modifiers[OrderType.DEF] += 0.15f;
             }
-            else if (frontline.LinePosition >= 4)
+            else if (frontline.LinePosition >= 3.5f)
             {
                 modifiers[OrderType.ATK] += 0.1f;
             }

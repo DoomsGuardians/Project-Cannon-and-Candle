@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e8d3c5a2b1f4e6a9c0d8f3e5a7b2c1d, type: 3}
+  m_Name: UITextConfig
+  m_EditorClassIdentifier:
+  TooltipTurn: "\u5F53\u524D\u56DE\u5408 / \u6700\u5927\u56DE\u5408\u6570"
+  TooltipCash: "\u53EF\u7528\u4E8E\u91C7\u8D2D\u519B\u9700\u3001\u652F\u4ED8\u5229\u606F\u548C\u4ED3\u50A8\u8D39\u7528"
+  TooltipNetWorth: "\u73B0\u91D1 + \u5E93\u5B58\u4EF7\u503C - \u8D1F\u503A"
+  TooltipAudit: "\u521D\u59CB\u8D44\u4EA7\uFF0C\u7528\u4E8E\u8BA1\u7B97\u6700\u7EC8\u76C8\u4E8F"
+  TooltipReserves: "\u540E\u52E4\u50A8\u5907\uFF0C\u7528\u4E8E\u8865\u5145\u524D\u7EBF\u5175\u5458\u3002\u5C06\u519B\u64A4\u9000\u6216\u5728\u57FA\u5730\u4F11\u6574\u65F6\u6D88\u8017\u3002"
+  TooltipATK: "\u4E0B\u8FBE\u8FDB\u653B\u6307\u4EE4\uFF0C\u547D\u4EE4\u524D\u7EBF\u90E8\u961F\u5411\u654C\u9635\u63A8\u8FDB"
+  TooltipDEF: "\u4E0B\u8FBE\u9632\u5B88\u6307\u4EE4\uFF0C\u547D\u4EE4\u90E8\u961F\u56FA\u5B88\u5F53\u524D\u9635\u5730"
+  TooltipRET: "\u4E0B\u8FBE\u64A4\u9000\u6307\u4EE4\uFF0C\u547D\u4EE4\u90E8\u961F\u540E\u64A4\u8FDB\u884C\u4F11\u6574\u8865\u5145"
+  IntelFrontlineHeader: "\u3010\u524D\u7EBF\u6218\u62A5\u3011"
+  IntelEnemyHeader: "\u3010\u654C\u60C5\u901A\u62A5\u3011"
+  IntelReservesFormat: "\u540E\u52E4\u50A8\u5907: \u6211\u519B {0} / \u654C\u519B\u7EA6
+    {1}"
+  StatusFullStrength: "\u6EE1\u7F16\u5F85\u547D"
+  StatusHealthy: "\u6218\u529B\u5145\u6C9B"
+  StatusWounded: "\u51CF\u5458\u4E2D"
+  StatusCritical: "\u4E9F\u9700\u652F\u63F4"
+  StatusRouted: "\u5DF2\u6E83\u6563"
+  BattleResultTitle: "\u7B2C{0}\u5468 \u6218\u6597\u62A5\u544A"
+  BattleBothEngaged: "\u53CC\u65B9\u6FC0\u70C8\u4EA4\u706B\uFF0C\u6218\u7EBF\u50F5\u6301"
+  BattleAllyCaptured: "\u6211\u519B\u6210\u529F\u63A8\u8FDB\u81F3{0}\u53F7\u9635\u5730"
+  BattleEnemyCaptured: "\u654C\u519B\u5360\u9886\u4E86{0}\u53F7\u9635\u5730"
+  BattleStalemate: "\u6218\u7EBF\u65E0\u53D8\u5316\uFF0C\u53CC\u65B9\u5BF9\u5CE8\u4E2D"
+  BattleCriticalHit: "\u6218\u679C\u663E\u8457\uFF01"
+  BattleFumble: "\u6307\u6325\u5931\u8BEF\uFF01"
+  BattleResultBtnConfirm: "\u77E5\u6089"
+  BattleResultBtnVictory: "\u5927\u6377\uFF01"
+  BattleResultBtnDefeat: "...\u4E0D\u4F1A\u6709\u4E0B\u4E00\u6B21\u4E86"
+  BattleResultBtnStalemate: "\u8FD9\u662F\u610F\u5FD7\u529B\u7684\u6BD4\u62FC"
+  CampaignVictory: "\u80DC\u5229\uFF01"
+  CampaignDefeat: "\u6218\u8D25"
+  CampaignStatsTurn: "\u6700\u7EC8\u56DE\u5408"
+  CampaignStatsCash: "\u73B0\u91D1\u7ED3\u4F59"
+  CampaignStatsNetWorth: "\u603B\u8D44\u4EA7"
+  CampaignStatsCommissions: "\u59D4\u6258\u4EFB\u52A1"
+  CampaignBtnRestart: "\u518D\u6765\u4E00\u5C40"
+  CampaignBtnMainMenu: "\u8FD4\u56DE\u4E3B\u83DC\u5355"
+  EventEffectsHeader: "\u3010\u4E8B\u4EF6\u6548\u679C\u3011"
+  EventBtnConfirm: "\u4E86\u89E3"
+  PauseTitle: "\u6E38\u620F\u6682\u505C"
+  PauseBtnResume: "\u7EE7\u7EED"
+  PauseBtnSettings: "\u8BBE\u7F6E"
+  PauseBtnMainMenu: "\u8FD4\u56DE\u4E3B\u83DC\u5355"
+  PauseBtnQuit: "\u9000\u51FA\u6E38\u620F"
+  PhasePlayer: "\u73A9\u5BB6\u9636\u6BB5"
+  PhasePlayerSubtitle: "\u8FDB\u884C\u4EA4\u6613\u4E0E\u90E8\u7F72"
+  PhaseOpponent: "\u5BF9\u624B\u9636\u6BB5"
+  PhaseOpponentSubtitle: "\u654C\u65B9\u6B63\u5728\u884C\u52A8..."
+  PhaseBattle: "\u6218\u6597\u9636\u6BB5"
+  PhaseBattleSubtitle: "\u524D\u7EBF\u6218\u6597\u5373\u5C06\u6253\u54CD"

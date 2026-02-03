@@ -603,7 +603,7 @@ public class MarketSystem : ILogic
 
         foreach (var frontline in campaignData.Battle.Frontlines.Values)
         {
-            if (frontline.LinePosition <= 2 && orderType == OrderType.DEF)
+            if (frontline.LinePosition <= 2.5f && orderType == OrderType.DEF)
             {
                 intel.Add(new MarketIntelItem
                 {

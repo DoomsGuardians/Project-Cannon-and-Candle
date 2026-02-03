@@ -20,6 +20,12 @@ public class GeneralDetailPanel : WindowBase
     private Slider sliderHP;
     private TMP_Text txtHP;
 
+    [Header("状态属性")]
+    private TMP_Text txtStatus;
+    private TMP_Text txtTrust;
+    private TMP_Text txtMorale;
+    private TMP_Text txtGridPosition;
+
     [Header("意图显示")]
     private TMP_Text txtIntent;
 
@@ -38,6 +44,7 @@ public class GeneralDetailPanel : WindowBase
     private IntentSystem intentSystem;
     private GameplayManager gameplayManager;
     private GameBalanceConfig balanceConfig;
+    private UITextConfig textConfig;
 
     public override void OnAwake()
     {
@@ -45,6 +52,7 @@ public class GeneralDetailPanel : WindowBase
 
         gameplayManager = GameRoot.Instance.managerService.GetManager<GameplayManager>();
         balanceConfig = resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
+        textConfig = resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
 
         // 获取 IntentSystem
         if (GameRoot.Instance.campaignSystem != null)
@@ -63,6 +71,12 @@ public class GeneralDetailPanel : WindowBase
             // HP
             sliderHP = b.sliderHP;
             txtHP = b.txtHP;
+
+            // 状态属性
+            txtStatus = b.txtStatus;
+            txtTrust = b.txtTrust;
+            txtMorale = b.txtMorale;
+            txtGridPosition = b.txtGridPosition;
 
             // 意图
             txtIntent = b.txtIntent;
@@ -154,6 +168,7 @@ public class GeneralDetailPanel : WindowBase
 
         RefreshGeneralInfo();
         RefreshHP();
+        RefreshStatusAttributes();
         RefreshIntent();
         RefreshButtons();
     }
@@ -180,6 +195,59 @@ public class GeneralDetailPanel : WindowBase
         }
         if (txtHP != null)
             txtHP.text = $"{currentGeneral.Troops}/20";
+    }
+
+    private void RefreshStatusAttributes()
+    {
+        // 状态
+        if (txtStatus != null)
+        {
+            var status = currentGeneral.GetStatus(balanceConfig);
+            txtStatus.text = $"状态: {GetStatusText(status)}";
+            txtStatus.color = GetStatusColor(status);
+        }
+
+        // 信任
+        if (txtTrust != null)
+            txtTrust.text = $"信任: {currentGeneral.Trust}";
+
+        // 士气
+        if (txtMorale != null)
+            txtMorale.text = $"士气: {currentGeneral.Morale}";
+
+        // 格位置
+        if (txtGridPosition != null)
+            txtGridPosition.text = $"位置: 格{currentGeneral.GridPosition}";
+    }
+
+    private string GetStatusText(GeneralStatus status)
+    {
+        if (textConfig != null)
+        {
+            return textConfig.GetStatusText(status);
+        }
+        return status switch
+        {
+            GeneralStatus.FullStrength => "满编",
+            GeneralStatus.Healthy => "健康",
+            GeneralStatus.Wounded => "受伤",
+            GeneralStatus.Critical => "危急",
+            GeneralStatus.Routed => "溃败",
+            _ => status.ToString()
+        };
+    }
+
+    private Color GetStatusColor(GeneralStatus status)
+    {
+        return status switch
+        {
+            GeneralStatus.FullStrength => Color.green,
+            GeneralStatus.Healthy => new Color(0.5f, 1f, 0.5f), // 浅绿
+            GeneralStatus.Wounded => Color.yellow,
+            GeneralStatus.Critical => new Color(1f, 0.5f, 0f), // 橙色
+            GeneralStatus.Routed => Color.red,
+            _ => Color.white
+        };
     }
 
     private void RefreshIntent()

@@ -12,4 +12,8 @@ public class PausePopupBinder : UIBinder
     public Button btnSettings;
     public Button btnMainMenu;
     public Button btnQuit;
+    public TMP_Text txtBtnResume;
+    public TMP_Text txtBtnSettings;
+    public TMP_Text txtBtnMainMenu;
+    public TMP_Text txtBtnQuit;
 }

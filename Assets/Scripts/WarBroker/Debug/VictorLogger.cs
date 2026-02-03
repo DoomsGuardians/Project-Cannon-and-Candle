@@ -344,7 +344,7 @@ public class VictorLogger
             foreach (var fl in log.FrontlineStatuses)
             {
                 string engagedStr = fl.IsEngaged ? "交战中" : $"间隙={fl.Gap}";
-                sb.AppendLine($"  {fl.Position}: 战线位置={fl.LinePosition}/5 ({engagedStr})");
+                sb.AppendLine($"  {fl.Position}: 战线位置={fl.LinePosition:F1}/5 ({engagedStr})");
             }
         }
 
@@ -511,7 +511,7 @@ public class VictorTurnLog
 public class FrontlineLogStatus
 {
     public string Position;
-    public int LinePosition;
+    public float LinePosition;  // 改为 float
     public int Gap;
     public bool IsEngaged;
 }

@@ -10,22 +10,10 @@ public class CampaignEndPopup : WindowBase
 {
     private TMP_Text txtTitle, txtStats, txtCommissions;
     private Button btnRestart, btnMainMenu;
+    private TMP_Text txtBtnRestart, txtBtnMainMenu;
 
-    private static readonly Dictionary<string, string> CommissionNames = new Dictionary<string, string>
-    {
-        { "WinWar", "赢下战争" },
-        { "ShortCountry", "做空祖国" },
-        { "Traitor", "卖国求荣" },
-        { "MeatGrinder", "绞肉机" }
-    };
-
-    private static readonly Dictionary<string, float> CommissionBonuses = new Dictionary<string, float>
-    {
-        { "WinWar", 200f },
-        { "ShortCountry", 500f },
-        { "Traitor", 300f },
-        { "MeatGrinder", 150f }
-    };
+    // UI文本配置
+    private UITextConfig textConfig;
 
     // 缓存的结果数据
     private bool? cachedIsVictory = null;
@@ -35,6 +23,9 @@ public class CampaignEndPopup : WindowBase
         base.OnAwake();
         uiLayer = UILayer.Top;
 
+        // 加载文本配置
+        textConfig = resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
+
         var b = gameObject.GetComponent<CampaignEndPopupBinder>();
         if (b != null)
         {
@@ -43,6 +34,8 @@ public class CampaignEndPopup : WindowBase
             txtCommissions = b.txtCommissions;
             btnRestart = b.btnRestart;
             btnMainMenu = b.btnMainMenu;
+            txtBtnRestart = b.txtBtnRestart;
+            txtBtnMainMenu = b.txtBtnMainMenu;
         }
     }
 
@@ -90,7 +83,10 @@ public class CampaignEndPopup : WindowBase
         // 标题
         if (txtTitle != null)
         {
-            txtTitle.text = isVictory ? "胜利！" : "失败";
+            if (isVictory)
+                txtTitle.text = textConfig?.CampaignVictory ?? "胜利！";
+            else
+                txtTitle.text = textConfig?.CampaignDefeat ?? "失败";
             Debug.Log($"[CampaignEndPopup] 设置标题: {txtTitle.text}, isVictory={isVictory}");
         }
         else
@@ -104,9 +100,13 @@ public class CampaignEndPopup : WindowBase
             float netWorth = data.Player.CalculateNetWorth(data.Market);
             float profit = netWorth - data.Player.AuditValue;
 
-            txtStats.text = $"最终回合: {data.CurrentTurn}\n" +
-                $"现金: {data.Player.Cash:F0}\n" +
-                $"净资产: {netWorth:F0}\n" +
+            string turnLabel = textConfig?.CampaignStatsTurn ?? "最终回合";
+            string cashLabel = textConfig?.CampaignStatsCash ?? "现金";
+            string netWorthLabel = textConfig?.CampaignStatsNetWorth ?? "净资产";
+
+            txtStats.text = $"{turnLabel}: {data.CurrentTurn}\n" +
+                $"{cashLabel}: {data.Player.Cash:F0}\n" +
+                $"{netWorthLabel}: {netWorth:F0}\n" +
                 $"交易盈亏: {(profit >= 0 ? "+" : "")}{profit:F0}\n" +
                 $"委托奖金: +{data.CommissionTotalBonus:F0}\n" +
                 $"总回报: {(profit + data.CommissionTotalBonus >= 0 ? "+" : "")}{profit + data.CommissionTotalBonus:F0}";
@@ -115,13 +115,27 @@ public class CampaignEndPopup : WindowBase
         // 委托达成情况
         if (txtCommissions != null && data.CommissionResults != null)
         {
+            var commissions = manager.GetCommissionSystem()?.GetCommissions();
+
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine("-- 委托任务 --");
+            sb.AppendLine($"-- {textConfig?.CampaignStatsCommissions ?? "委托任务"} --");
 
             foreach (var kvp in data.CommissionResults)
             {
-                string name = CommissionNames.ContainsKey(kvp.Key) ? CommissionNames[kvp.Key] : kvp.Key;
-                float bonus = CommissionBonuses.ContainsKey(kvp.Key) ? CommissionBonuses[kvp.Key] : 0f;
+                // 从委托配置中获取名称和奖金
+                string name = kvp.Key;
+                float bonus = 0f;
+
+                if (commissions != null)
+                {
+                    var config = commissions.Find(c => c.CommissionId == kvp.Key);
+                    if (config != null)
+                    {
+                        name = config.DisplayName;
+                        bonus = config.BonusAmount;
+                    }
+                }
+
                 string mark = kvp.Value ? "v" : "x";
                 string bonusText = kvp.Value ? $"+${bonus:F0}" : "--";
                 sb.AppendLine($"[{mark}] {name}  {bonusText}");
@@ -129,6 +143,12 @@ public class CampaignEndPopup : WindowBase
 
             txtCommissions.text = sb.ToString();
         }
+
+        // 更新按钮文本
+        if (txtBtnRestart != null)
+            txtBtnRestart.text = textConfig?.CampaignBtnRestart ?? "再来一局";
+        if (txtBtnMainMenu != null)
+            txtBtnMainMenu.text = textConfig?.CampaignBtnMainMenu ?? "返回主菜单";
     }
 
     private void OnRestart()

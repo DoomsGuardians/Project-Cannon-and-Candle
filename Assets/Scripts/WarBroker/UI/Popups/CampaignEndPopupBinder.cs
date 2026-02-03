@@ -9,4 +9,6 @@ public class CampaignEndPopupBinder : UIBinder
     public TMP_Text txtCommissions;
     public Button btnRestart;
     public Button btnMainMenu;
+    public TMP_Text txtBtnRestart;
+    public TMP_Text txtBtnMainMenu;
 }

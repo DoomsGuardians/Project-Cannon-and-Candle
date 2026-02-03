@@ -11,4 +11,5 @@ public class EventPopupBinder : UIBinder
     public TMP_Text txtDescription;
     public TMP_Text txtEffects;
     public Button btnConfirm;
+    public TMP_Text txtBtnConfirm;
 }

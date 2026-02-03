@@ -16,13 +16,18 @@ public class PausePopup : WindowBase
     private Button btnSettings;
     private Button btnMainMenu;
     private Button btnQuit;
+    private TMP_Text txtBtnResume, txtBtnSettings, txtBtnMainMenu, txtBtnQuit;
 
     private PauseSystem pauseSystem;
     private InputService inputService;
+    private UITextConfig textConfig;
 
     public override void OnAwake()
     {
         base.OnAwake();
+
+        // 加载文本配置
+        textConfig = resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
 
         var binder = gameObject.GetComponent<PausePopupBinder>();
         if (binder != null)
@@ -32,6 +37,10 @@ public class PausePopup : WindowBase
             btnSettings = binder.btnSettings;
             btnMainMenu = binder.btnMainMenu;
             btnQuit = binder.btnQuit;
+            txtBtnResume = binder.txtBtnResume;
+            txtBtnSettings = binder.txtBtnSettings;
+            txtBtnMainMenu = binder.txtBtnMainMenu;
+            txtBtnQuit = binder.txtBtnQuit;
         }
 
         pauseSystem = GameRoot.Instance.pauseSystem;
@@ -48,10 +57,17 @@ public class PausePopup : WindowBase
         AddButtonListener(btnMainMenu, OnMainMenuClick);
         AddButtonListener(btnQuit, OnQuitClick);
 
+        // 更新文本
         if (txtTitle != null)
-        {
-            txtTitle.text = "游戏暂停";
-        }
+            txtTitle.text = textConfig?.PauseTitle ?? "游戏暂停";
+        if (txtBtnResume != null)
+            txtBtnResume.text = textConfig?.PauseBtnResume ?? "继续";
+        if (txtBtnSettings != null)
+            txtBtnSettings.text = textConfig?.PauseBtnSettings ?? "设置";
+        if (txtBtnMainMenu != null)
+            txtBtnMainMenu.text = textConfig?.PauseBtnMainMenu ?? "返回主菜单";
+        if (txtBtnQuit != null)
+            txtBtnQuit.text = textConfig?.PauseBtnQuit ?? "退出游戏";
 
         // 注册 Update 监听 Cancel 输入
         GameRoot.Instance.AddUpdateAction(HandleUpdate);

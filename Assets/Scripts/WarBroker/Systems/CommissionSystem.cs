@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 委托任务系统 (配置化版本)
 /// 从 CommissionConfig 加载委托定义，支持动态配置
+/// 委托完成时即时发放奖励
 /// </summary>
 public class CommissionSystem
 {
@@ -11,11 +12,15 @@ public class CommissionSystem
     private GameBalanceConfig balanceConfig;
     private List<CommissionConfig> commissions;
 
+    // 已完成并发放奖励的委托ID集合
+    private HashSet<string> completedCommissions = new HashSet<string>();
+
     public void Init(CampaignRuntimeData campaignData, GameBalanceConfig balanceConfig)
     {
         this.campaignData = campaignData;
         this.balanceConfig = balanceConfig;
         this.commissions = new List<CommissionConfig>();
+        this.completedCommissions.Clear();
     }
 
     /// <summary>
@@ -34,32 +39,67 @@ public class CommissionSystem
 
     /// <summary>
     /// 检查并结算所有委托任务
-    /// 在战役结束时调用
+    /// 在战役结束时调用，返回最终结果（不再重复发放已发放的奖励）
     /// </summary>
     public Dictionary<string, bool> CheckAndSettleCommissions(out float totalBonus)
     {
         var results = new Dictionary<string, bool>();
-        totalBonus = 0f;
+        totalBonus = campaignData.CommissionTotalBonus; // 使用已累计的奖金
 
         foreach (var config in commissions)
         {
             bool achieved = CheckCommission(config);
             results[config.CommissionId] = achieved;
-            if (achieved)
-            {
-                totalBonus += config.BonusAmount;
-                Debug.Log($"[委托达成] {config.DisplayName}: +${config.BonusAmount}");
-            }
-        }
-
-        // 将奖金加入玩家现金
-        if (totalBonus > 0)
-        {
-            campaignData.Player.Cash += totalBonus;
-            Debug.Log($"[委托结算] 总奖金: ${totalBonus}");
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// 每回合检查委托完成情况，新完成的委托立即发放奖励
+    /// 在结算阶段调用
+    /// </summary>
+    /// <returns>本回合新完成的委托列表</returns>
+    public List<CommissionConfig> CheckCommissionsThisTurn()
+    {
+        var newlyCompleted = new List<CommissionConfig>();
+
+        foreach (var config in commissions)
+        {
+            // 跳过已完成的委托
+            if (completedCommissions.Contains(config.CommissionId))
+                continue;
+
+            bool achieved = CheckCommission(config);
+            if (achieved)
+            {
+                // 标记为已完成
+                completedCommissions.Add(config.CommissionId);
+
+                // 立即发放奖励
+                campaignData.Player.Cash += config.BonusAmount;
+                campaignData.CommissionTotalBonus += config.BonusAmount;
+
+                newlyCompleted.Add(config);
+
+                Debug.Log($"[委托达成] {config.DisplayName}: +${config.BonusAmount} (第{campaignData.CurrentTurn}周)");
+
+                // 触发事件通知UI
+                GameRoot.Instance.eventService.SendMessage(
+                    (EventID)WarBrokerEventID.OnCommissionCompleted,
+                    config, config.BonusAmount);
+            }
+        }
+
+        return newlyCompleted;
+    }
+
+    /// <summary>
+    /// 检查委托是否已完成（用于UI显示）
+    /// </summary>
+    public bool IsCommissionCompleted(string commissionId)
+    {
+        return completedCommissions.Contains(commissionId);
     }
 
     /// <summary>

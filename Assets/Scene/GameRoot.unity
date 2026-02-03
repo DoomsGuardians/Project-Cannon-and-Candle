@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 806ddea4e6040574384efbdf97489aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameFrameRate: 60
+  GameFrameRate: 120
   TestStageID: 1
   EnableGameSave: 1
 --- !u!4 &505429771

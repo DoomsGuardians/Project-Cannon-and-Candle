@@ -15,12 +15,17 @@ public class EventPopup : WindowBase
     private TMP_Text txtDescription;
     private TMP_Text txtEffects;
     private Button btnConfirm;
+    private TMP_Text txtBtnConfirm;
 
     private RandomEventConfig eventConfig;
+    private UITextConfig textConfig;
 
     public override void OnAwake()
     {
         base.OnAwake();
+
+        // 加载文本配置
+        textConfig = resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
 
         var binder = gameObject.GetComponent<EventPopupBinder>();
         if (binder != null)
@@ -29,6 +34,7 @@ public class EventPopup : WindowBase
             txtDescription = binder.txtDescription;
             txtEffects = binder.txtEffects;
             btnConfirm = binder.btnConfirm;
+            txtBtnConfirm = binder.txtBtnConfirm;
         }
     }
 
@@ -38,8 +44,6 @@ public class EventPopup : WindowBase
         InputRouter.Acquire(InputChannel.Gameplay, this);
 
         AddButtonListener(btnConfirm, OnConfirm);
-
-        RefreshUI();
     }
 
     public override void OnHide()
@@ -69,6 +73,10 @@ public class EventPopup : WindowBase
 
         if (txtEffects != null)
             txtEffects.text = BuildEffectsText();
+
+        // 更新按钮文本
+        if (txtBtnConfirm != null)
+            txtBtnConfirm.text = textConfig?.EventBtnConfirm ?? "了解";
     }
 
     private string BuildEffectsText()
@@ -76,7 +84,7 @@ public class EventPopup : WindowBase
         if (eventConfig == null) return "";
 
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("【事件效果】");
+        sb.AppendLine(textConfig?.EventEffectsHeader ?? "【事件效果】");
 
         if (Mathf.Abs(eventConfig.ProductionModifier) > 0.001f)
             sb.AppendLine($"产能: {eventConfig.ProductionModifier:+0.#%;-0.#%}");

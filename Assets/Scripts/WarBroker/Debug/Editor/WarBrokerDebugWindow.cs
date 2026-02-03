@@ -64,7 +64,22 @@ public class WarBrokerDebugWindow : EditorWindow
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("战线", EditorStyles.boldLabel);
         foreach (var kvp in data.Battle.Frontlines)
-            EditorGUILayout.LabelField($"  {kvp.Key}: 位置={kvp.Value.LinePosition} 停滞={kvp.Value.StagnantTurns}");
+        {
+            string gridStr = "";
+            if (kvp.Value.GridOwners != null)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    gridStr += kvp.Value.GridOwners[i] switch
+                    {
+                        GridOwner.Ally => "A",
+                        GridOwner.Enemy => "E",
+                        _ => "."
+                    };
+                }
+            }
+            EditorGUILayout.LabelField($"  {kvp.Key}: [{gridStr}] 位置={kvp.Value.LinePosition:F1} 停滞={kvp.Value.StagnantTurns}");
+        }
 
         var balanceConfig = GameRoot.Instance.resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
 

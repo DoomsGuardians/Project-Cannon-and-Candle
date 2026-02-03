@@ -16,6 +16,7 @@ public class BattleResultPopup : WindowBase
     private Transform resultContainer;
     private GameObject resultItemPrefab;
     private Button btnConfirm;
+    private TMP_Text txtBtnConfirm;
 
     private List<BattleResult> results;
     private List<GameObject> spawnedItems = new List<GameObject>();
@@ -23,9 +24,17 @@ public class BattleResultPopup : WindowBase
     // 关闭回调
     private System.Action onCloseCallback;
 
+    // UI文本配置
+    private UITextConfig textConfig;
+    private GameplayManager gameplayManager;
+
     public override void OnAwake()
     {
         base.OnAwake();
+
+        // 加载文本配置
+        textConfig = resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
+        gameplayManager = GameRoot.Instance.managerService.GetManager<GameplayManager>();
 
         var binder = gameObject.GetComponent<BattleResultPopupBinder>();
         if (binder != null)
@@ -34,6 +43,7 @@ public class BattleResultPopup : WindowBase
             resultContainer = binder.resultContainer;
             resultItemPrefab = binder.resultItemPrefab;
             btnConfirm = binder.btnConfirm;
+            txtBtnConfirm = binder.txtBtnConfirm;
         }
     }
 
@@ -79,18 +89,59 @@ public class BattleResultPopup : WindowBase
 
     private void RefreshUI()
     {
+        int currentTurn = gameplayManager?.GetCampaignData()?.CurrentTurn ?? 1;
+
+        if (txtTitle != null)
+            txtTitle.text = string.Format(textConfig?.BattleResultTitle ?? "第{0}周 战斗报告", currentTurn);
+
         if (results == null || results.Count == 0)
         {
-            if (txtTitle != null)
-                txtTitle.text = "本回合无战斗";
+            UpdateConfirmButtonText(false, false, true);
             return;
         }
 
-        if (txtTitle != null)
-            txtTitle.text = $"战斗结算 - {results.Count} 条战线";
-
         ClearSpawnedItems();
         SpawnResultItems();
+
+        // 根据战斗结果更新确认按钮文本
+        UpdateConfirmButtonFromResults();
+    }
+
+    private void UpdateConfirmButtonFromResults()
+    {
+        if (results == null || results.Count == 0)
+        {
+            UpdateConfirmButtonText(false, false, true);
+            return;
+        }
+
+        bool hasAllyCapture = false;
+        bool hasEnemyCapture = false;
+
+        foreach (var result in results)
+        {
+            if (result.AllyCapturedGrid.HasValue)
+                hasAllyCapture = true;
+            if (result.EnemyCapturedGrid.HasValue)
+                hasEnemyCapture = true;
+        }
+
+        bool isStalemate = !hasAllyCapture && !hasEnemyCapture;
+        UpdateConfirmButtonText(hasAllyCapture, hasEnemyCapture, isStalemate);
+    }
+
+    private void UpdateConfirmButtonText(bool hasAllyCapture, bool hasEnemyCapture, bool isStalemate)
+    {
+        if (txtBtnConfirm == null) return;
+
+        if (textConfig != null)
+        {
+            txtBtnConfirm.text = textConfig.GetBattleConfirmButtonText(hasAllyCapture, hasEnemyCapture, isStalemate);
+        }
+        else
+        {
+            txtBtnConfirm.text = "确认";
+        }
     }
 
     private void ClearSpawnedItems()
@@ -131,12 +182,26 @@ public class BattleResultPopup : WindowBase
         if (binder.txtOrders != null)
             binder.txtOrders.text = $"{result.AllyOrder} vs {result.EnemyOrder}";
 
-        // 战线移动
+        // 战线移动 / 领土占领
         if (binder.txtLineMove != null)
         {
-            string moveText = result.LineMovement > 0 ? $"推进 +{result.LineMovement}"
-                            : result.LineMovement < 0 ? $"后退 {result.LineMovement}"
-                            : "僵持";
+            string moveText;
+            if (result.AllyCapturedGrid.HasValue && result.EnemyCapturedGrid.HasValue)
+            {
+                moveText = textConfig?.BattleBothEngaged ?? "双方交战";
+            }
+            else if (result.AllyCapturedGrid.HasValue)
+            {
+                moveText = string.Format(textConfig?.BattleAllyCaptured ?? "占领格{0}", result.AllyCapturedGrid.Value);
+            }
+            else if (result.EnemyCapturedGrid.HasValue)
+            {
+                moveText = string.Format(textConfig?.BattleEnemyCaptured ?? "敌占格{0}", result.EnemyCapturedGrid.Value);
+            }
+            else
+            {
+                moveText = textConfig?.BattleStalemate ?? "僵持";
+            }
             binder.txtLineMove.text = moveText;
         }
 
@@ -148,25 +213,19 @@ public class BattleResultPopup : WindowBase
             binder.txtTroopChange.text = $"我军: {allyChange} | 敌军: {enemyChange}";
         }
 
-        // 技能系统已移除 (GDD v7.0)
-        if (binder.txtSkill != null)
-        {
-            binder.txtSkill.gameObject.SetActive(false);
-        }
-
         // 暴击/失误
         if (binder.txtSpecial != null)
         {
             if (result.WasCrit)
             {
                 binder.txtSpecial.gameObject.SetActive(true);
-                binder.txtSpecial.text = "暴击!";
+                binder.txtSpecial.text = textConfig?.BattleCriticalHit ?? "暴击!";
                 binder.txtSpecial.color = Color.yellow;
             }
             else if (result.WasFumble)
             {
                 binder.txtSpecial.gameObject.SetActive(true);
-                binder.txtSpecial.text = "失误!";
+                binder.txtSpecial.text = textConfig?.BattleFumble ?? "失误!";
                 binder.txtSpecial.color = Color.red;
             }
             else

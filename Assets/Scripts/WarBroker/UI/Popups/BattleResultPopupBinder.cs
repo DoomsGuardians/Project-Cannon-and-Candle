@@ -11,4 +11,5 @@ public class BattleResultPopupBinder : UIBinder
     public Transform resultContainer;
     public GameObject resultItemPrefab;
     public Button btnConfirm;
+    public TMP_Text txtBtnConfirm;
 }

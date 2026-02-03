@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 /// <summary>
@@ -45,6 +46,7 @@ public class SpotMarketTab : MonoBehaviour
         parentWindow = parent;
 
         BindButtons();
+        BindHoverEvents();
         InitializeChart();
         RefreshUI();
     }
@@ -64,6 +66,43 @@ public class SpotMarketTab : MonoBehaviour
         parentWindow.AddButtonListener(btnAtkChart, () => SelectOrderType(OrderType.ATK));
         parentWindow.AddButtonListener(btnDefChart, () => SelectOrderType(OrderType.DEF));
         parentWindow.AddButtonListener(btnRetChart, () => SelectOrderType(OrderType.RET));
+    }
+
+    private void BindHoverEvents()
+    {
+        // 为买入/卖出按钮添加悬停事件
+        AddHoverEvent(btnAtkBuy, OrderType.ATK, 1);
+        AddHoverEvent(btnAtkSell, OrderType.ATK, -1);
+        AddHoverEvent(btnDefBuy, OrderType.DEF, 1);
+        AddHoverEvent(btnDefSell, OrderType.DEF, -1);
+        AddHoverEvent(btnRetBuy, OrderType.RET, 1);
+        AddHoverEvent(btnRetSell, OrderType.RET, -1);
+    }
+
+    private void AddHoverEvent(Button button, OrderType orderType, int delta)
+    {
+        if (button == null) return;
+
+        var trigger = button.gameObject.GetComponent<EventTrigger>();
+        if (trigger == null)
+            trigger = button.gameObject.AddComponent<EventTrigger>();
+
+        // 鼠标进入
+        var entryEnter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        entryEnter.callback.AddListener((data) => SendPreviewEvent(orderType, delta));
+        trigger.triggers.Add(entryEnter);
+
+        // 鼠标离开
+        var entryExit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+        entryExit.callback.AddListener((data) => SendPreviewEvent(orderType, 0));
+        trigger.triggers.Add(entryExit);
+    }
+
+    private void SendPreviewEvent(OrderType orderType, int delta)
+    {
+        GameRoot.Instance?.eventService?.SendMessage(
+            (EventID)WarBrokerEventID.OnInventoryPreview,
+            orderType, delta);
     }
 
     private void InitializeChart()

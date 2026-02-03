@@ -369,9 +369,9 @@ public class VictorAISystem
             // 对维克多来说，Grid 5 是他的大本营（敌方大本营=己方视角Grid 5）
             // 己方将军在Grid 4-5 → 即将突破，好事（低紧急度）
             // 己方将军在Grid 1-2 → 被压制（高紧急度）
-            if (frontline.LinePosition <= 2)
+            if (frontline.LinePosition <= 2.5f)
                 urgency += 0.1f;  // 己方被压
-            else if (frontline.LinePosition >= 4)
+            else if (frontline.LinePosition >= 3.5f)
                 urgency -= 0.05f; // 己方推进顺利
         }
 
