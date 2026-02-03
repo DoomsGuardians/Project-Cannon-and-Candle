@@ -87,7 +87,10 @@ public class PausePopup : WindowBase
     private void HandleUpdate()
     {
         // ESC 键关闭暂停面板
-        if (inputService != null && inputService.CancelPressed)
+        // 注意：由于 PausePopup 获取了 Gameplay 输入锁，InputService.CancelPressed 会被禁用
+        // 因此直接使用 Keyboard 检测 ESC 键
+        if (UnityEngine.InputSystem.Keyboard.current != null &&
+            UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             OnResumeClick();
         }

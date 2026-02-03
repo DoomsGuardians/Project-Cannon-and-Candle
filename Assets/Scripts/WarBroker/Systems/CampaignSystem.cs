@@ -132,8 +132,8 @@ public class CampaignSystem : ILogic
         marketSystem.ApplyInterest();      // 银行利息
         marketSystem.ApplyStorageCost();   // 仓储费
 
-        // Step 3: 随机事件抽取与公示
-        TryTriggerRandomEvent();
+        // Step 3: 随机事件抽取（不立即弹窗，等玩家阶段横幅完成后再弹）
+        CheckRandomEvent();
 
         // Step 4: 将军意图生成（灰色气泡）
         GenerateAllIntents();
@@ -178,10 +178,9 @@ public class CampaignSystem : ILogic
         // 执行维克多 AI
         ExecuteVictorAI();
 
+        // 发送阶段切换事件（触发横幅动画）
+        // 战斗阶段将在横幅动画完成后自动进入（通过OnPhaseBannerComplete）
         eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.IntentPhase, null);
-
-        // 自动进入阶段 IV：战斗推演
-        EnterBattlePhase();
     }
 
     /// <summary>
@@ -258,10 +257,31 @@ public class CampaignSystem : ILogic
     {
         if (p1 is TurnPhase phase)
         {
-            // 战斗阶段横幅完成后，执行战斗结算
-            if (phase == TurnPhase.BattlePhase && Data.CurrentPhase == TurnPhase.BattlePhase)
+            switch (phase)
             {
-                ExecuteBattleResolution();
+                // 玩家阶段横幅完成后，触发待处理的随机事件弹窗
+                case TurnPhase.MarketPhase:
+                    if (Data.CurrentPhase == TurnPhase.MarketPhase)
+                    {
+                        TriggerPendingRandomEvent();
+                    }
+                    break;
+
+                // 对手阶段横幅完成后，进入战斗阶段
+                case TurnPhase.IntentPhase:
+                    if (Data.CurrentPhase == TurnPhase.IntentPhase)
+                    {
+                        EnterBattlePhase();
+                    }
+                    break;
+
+                // 战斗阶段横幅完成后，执行战斗结算
+                case TurnPhase.BattlePhase:
+                    if (Data.CurrentPhase == TurnPhase.BattlePhase)
+                    {
+                        ExecuteBattleResolution();
+                    }
+                    break;
             }
         }
     }
@@ -492,8 +512,17 @@ public class CampaignSystem : ILogic
 
     #region 随机事件
 
-    private void TryTriggerRandomEvent()
+    // 待触发的随机事件（在玩家阶段横幅完成后弹出）
+    private RandomEventConfig pendingRandomEvent = null;
+
+    /// <summary>
+    /// 检查并存储随机事件（不立即弹窗）
+    /// 事件将在玩家阶段横幅完成后触发
+    /// </summary>
+    private void CheckRandomEvent()
     {
+        pendingRandomEvent = null;
+
         if (Data.ActiveEvent != null) return;
         if (UnityEngine.Random.value > balanceConfig.RandomEventChance) return;
 
@@ -501,6 +530,19 @@ public class CampaignSystem : ILogic
         if (availableEvents == null || availableEvents.Length == 0) return;
 
         var selectedEvent = availableEvents[UnityEngine.Random.Range(0, availableEvents.Length)];
+        pendingRandomEvent = selectedEvent;
+    }
+
+    /// <summary>
+    /// 触发待处理的随机事件（在横幅完成后调用）
+    /// </summary>
+    private void TriggerPendingRandomEvent()
+    {
+        if (pendingRandomEvent == null) return;
+
+        var selectedEvent = pendingRandomEvent;
+        pendingRandomEvent = null;
+
         Data.ActiveEvent = selectedEvent;
         Data.EventRemainingTurns = selectedEvent.Duration;
 

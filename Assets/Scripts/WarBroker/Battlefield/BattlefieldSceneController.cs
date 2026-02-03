@@ -19,6 +19,7 @@ public class BattlefieldSceneController : MonoBehaviour
 
     [Header("动画配置")]
     [SerializeField] private float animationDelay = 0.3f;  // 动画间隔
+    [SerializeField] private float actionPauseDuration = 0.6f;  // 每组行动后的停顿时间
 
     [Header("相机")]
     [SerializeField] private BattlefieldCameraController battlefieldCamera;
@@ -318,14 +319,18 @@ public class BattlefieldSceneController : MonoBehaviour
 
         // 相机跟随到当前战线
         Transform laneAnchor = GetLaneAnchor(result.Position);
+        Tweener cameraTweener = null;
         if (battlefieldCamera != null && laneAnchor != null)
         {
-            battlefieldCamera.SmoothFollowBattle(laneAnchor);
+            cameraTweener = battlefieldCamera.SmoothFollowBattle(laneAnchor);
         }
 
         Debug.Log($"[BattleAnim] {result.Position}: Ally {result.AllyOldPosition}->{result.AllyNewPosition}, Enemy {result.EnemyOldPosition}->{result.EnemyNewPosition}");
 
-        float delay = 0f;
+        // 等待相机聚焦完成后再开始战斗动画
+        float cameraDelay = cameraTweener != null ? cameraTweener.Duration() : 0f;
+
+        float delay = cameraDelay;
 
         // 1. 移动动画（使用新的位置信息）
         bool allyMoved = result.AllyOldPosition != result.AllyNewPosition;
@@ -395,6 +400,9 @@ public class BattlefieldSceneController : MonoBehaviour
 
         // 添加动画间隔
         currentSequence.AppendInterval(animationDelay);
+
+        // 添加行动后停顿，让玩家看清结果
+        currentSequence.AppendInterval(actionPauseDuration);
 
         // 动画完成后播放下一个
         currentSequence.OnComplete(() =>

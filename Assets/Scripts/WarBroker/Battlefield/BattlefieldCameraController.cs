@@ -1,5 +1,6 @@
 using UnityEngine;
 using Cinemachine;
+using DG.Tweening;
 
 /// <summary>
 /// 战场相机控制器 - 使用 Cinemachine 实现平滑相机过渡
@@ -25,15 +26,29 @@ public class BattlefieldCameraController : MonoBehaviour
     [SerializeField] private float minZoom = 5f;
     [SerializeField] private float maxZoom = 20f;
 
+    [Header("键盘平移设置")]
+    [SerializeField] private float panSpeed = 15f;
+    [SerializeField] private Vector2 panLimitX = new Vector2(-30f, 30f);
+    [SerializeField] private Vector2 panLimitZ = new Vector2(-30f, 30f);
+
+    [Header("平移聚焦设置")]
+    [SerializeField] private float panDuration = 0.5f;  // 平移动画时长
+    [SerializeField] private Ease panEase = Ease.InOutQuad;  // 平移缓动曲线
+
     [Header("优先级设置")]
     [SerializeField] private int priorityActive = 20;
     [SerializeField] private int priorityBattle = 15;
     [SerializeField] private int priorityDefault = 10;
     [SerializeField] private int priorityInactive = 0;
 
-    private float currentYaw = 0f;
-    private float currentPitch = 45f;
-    private float currentDistance = 10f;
+    [Header("初始视角设置")]
+    [SerializeField] private float initialYaw = 180f;    // 初始水平角度（180=面向敌方）
+    [SerializeField] private float initialPitch = 45f;   // 初始俯仰角度
+    [SerializeField] private float initialDistance = 15f; // 初始距离
+
+    private float currentYaw;
+    private float currentPitch;
+    private float currentDistance;
 
     private bool isDragging = false;
     private Vector2 lastPointerPosition;
@@ -42,10 +57,14 @@ public class BattlefieldCameraController : MonoBehaviour
     private CameraMode currentMode = CameraMode.Battlefield;
 
     private CinemachineTransposer battlefieldTransposer;
+    private Tweener panTweener;  // 当前平移动画
 
     private void Start()
     {
-        currentDistance = (minZoom + maxZoom) / 2f;
+        // 使用 Inspector 中配置的初始值
+        currentYaw = initialYaw;
+        currentPitch = initialPitch;
+        currentDistance = Mathf.Clamp(initialDistance, minZoom, maxZoom);
 
         if (GameRoot.Instance != null)
         {
@@ -82,10 +101,47 @@ public class BattlefieldCameraController : MonoBehaviour
         // 只在 Battlefield 模式下允许手动控制
         if (currentMode == CameraMode.Battlefield)
         {
+            HandleKeyboardPan();
             HandleRotation();
             HandleZoom();
             UpdateOrbitalCamera();
         }
+    }
+
+    /// <summary>
+    /// 处理键盘平移输入 (WASD)
+    /// </summary>
+    private void HandleKeyboardPan()
+    {
+        Vector2 moveInput = inputService.MoveInput;
+        if (moveInput == Vector2.zero) return;
+
+        // 取消正在进行的平移动画，让玩家接管控制
+        panTweener?.Kill();
+
+        // 获取相机的水平朝向（忽略Y轴）
+        var mainCamera = Camera.main;
+        if (mainCamera == null) return;
+
+        Vector3 cameraForward = mainCamera.transform.forward;
+        cameraForward.y = 0;
+        cameraForward.Normalize();
+
+        Vector3 cameraRight = mainCamera.transform.right;
+        cameraRight.y = 0;
+        cameraRight.Normalize();
+
+        // 根据相机朝向计算移动方向
+        Vector3 moveDirection = (cameraForward * moveInput.y + cameraRight * moveInput.x);
+
+        // 计算新位置
+        Vector3 newPosition = battlefieldPivot.position + moveDirection * panSpeed * Time.deltaTime;
+
+        // 限制在范围内
+        newPosition.x = Mathf.Clamp(newPosition.x, panLimitX.x, panLimitX.y);
+        newPosition.z = Mathf.Clamp(newPosition.z, panLimitZ.x, panLimitZ.y);
+
+        battlefieldPivot.position = newPosition;
     }
 
     private void HandleRotation()
@@ -148,27 +204,42 @@ public class BattlefieldCameraController : MonoBehaviour
     }
 
     /// <summary>
-    /// 平滑聚焦到指定目标（将军单位）
+    /// 平滑聚焦到指定目标（将军单位）- 使用平移而非旋转
     /// </summary>
     public void SmoothFocusOn(Transform target)
     {
-        if (vcamFocusUnit == null || target == null) return;
+        if (battlefieldPivot == null || target == null) return;
 
-        vcamFocusUnit.Follow = target;
-        vcamFocusUnit.LookAt = target;
-        SetMode(CameraMode.FocusUnit);
+        // 取消之前的平移动画
+        panTweener?.Kill();
+
+        // 平移 pivot 到目标位置，保持当前视角
+        panTweener = battlefieldPivot.DOMove(target.position, panDuration)
+            .SetEase(panEase);
+
+        // 保持在 Battlefield 模式，不切换相机
+        SetMode(CameraMode.Battlefield);
     }
 
     /// <summary>
-    /// 平滑跟随战斗（跟随战线锚点）
+    /// 平滑跟随战斗（跟随战线锚点）- 使用平移而非旋转
     /// </summary>
-    public void SmoothFollowBattle(Transform laneAnchor)
+    /// <returns>返回平移动画的 Tweener，可用于等待完成</returns>
+    public Tweener SmoothFollowBattle(Transform laneAnchor)
     {
-        if (vcamBattle == null || laneAnchor == null) return;
+        if (battlefieldPivot == null || laneAnchor == null) return null;
 
-        vcamBattle.Follow = laneAnchor;
-        vcamBattle.LookAt = laneAnchor;
-        SetMode(CameraMode.Battle);
+        // 取消之前的平移动画
+        panTweener?.Kill();
+
+        // 平移 pivot 到战线锚点位置，保持当前视角
+        panTweener = battlefieldPivot.DOMove(laneAnchor.position, panDuration)
+            .SetEase(panEase);
+
+        // 保持在 Battlefield 模式，不切换相机
+        SetMode(CameraMode.Battlefield);
+
+        return panTweener;
     }
 
     /// <summary>
@@ -176,10 +247,14 @@ public class BattlefieldCameraController : MonoBehaviour
     /// </summary>
     public void SmoothReturnToDefault()
     {
-        // 不重置 Yaw/Pitch/Distance，只切换回默认相机
+        // 取消之前的平移动画
+        panTweener?.Kill();
+
+        // 平移回原点，不重置 Yaw/Pitch/Distance
         if (battlefieldPivot != null)
         {
-            battlefieldPivot.position = Vector3.zero;
+            panTweener = battlefieldPivot.DOMove(Vector3.zero, panDuration)
+                .SetEase(panEase);
         }
         SetMode(CameraMode.Battlefield);
     }

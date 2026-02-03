@@ -18,6 +18,7 @@ public class GeneralUnit3D : MonoBehaviour
 
     [Header("意图气泡 (World Space UI)")]
     [SerializeField] private Canvas intentBubbleCanvas;
+    [SerializeField] private CanvasGroup intentBubbleCanvasGroup;
     [SerializeField] private Image intentBubbleImage;
     [SerializeField] private TMP_Text intentText;
 
@@ -33,6 +34,10 @@ public class GeneralUnit3D : MonoBehaviour
     [SerializeField] private float soldierFallDuration = 0.3f;
     [SerializeField] private float soldierFallDelay = 0.05f;
     [SerializeField] private float moveDuration = 0.5f;
+
+    [Header("意图气泡渐隐")]
+    [SerializeField] private float bubbleFadeStartDistance = 8f;  // 开始渐隐的距离
+    [SerializeField] private float bubbleFadeEndDistance = 4f;    // 完全隐藏的距离
 
     public GeneralData Data { get; private set; }
     public bool IsAlly { get; private set; }
@@ -63,6 +68,14 @@ public class GeneralUnit3D : MonoBehaviour
             if (cam != null)
             {
                 intentBubbleCanvas.transform.rotation = cam.transform.rotation;
+
+                // 基于相机距离渐隐
+                if (intentBubbleCanvasGroup != null)
+                {
+                    float distance = Vector3.Distance(cam.transform.position, transform.position);
+                    float alpha = Mathf.InverseLerp(bubbleFadeEndDistance, bubbleFadeStartDistance, distance);
+                    intentBubbleCanvasGroup.alpha = alpha;
+                }
             }
         }
     }

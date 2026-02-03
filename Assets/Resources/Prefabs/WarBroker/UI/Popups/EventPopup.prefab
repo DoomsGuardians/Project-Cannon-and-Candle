@@ -449,6 +449,7 @@ GameObject:
   - component: {fileID: 5325138905899349522}
   - component: {fileID: 4673612621266167886}
   - component: {fileID: 3480176485949680814}
+  - component: {fileID: 7711142826864769624}
   m_Layer: 5
   m_Name: ConfirmBtn
   m_TagString: Untagged
@@ -558,6 +559,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7711142826864769624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4712477138142488111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &4990024283139486521
 GameObject:
   m_ObjectHideFlags: 0
@@ -749,6 +771,8 @@ GameObject:
   - component: {fileID: 7678412229524802956}
   - component: {fileID: 4492305797606297698}
   - component: {fileID: 5423906926535055701}
+  - component: {fileID: 2025040206624682385}
+  - component: {fileID: 7937209763544745262}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -817,6 +841,51 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &2025040206624682385
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6104950905872889388}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &7937209763544745262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6104950905872889388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2f4ddff71b24684c9290bcb1043b775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inPreset: 4
+  outPreset: 0
+  inDuration: 0.3
+  outDuration: 0.2
+  inEase: 6
+  outEase: 5
+  slideOffset: 100
+  scaleFrom: 0
+  scaleTo: 1
+  rotationAngle: 180
+  customUseFade: 1
+  customUseScale: 0
+  customUseSlide: 0
+  customUseRotation: 0
+  customSlideDirection: {x: 0, y: -1}
+  playInOnEnable: 1
+  skipFirstEnable: 1
+  enableInteractionOnIn: 1
+  disableInteractionOnOut: 1
+  hideOnOutComplete: 1
+  ignoreTimeScale: 1
 --- !u!1 &6971895496730507789
 GameObject:
   m_ObjectHideFlags: 0

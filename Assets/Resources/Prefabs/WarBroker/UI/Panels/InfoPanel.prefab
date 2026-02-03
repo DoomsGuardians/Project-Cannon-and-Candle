@@ -23536,6 +23536,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1462676288897555957}
   - component: {fileID: 7459082374583191440}
+  - component: {fileID: 5600282185977454487}
+  - component: {fileID: 5267011137189148175}
   m_Layer: 5
   m_Name: InfoPanel
   m_TagString: Untagged
@@ -23582,6 +23584,51 @@ MonoBehaviour:
   chartAtk: {fileID: 9003354950535391353}
   chartDef: {fileID: 6042741675980696925}
   chartRet: {fileID: 2830187928912164180}
+--- !u!225 &5600282185977454487
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8501668277368570669}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &5267011137189148175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8501668277368570669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2f4ddff71b24684c9290bcb1043b775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inPreset: 10
+  outPreset: 0
+  inDuration: 0.25
+  outDuration: 0.25
+  inEase: 6
+  outEase: 5
+  slideOffset: 1000
+  scaleFrom: 0
+  scaleTo: 1
+  rotationAngle: 180
+  customUseFade: 1
+  customUseScale: 0
+  customUseSlide: 0
+  customUseRotation: 0
+  customSlideDirection: {x: 0, y: -1}
+  playInOnEnable: 1
+  skipFirstEnable: 1
+  enableInteractionOnIn: 0
+  disableInteractionOnOut: 0
+  hideOnOutComplete: 1
+  ignoreTimeScale: 1
 --- !u!1 &8586904063801479427
 GameObject:
   m_ObjectHideFlags: 0

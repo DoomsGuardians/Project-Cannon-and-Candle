@@ -81,6 +81,30 @@ public static class DOTweenExtensions
     }
 
     /// <summary>
+    /// RectTransform offsetMin 动画（用于拉伸模式的位移）
+    /// </summary>
+    public static Tweener DOOffsetMin(this RectTransform rectTransform, Vector2 endValue, float duration)
+    {
+        Vector2 startValue = rectTransform.offsetMin;
+        return DOVirtual.Float(0f, 1f, duration, t =>
+        {
+            rectTransform.offsetMin = Vector2.LerpUnclamped(startValue, endValue, t);
+        });
+    }
+
+    /// <summary>
+    /// RectTransform offsetMax 动画（用于拉伸模式的位移）
+    /// </summary>
+    public static Tweener DOOffsetMax(this RectTransform rectTransform, Vector2 endValue, float duration)
+    {
+        Vector2 startValue = rectTransform.offsetMax;
+        return DOVirtual.Float(0f, 1f, duration, t =>
+        {
+            rectTransform.offsetMax = Vector2.LerpUnclamped(startValue, endValue, t);
+        });
+    }
+
+    /// <summary>
     /// RectTransform 尺寸动画
     /// </summary>
     public static Tweener DOSizeDelta(this RectTransform rectTransform, Vector2 endValue, float duration)

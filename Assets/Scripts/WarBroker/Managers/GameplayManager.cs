@@ -71,10 +71,11 @@ public class GameplayManager : ManagerBase
         // 先注册事件，确保能接收到战斗结果
         RegisterEvents();
 
-        campaignSystem.StartTurn();
-
-        // 打开主界面
+        // 先打开主界面，确保能接收到第一回合的阶段事件
         uiService.ShowWindow<GameplayWindow>("GameplayWindow");
+
+        // 然后开始第一回合
+        campaignSystem.StartTurn();
     }
 
     #region 玩家操作接口

@@ -221,6 +221,7 @@ GameObject:
   - component: {fileID: 7990115823463727925}
   - component: {fileID: 7160214262666668094}
   - component: {fileID: 231387316351461361}
+  - component: {fileID: 1435537016517201322}
   m_Layer: 5
   m_Name: MainMenuiBtn
   m_TagString: Untagged
@@ -330,6 +331,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1435537016517201322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4478640639651010850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &5772807599266654988
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,6 +564,7 @@ GameObject:
   - component: {fileID: 2887497415671215796}
   - component: {fileID: 591848446441491210}
   - component: {fileID: 51273838492789436}
+  - component: {fileID: 7967518489134095830}
   m_Layer: 5
   m_Name: RestartBtn
   m_TagString: Untagged
@@ -651,6 +674,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7967518489134095830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7342144486480090147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &7684293241164924336
 GameObject:
   m_ObjectHideFlags: 0
@@ -662,6 +706,8 @@ GameObject:
   - component: {fileID: 2485720678781356282}
   - component: {fileID: 6866580182408941463}
   - component: {fileID: 5256696218391839840}
+  - component: {fileID: 383477643651184505}
+  - component: {fileID: 4330907266220689588}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -731,6 +777,51 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &383477643651184505
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7684293241164924336}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &4330907266220689588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7684293241164924336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2f4ddff71b24684c9290bcb1043b775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inPreset: 4
+  outPreset: 0
+  inDuration: 0.3
+  outDuration: 0.2
+  inEase: 6
+  outEase: 5
+  slideOffset: 100
+  scaleFrom: 0
+  scaleTo: 1
+  rotationAngle: 180
+  customUseFade: 1
+  customUseScale: 0
+  customUseSlide: 0
+  customUseRotation: 0
+  customSlideDirection: {x: 0, y: -1}
+  playInOnEnable: 1
+  skipFirstEnable: 1
+  enableInteractionOnIn: 1
+  disableInteractionOnOut: 1
+  hideOnOutComplete: 1
+  ignoreTimeScale: 1
 --- !u!1 &7850272320794515674
 GameObject:
   m_ObjectHideFlags: 0
