@@ -18,7 +18,13 @@ public sealed class LilliputVolume : VolumeComponent, IPostProcessComponent
     public ClampedFloatParameter focusRange = new ClampedFloatParameter(10f, 0.1f, 100f);
 
     [Tooltip("模糊强度 (像素半径)\n值越大，失焦区域越模糊\n建议值: 3-10")]
-    public ClampedFloatParameter blurStrength = new ClampedFloatParameter(6f, 0f, 30f);
+    public ClampedFloatParameter blurStrength = new ClampedFloatParameter(6f, 0f, 1000f);
+
+    [Tooltip("模糊迭代次数\n次数越多模糊越平滑，但性能消耗越大\n建议值: 1-3")]
+    public ClampedIntParameter blurIterations = new ClampedIntParameter(1, 1, 4);
+
+    [Tooltip("高斯模糊强度\n在 Bokeh 模糊后额外应用高斯模糊，使效果更柔和\n0 = 禁用，建议值: 0-2")]
+    public ClampedFloatParameter gaussianStrength = new ClampedFloatParameter(0.5f, 0f, 4f);
 
     public bool IsActive()
     {

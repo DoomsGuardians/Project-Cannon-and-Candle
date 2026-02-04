@@ -41,3 +41,12 @@ MonoBehaviour:
     RoleConfig: {fileID: 0}
     preLoadItems: {fileID: 0}
     camera: {fileID: 0}
+  - stageID: 3
+    sceneName: Battle
+    gameMode: 6
+    stageDescription: 
+    GameMangers: []
+    UIWindowBase: {fileID: 0}
+    RoleConfig: {fileID: 0}
+    preLoadItems: {fileID: 0}
+    camera: {fileID: 0}

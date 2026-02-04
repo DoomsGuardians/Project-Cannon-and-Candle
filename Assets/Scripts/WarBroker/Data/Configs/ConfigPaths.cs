@@ -10,4 +10,7 @@ public static class ConfigPaths
     public const string VICTOR_PROFILE = "Config/WarBroker/VictorProfile_Default";
     public const string UI_TEXT = "Config/WarBroker/UITextConfig";
     public const string MUSIC_CONFIG = "Config/WarBroker/MusicConfig";
+    public const string SPECTATOR_MODE = "Config/WarBroker/SpectatorModeConfig";
+    public const string SOLDIER_TYPE = "Config/WarBroker/SoldierTypeConfig";
+    public const string BATTLEFIELD = "Config/WarBroker/BattlefieldConfig";
 }

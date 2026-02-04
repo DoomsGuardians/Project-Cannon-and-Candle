@@ -43,13 +43,19 @@ MonoBehaviour:
   active: 1
   focusDistance:
     m_OverrideState: 1
-    m_Value: 0.1
+    m_Value: 5
   focusRange:
     m_OverrideState: 1
-    m_Value: 20
+    m_Value: 65
   blurStrength:
     m_OverrideState: 1
-    m_Value: 30
+    m_Value: 10
+  blurIterations:
+    m_OverrideState: 1
+    m_Value: 3
+  gaussianStrength:
+    m_OverrideState: 1
+    m_Value: 1
 --- !u!114 &-3149960835934075850
 MonoBehaviour:
   m_ObjectHideFlags: 3

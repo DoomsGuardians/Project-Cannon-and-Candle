@@ -2,6 +2,27 @@ using System;
 using UnityEngine;
 
 /// <summary>
+/// 将军士兵配置
+/// 定义将军麾下20个士兵的兵种分配
+/// </summary>
+[Serializable]
+public class GeneralSoldierConfig
+{
+    [Tooltip("20个士兵的兵种配置")]
+    public SoldierType[] soldierTypes = new SoldierType[20];
+
+    public GeneralSoldierConfig()
+    {
+        // 默认全部为长枪兵
+        soldierTypes = new SoldierType[20];
+        for (int i = 0; i < 20; i++)
+        {
+            soldierTypes[i] = SoldierType.Pikeman;
+        }
+    }
+}
+
+/// <summary>
 /// 将军配置
 /// </summary>
 [Serializable]
@@ -40,6 +61,10 @@ public class GeneralConfigItem
 
     [Tooltip("RET出价系数")]
     public float RetBidModifier = 1f;
+
+    [Header("士兵配置")]
+    [Tooltip("将军麾下士兵的兵种配置")]
+    public GeneralSoldierConfig soldierConfig = new GeneralSoldierConfig();
 }
 
 /// <summary>

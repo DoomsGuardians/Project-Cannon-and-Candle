@@ -12,8 +12,8 @@ using WarBroker.Battlefield;
 public class GeneralUnit3D : MonoBehaviour
 {
     [Header("锡兵显示")]
-    [SerializeField] private Transform[] soldierSlots;  // 20个锡兵Transform（Prefab中已有实例）
-    [SerializeField] private GameObject soldierPrefab;  // 备用，动态创建时使用
+    [SerializeField] private Transform[] soldierSlots;  // 20个锡兵位置槽
+    [SerializeField] private GameObject soldierPrefab;  // 备用，动态创建时使用（旧版兼容）
     [SerializeField] private Material allySoldierMaterial;
     [SerializeField] private Material enemySoldierMaterial;
 
@@ -63,6 +63,12 @@ public class GeneralUnit3D : MonoBehaviour
     private int currentSoldierCount = 0;
     private Sequence currentAnimation;
 
+    // 动态加载的士兵实例
+    private TinSoldier[] soldiers;
+    private SoldierTypeConfig soldierTypeConfig;
+    private bool useDynamicSoldiers = false;
+    private OrderType? lastSoldierPose;
+
     public System.Action<GeneralUnit3D> OnClicked;
 
     private void Awake()
@@ -108,10 +114,77 @@ public class GeneralUnit3D : MonoBehaviour
         Data = data;
         IsAlly = isAlly;
 
+        // 尝试初始化动态士兵系统
+        InitializeDynamicSoldiers();
+
         // 给气泡添加点击事件
         SetupBubbleClick();
 
         UpdateDisplay();
+    }
+
+    /// <summary>初始化动态士兵系统</summary>
+    private void InitializeDynamicSoldiers()
+    {
+        if (Data?.Config?.soldierConfig?.soldierTypes == null) return;
+
+        var resService = GameRoot.Instance?.resService;
+        if (resService == null) return;
+
+        // 加载兵种配置
+        soldierTypeConfig = resService.LoadResource<SoldierTypeConfig>(ConfigPaths.SOLDIER_TYPE);
+        if (soldierTypeConfig == null)
+        {
+            Debug.LogWarning("[GeneralUnit3D] 未找到 SoldierTypeConfig，使用静态士兵");
+            return;
+        }
+
+        var soldierTypes = Data.Config.soldierConfig.soldierTypes;
+        if (soldierTypes.Length == 0) return;
+
+        soldiers = new TinSoldier[soldierSlots.Length];
+        useDynamicSoldiers = true;
+
+        Material soldierMat = IsAlly ? allySoldierMaterial : enemySoldierMaterial;
+
+        for (int i = 0; i < soldierSlots.Length && i < soldierTypes.Length; i++)
+        {
+            if (soldierSlots[i] == null) continue;
+
+            var soldierType = soldierTypes[i];
+            var prefabPath = soldierTypeConfig.GetPrefabPath(soldierType);
+            if (string.IsNullOrEmpty(prefabPath)) continue;
+
+            var prefab = resService.LoadResource<GameObject>(prefabPath);
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[GeneralUnit3D] 未找到兵种 Prefab: {prefabPath}");
+                continue;
+            }
+
+            // 清除 slot 下的旧子物体
+            foreach (Transform child in soldierSlots[i])
+            {
+                Destroy(child.gameObject);
+            }
+
+            // 实例化新士兵
+            var soldierGO = Instantiate(prefab, soldierSlots[i]);
+            soldierGO.transform.localPosition = Vector3.zero;
+            soldierGO.transform.localRotation = Quaternion.identity;
+            soldierGO.transform.localScale = Vector3.one;
+
+            var tinSoldier = soldierGO.GetComponent<TinSoldier>();
+            if (tinSoldier != null)
+            {
+                tinSoldier.Initialize(soldierType);
+                tinSoldier.SetMaterial(soldierMat);
+                soldiers[i] = tinSoldier;
+            }
+
+            // 初始隐藏
+            soldierSlots[i].gameObject.SetActive(false);
+        }
     }
 
     /// <summary>设置气泡点击事件</summary>
@@ -142,7 +215,25 @@ public class GeneralUnit3D : MonoBehaviour
         if (Data == null) return;
 
         UpdateSoldierCount(Data.Troops);
+        UpdateSoldierPose(Data.FinalIntent);
         UpdateIntentBubble();
+    }
+
+    /// <summary>更新所有士兵的姿态</summary>
+    public void UpdateSoldierPose(OrderType? intent)
+    {
+        if (!useDynamicSoldiers || soldiers == null) return;
+        if (lastSoldierPose == intent) return;
+
+        lastSoldierPose = intent;
+
+        foreach (var soldier in soldiers)
+        {
+            if (soldier != null)
+            {
+                soldier.SetPose(intent);
+            }
+        }
     }
 
     /// <summary>更新锡兵数量显示（直接使用Prefab中的锡兵实例）</summary>
@@ -165,13 +256,6 @@ public class GeneralUnit3D : MonoBehaviour
                 soldier.transform.localRotation = Quaternion.identity;
                 soldier.transform.localScale = Vector3.one;
                 soldier.SetActive(true);
-
-                // 设置材质
-                var renderer = soldier.GetComponentInChildren<Renderer>();
-                if (renderer != null)
-                {
-                    renderer.material = IsAlly ? allySoldierMaterial : enemySoldierMaterial;
-                }
             }
             else if (!shouldBeActive && soldier.activeSelf)
             {
@@ -347,13 +431,6 @@ public class GeneralUnit3D : MonoBehaviour
             // 先设置初始状态：缩小 + 稍微下沉
             soldier.transform.localScale = Vector3.zero;
             soldier.transform.localRotation = Quaternion.identity;
-
-            // 设置材质
-            var renderer = soldier.GetComponentInChildren<Renderer>();
-            if (renderer != null)
-            {
-                renderer.material = IsAlly ? allySoldierMaterial : enemySoldierMaterial;
-            }
 
             // 立即显示
             int capturedIdx = idx;

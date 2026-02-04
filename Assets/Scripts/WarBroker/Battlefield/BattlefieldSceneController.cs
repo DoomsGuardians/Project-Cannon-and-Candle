@@ -11,14 +11,8 @@ using WarBroker.Battlefield;
 /// </summary>
 public class BattlefieldSceneController : MonoBehaviour
 {
-    [Header("战线锚点")]
-    [SerializeField] private Transform leftLaneAnchor;
-    [SerializeField] private Transform centerLaneAnchor;
-    [SerializeField] private Transform rightLaneAnchor;
-
     [Header("单位配置")]
     [SerializeField] private GameObject generalUnitPrefab;
-    [SerializeField] private float gridGap = 4f;  // Grid间距（Z轴方向）
 
     [Header("动画配置")]
     [SerializeField] private float animationDelay = 0.3f;  // 动画间隔
@@ -49,6 +43,12 @@ public class BattlefieldSceneController : MonoBehaviour
 
     [Header("相机")]
     [SerializeField] private BattlefieldCameraController battlefieldCamera;
+
+    // 战场根节点引用
+    private BattlefieldRoot battlefieldRoot;
+
+    // 单位容器（所有单位的父级）
+    private Transform unitsContainer;
 
     private Dictionary<string, GeneralUnit3D> allyUnits = new Dictionary<string, GeneralUnit3D>();
     private Dictionary<string, GeneralUnit3D> enemyUnits = new Dictionary<string, GeneralUnit3D>();
@@ -112,6 +112,23 @@ public class BattlefieldSceneController : MonoBehaviour
         ClearAllUnits();
     }
 
+    /// <summary>设置战场根节点引用</summary>
+    public void SetBattlefieldRoot(BattlefieldRoot root)
+    {
+        battlefieldRoot = root;
+
+        // 创建单位容器
+        if (unitsContainer == null)
+        {
+            var containerGO = new GameObject("UnitsContainer");
+            unitsContainer = containerGO.transform;
+            if (root != null)
+            {
+                unitsContainer.SetParent(root.transform);
+            }
+        }
+    }
+
     /// <summary>初始化战场</summary>
     public void Initialize(BattleData data)
     {
@@ -156,10 +173,9 @@ public class BattlefieldSceneController : MonoBehaviour
 
     private GeneralUnit3D SpawnUnit(GeneralData general, bool isAlly)
     {
-        Transform anchor = GetLaneAnchor(general.Position);
-        if (anchor == null) return null;
+        if (unitsContainer == null) return null;
 
-        var go = Instantiate(generalUnitPrefab, anchor);
+        var go = Instantiate(generalUnitPrefab, unitsContainer);
         go.name = $"{(isAlly ? "Ally" : "Enemy")}_{general.Name}";
         var unit = go.GetComponent<GeneralUnit3D>();
 
@@ -177,29 +193,35 @@ public class BattlefieldSceneController : MonoBehaviour
 
     private void UpdateUnitPosition(GeneralUnit3D unit, GeneralData general, bool isAlly)
     {
-        if (unit == null) return;
+        if (unit == null || battlefieldRoot == null) return;
 
-        // Grid沿Z轴排列，Grid 1-5 对应 Z: -8, -4, 0, +4, +8
-        // 己方初始Grid1在Z=-8（己方大本营）
-        // 敌方初始Grid5在Z=+8（敌方大本营）
-        // 双方都用同样的公式，GridPosition直接映射到Z坐标
-        float gridZ = (general.GridPosition - 3) * gridGap;
-
-        unit.transform.localPosition = new Vector3(0, 0, gridZ);
+        int laneIndex = (int)general.Position;
+        // GridPosition 是 1-based，转换为 0-based 索引
+        Vector3 gridPos = battlefieldRoot.GetGridPosition(laneIndex, general.GridPosition - 1);
+        unit.transform.localPosition = gridPos;
 
         // 面向对方（沿Z轴对峙）
         unit.transform.localRotation = Quaternion.Euler(0, isAlly ? 0 : 180, 0);
     }
 
-    private Transform GetLaneAnchor(FrontlinePosition position)
+    /// <summary>获取格子的本地坐标</summary>
+    private Vector3 GetGridLocalPosition(int gridPosition, bool isAlly, GeneralUnit3D unit)
     {
-        return position switch
+        if (battlefieldRoot == null || unit == null)
         {
-            FrontlinePosition.Left => leftLaneAnchor,
-            FrontlinePosition.Center => centerLaneAnchor,
-            FrontlinePosition.Right => rightLaneAnchor,
-            _ => centerLaneAnchor
-        };
+            return Vector3.zero;
+        }
+
+        // 从单位数据获取战线索引
+        int laneIndex = 0;
+        if (unit.Data != null)
+        {
+            laneIndex = (int)unit.Data.Position;
+        }
+
+        // GridPosition 是 1-based，转换为 0-based 索引
+        // UnitsContainer 在原点，所以世界坐标 = 本地坐标
+        return battlefieldRoot.GetGridPosition(laneIndex, gridPosition - 1);
     }
 
     private void UpdateAllUnits()
@@ -410,9 +432,9 @@ public class BattlefieldSceneController : MonoBehaviour
     /// <summary>根据指令组合选择动画</summary>
     private float AnimateByOrderCombination(BattleResult result, GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, float delay)
     {
-        // 计算目标位置
-        Vector3 allyTargetLocal = new Vector3(0, 0, (result.AllyNewPosition - 3) * gridGap);
-        Vector3 enemyTargetLocal = new Vector3(0, 0, (result.EnemyNewPosition - 3) * gridGap);
+        // 计算目标位置（使用 BattlefieldRoot 获取格子位置）
+        Vector3 allyTargetLocal = GetGridLocalPosition(result.AllyNewPosition, true, allyUnit);
+        Vector3 enemyTargetLocal = GetGridLocalPosition(result.EnemyNewPosition, false, enemyUnit);
 
         // 计算实际战斗伤害（不含大本营恢复）用于判断是否有接触
         int allyBattleDamage = result.AllyTroopChange - result.AllyBaseRecovery;

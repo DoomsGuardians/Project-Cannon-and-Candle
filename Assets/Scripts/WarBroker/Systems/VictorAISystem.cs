@@ -142,6 +142,23 @@ public class VictorAISystem
             memory.Init();
     }
 
+    /// <summary>
+    /// 运行时切换维克多性格配置
+    /// 用于观战模式等需要动态配置的场景
+    /// </summary>
+    public void SetProfile(VictorProfile newProfile)
+    {
+        if (newProfile != null)
+        {
+            this.profile = newProfile;
+        }
+    }
+
+    /// <summary>
+    /// 获取当前性格配置
+    /// </summary>
+    public VictorProfile GetProfile() => profile;
+
     // ═══════════════════════════════════════════════════════════
     //  主入口 (DevGuide Task 2.7)
     // ═══════════════════════════════════════════════════════════

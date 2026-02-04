@@ -106,18 +106,22 @@ public class LilliputRendererFeature : ScriptableRendererFeature
         private static readonly int FocusDistanceId = Shader.PropertyToID("_FocusDistance");
         private static readonly int FocusRangeId = Shader.PropertyToID("_FocusRange");
         private static readonly int BlurStrengthId = Shader.PropertyToID("_BokehRadius");
+        private static readonly int GaussianStrengthId = Shader.PropertyToID("_GaussianStrength");
 
         private const int CircleOfConfusionPass = 0;
         private const int PreFilterPass = 1;
         private const int BokehPass = 2;
         private const int PostFilterPass = 3;
         private const int CombinePass = 4;
+        private const int GaussianHorizontalPass = 5;
+        private const int GaussianVerticalPass = 6;
 
         private Material material;
         private RTHandle cocHandle;
         private RTHandle dof0Handle;
         private RTHandle dof1Handle;
         private RTHandle colorCopyHandle;
+        private RTHandle gaussianTempHandle;
         private RTHandle source;
 
         public bool IsMaterialValid => material != null;
@@ -152,6 +156,13 @@ public class LilliputRendererFeature : ScriptableRendererFeature
                 FilterMode.Bilinear,
                 TextureWrapMode.Clamp,
                 name: "_LilliputColorCopy");
+
+            RenderingUtils.ReAllocateIfNeeded(
+                ref gaussianTempHandle,
+                descriptor,
+                FilterMode.Bilinear,
+                TextureWrapMode.Clamp,
+                name: "_LilliputGaussianTemp");
 
             var cocDescriptor = descriptor;
             cocDescriptor.graphicsFormat = GraphicsFormat.R16_SFloat;
@@ -195,10 +206,13 @@ public class LilliputRendererFeature : ScriptableRendererFeature
             float focusDistance = volume.focusDistance.value;
             float focusRange = Mathf.Max(0.1f, volume.focusRange.value);
             float blurStrength = Mathf.Max(0f, volume.blurStrength.value);
+            int iterations = volume.blurIterations.value;
+            float gaussianStrength = volume.gaussianStrength.value;
 
             material.SetFloat(FocusDistanceId, focusDistance);
             material.SetFloat(FocusRangeId, focusRange);
             material.SetFloat(BlurStrengthId, blurStrength);
+            material.SetFloat(GaussianStrengthId, gaussianStrength);
 
             var cmd = CommandBufferPool.Get("Lilliput");
             using (new ProfilingScope(cmd, profilingSampler))
@@ -210,16 +224,27 @@ public class LilliputRendererFeature : ScriptableRendererFeature
                 // Pass 1: PreFilter - downsample with CoC
                 cmd.Blit(source, dof0Handle, material, PreFilterPass);
 
-                // Pass 2: Bokeh blur
-                cmd.Blit(dof0Handle, dof1Handle, material, BokehPass);
+                // Pass 2 & 3: Bokeh blur with iterations
+                for (int i = 0; i < iterations; i++)
+                {
+                    // Bokeh blur
+                    cmd.Blit(dof0Handle, dof1Handle, material, BokehPass);
 
-                // Pass 3: PostFilter - tent filter smoothing
-                cmd.Blit(dof1Handle, dof0Handle, material, PostFilterPass);
+                    // PostFilter - tent filter smoothing
+                    cmd.Blit(dof1Handle, dof0Handle, material, PostFilterPass);
+                }
 
                 // Pass 4: Combine - blend sharp and blurred
                 material.SetTexture(DoFTexId, dof0Handle);
                 cmd.Blit(source, colorCopyHandle);
                 cmd.Blit(colorCopyHandle, source, material, CombinePass);
+
+                // Pass 5 & 6: Optional Gaussian blur for extra smoothness
+                if (gaussianStrength > 0.01f)
+                {
+                    cmd.Blit(source, gaussianTempHandle, material, GaussianHorizontalPass);
+                    cmd.Blit(gaussianTempHandle, source, material, GaussianVerticalPass);
+                }
             }
 
             context.ExecuteCommandBuffer(cmd);
@@ -233,6 +258,7 @@ public class LilliputRendererFeature : ScriptableRendererFeature
             dof0Handle?.Release();
             dof1Handle?.Release();
             colorCopyHandle?.Release();
+            gaussianTempHandle?.Release();
         }
     }
 }

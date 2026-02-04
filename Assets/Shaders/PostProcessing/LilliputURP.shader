@@ -30,6 +30,7 @@ Shader "Hidden/LilliputURP"
         float _FocusDistance;   // 焦点距离 (世界单位)
         float _FocusRange;      // 焦点范围 (过渡区域)
         float _BokehRadius;     // 模糊半径
+        float _GaussianStrength; // 高斯模糊强度
 
         struct Attributes
         {
@@ -130,7 +131,7 @@ Shader "Hidden/LilliputURP"
             ENDHLSL
         }
 
-        // Pass 2: Bokeh blur
+        // Pass 2: Bokeh blur (Enhanced with 48 samples)
         Pass
         {
             Name "Bokeh"
@@ -138,32 +139,67 @@ Shader "Hidden/LilliputURP"
             #pragma vertex Vert
             #pragma fragment Frag
 
-            // Bokeh kernel - disc sampling pattern (golden angle spiral)
-            static const int KERNEL_SIZE = 22;
-            static const float2 kernel[KERNEL_SIZE] = {
-                float2(0, 0),
-                float2(0.53333336, 0),
-                float2(0.3325279, 0.4169768),
-                float2(-0.11867785, 0.5199616),
-                float2(-0.48051673, 0.2314047),
-                float2(-0.48051673, -0.23140468),
-                float2(-0.11867763, -0.51996166),
-                float2(0.33252785, -0.4169769),
-                float2(1, 0),
-                float2(0.90096885, 0.43388376),
-                float2(0.6234898, 0.7818315),
-                float2(0.22252098, 0.9749279),
-                float2(-0.22252095, 0.9749279),
-                float2(-0.62349, 0.7818314),
-                float2(-0.90096885, 0.43388382),
-                float2(-1, 0),
-                float2(-0.90096885, -0.43388376),
-                float2(-0.6234896, -0.7818316),
-                float2(-0.22252055, -0.974928),
-                float2(0.2225215, -0.9749278),
-                float2(0.6234897, -0.7818316),
-                float2(0.90096885, -0.43388376)
-            };
+            // Enhanced Bokeh kernel - 48 samples for smoother blur (4 rings)
+            #define KERNEL_SIZE 48
+
+            // Get kernel sample offset
+            float2 GetKernelSample(int index)
+            {
+                // Ring 0 - center (1 sample)
+                if (index == 0) return float2(0, 0);
+                // Ring 1 - 6 samples (radius 0.2)
+                if (index == 1) return float2(0.2, 0);
+                if (index == 2) return float2(0.1, 0.1732);
+                if (index == 3) return float2(-0.1, 0.1732);
+                if (index == 4) return float2(-0.2, 0);
+                if (index == 5) return float2(-0.1, -0.1732);
+                if (index == 6) return float2(0.1, -0.1732);
+                // Ring 2 - 12 samples (radius 0.4)
+                if (index == 7) return float2(0.4, 0);
+                if (index == 8) return float2(0.3464, 0.2);
+                if (index == 9) return float2(0.2, 0.3464);
+                if (index == 10) return float2(0, 0.4);
+                if (index == 11) return float2(-0.2, 0.3464);
+                if (index == 12) return float2(-0.3464, 0.2);
+                if (index == 13) return float2(-0.4, 0);
+                if (index == 14) return float2(-0.3464, -0.2);
+                if (index == 15) return float2(-0.2, -0.3464);
+                if (index == 16) return float2(0, -0.4);
+                if (index == 17) return float2(0.2, -0.3464);
+                if (index == 18) return float2(0.3464, -0.2);
+                // Ring 3 - 12 samples (radius 0.6)
+                if (index == 19) return float2(0.6, 0);
+                if (index == 20) return float2(0.5196, 0.3);
+                if (index == 21) return float2(0.3, 0.5196);
+                if (index == 22) return float2(0, 0.6);
+                if (index == 23) return float2(-0.3, 0.5196);
+                if (index == 24) return float2(-0.5196, 0.3);
+                if (index == 25) return float2(-0.6, 0);
+                if (index == 26) return float2(-0.5196, -0.3);
+                if (index == 27) return float2(-0.3, -0.5196);
+                if (index == 28) return float2(0, -0.6);
+                if (index == 29) return float2(0.3, -0.5196);
+                if (index == 30) return float2(0.5196, -0.3);
+                // Ring 4 - 16 samples (radius 1.0)
+                if (index == 31) return float2(1.0, 0);
+                if (index == 32) return float2(0.9239, 0.3827);
+                if (index == 33) return float2(0.7071, 0.7071);
+                if (index == 34) return float2(0.3827, 0.9239);
+                if (index == 35) return float2(0, 1.0);
+                if (index == 36) return float2(-0.3827, 0.9239);
+                if (index == 37) return float2(-0.7071, 0.7071);
+                if (index == 38) return float2(-0.9239, 0.3827);
+                if (index == 39) return float2(-1.0, 0);
+                if (index == 40) return float2(-0.9239, -0.3827);
+                if (index == 41) return float2(-0.7071, -0.7071);
+                if (index == 42) return float2(-0.3827, -0.9239);
+                if (index == 43) return float2(0, -1.0);
+                if (index == 44) return float2(0.3827, -0.9239);
+                if (index == 45) return float2(0.7071, -0.7071);
+                if (index == 46) return float2(0.9239, -0.3827);
+                if (index == 47) return float2(0.8, 0.15);
+                return float2(0, 0);
+            }
 
             half Weigh(half coc, half radius)
             {
@@ -188,9 +224,10 @@ Shader "Hidden/LilliputURP"
 
                 for (int i = 0; i < KERNEL_SIZE; i++)
                 {
-                    float2 offset = kernel[i] * absCenterCoC * texelSize;
+                    float2 kernelSample = GetKernelSample(i);
+                    float2 offset = kernelSample * absCenterCoC * texelSize;
                     half4 s = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv + offset);
-                    half radius = length(kernel[i]) * absCenterCoC;
+                    half radius = length(kernelSample) * absCenterCoC;
 
                     // Background (far) blur
                     half bgw = Weigh(max(0, s.a), radius);
@@ -258,6 +295,80 @@ Shader "Hidden/LilliputURP"
                 half3 color = lerp(source.rgb, dof.rgb, blendFactor);
 
                 return half4(color, source.a);
+            }
+            ENDHLSL
+        }
+
+        // Pass 5: Gaussian Blur Horizontal
+        Pass
+        {
+            Name "GaussianH"
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment Frag
+
+            // 9-tap Gaussian weights
+            static const float gaussWeights[9] = {
+                0.0162162162, 0.0540540541, 0.1216216216, 0.1945945946, 0.2270270270,
+                0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162
+            };
+            static const float gaussOffsets[9] = {
+                -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0
+            };
+
+            half4 Frag(Varyings input) : SV_Target
+            {
+                half coc = SAMPLE_TEXTURE2D(_CoCTex, sampler_CoCTex, input.uv).r;
+                half absCoc = abs(coc);
+
+                // Scale gaussian blur by CoC and gaussian strength
+                float blurScale = absCoc * _GaussianStrength * _MainTex_TexelSize.x;
+
+                half3 color = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    float2 offset = float2(gaussOffsets[i] * blurScale, 0);
+                    color += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv + offset).rgb * gaussWeights[i];
+                }
+
+                return half4(color, 1);
+            }
+            ENDHLSL
+        }
+
+        // Pass 6: Gaussian Blur Vertical
+        Pass
+        {
+            Name "GaussianV"
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment Frag
+
+            // 9-tap Gaussian weights
+            static const float gaussWeights[9] = {
+                0.0162162162, 0.0540540541, 0.1216216216, 0.1945945946, 0.2270270270,
+                0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162
+            };
+            static const float gaussOffsets[9] = {
+                -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0
+            };
+
+            half4 Frag(Varyings input) : SV_Target
+            {
+                half coc = SAMPLE_TEXTURE2D(_CoCTex, sampler_CoCTex, input.uv).r;
+                half absCoc = abs(coc);
+
+                // Scale gaussian blur by CoC and gaussian strength
+                float blurScale = absCoc * _GaussianStrength * _MainTex_TexelSize.y;
+
+                half3 color = 0;
+                for (int i = 0; i < 9; i++)
+                {
+                    float2 offset = float2(0, gaussOffsets[i] * blurScale);
+                    color += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv + offset).rgb * gaussWeights[i];
+                }
+
+                return half4(color, 1);
             }
             ENDHLSL
         }

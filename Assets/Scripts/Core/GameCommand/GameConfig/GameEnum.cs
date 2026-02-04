@@ -11,7 +11,8 @@ public enum GameMode
     GamePlay,
     Training,
     Narrative,
-    MainMenu
+    MainMenu,
+    Spectator
 }
 
 /// <summary>

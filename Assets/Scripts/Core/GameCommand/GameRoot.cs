@@ -235,6 +235,7 @@ public class GameRoot : MonoSingleton<GameRoot>
         RegisterGameMode(new DefaultGameMode());
         RegisterGameMode(new BattleGameMode());
         RegisterGameMode(new MainMenuGameMode());
+        RegisterGameMode(new SpectatorGameMode());
 
         if (GameModeDic.TryGetValue(GameMode.GameStart, out var defaultMode))
         {
