@@ -50,4 +50,5 @@ public enum WarBrokerEventID
     // === 新增事件（放在末尾避免影响已有 ID）===
     OnReinforcementsComplete = 1100,  // 基地休整动画播放完成
     OnGeneralReinforced,              // 将军获得基地休整 (param1=GeneralData, param2=int恢复量)
+    OnBattleReportConfirmed,          // 战报确认完成（玩家点击确认或无战报时自动触发）
 }

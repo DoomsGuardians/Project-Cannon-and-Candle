@@ -114,7 +114,20 @@ MonoBehaviour:
   overriddenIntentColor: {r: 1, g: 0, b: 0, a: 1}
   soldierFallDuration: 0.3
   soldierFallDelay: 0.05
+  soldierRiseDuration: 0.4
+  soldierRiseDelay: 0.08
   moveDuration: 0.5
+  anticipationDistance: 0.2
+  anticipationDuration: 0.1
+  arcHeightMultiplier: 0.08
+  landingSquashAmount: 0.15
+  landingSquashDuration: 0.15
+  gunfireEffect: {fileID: 0}
+  cannonEffect: {fileID: 0}
+  explosionEffect: {fileID: 0}
+  landingDustEffect: {fileID: 0}
+  healEffect: {fileID: 0}
+  chargeEffect: {fileID: 0}
   bubbleFadeStartDistance: 10
   bubbleFadeEndDistance: 5
 --- !u!65 &8768268196290546550

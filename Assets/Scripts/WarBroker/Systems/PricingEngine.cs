@@ -62,16 +62,19 @@ public class PricingEngine
             // 检查是否接触
             if (IsEngaged(ally, enemy))
             {
+                // Step 1: 接触状态基础修正 +20% (GDD v7.0)
+                frontlineAlpha = balanceConfig.AlphaContactBase;
+
                 // 计算交战中心
                 float center = (ally.GridPosition + enemy.GridPosition) / 2f;
 
-                // 查询位置修正表
-                frontlineAlpha = GetPositionModifier(type, center);
+                // Step 2: 查询位置修正表
+                frontlineAlpha += GetPositionModifier(type, center);
 
                 // 濒死修正（该战线）
                 if (ally.Troops >= 1 && ally.Troops <= 5)
                 {
-                    frontlineAlpha += 0.10f;
+                    frontlineAlpha += balanceConfig.AlphaLowHPBonus;
                 }
             }
 

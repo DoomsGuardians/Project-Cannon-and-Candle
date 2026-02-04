@@ -38,8 +38,8 @@ public class CampaignSystem : ILogic
 
         commissionSystem = new CommissionSystem();
 
-        // 监听战斗动画完成事件
-        eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleAnimationsComplete, OnBattleAnimationsComplete);
+        // 监听战报确认事件（玩家确认战报后或无战报时触发）
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleReportConfirmed, OnBattleReportConfirmed);
 
         // 监听阶段横幅动画完成事件
         eventService.AddEventListening((EventID)WarBrokerEventID.OnPhaseBannerComplete, OnPhaseBannerComplete);
@@ -234,8 +234,8 @@ public class CampaignSystem : ILogic
 
         var battleResults = battleSystem.ResolveBattles(victorOrders);
 
-        // 等待战斗动画完成后再进入结算阶段
-        // 如果有战斗结果，等待动画；否则直接进入结算
+        // 等待战报确认后再进入结算阶段
+        // 如果有战斗结果，等待动画和战报确认；否则直接进入结算
         if (battleResults.Count > 0)
         {
             waitingForBattleAnimations = true;
@@ -244,7 +244,7 @@ public class CampaignSystem : ILogic
             var battlefieldController = UnityEngine.Object.FindObjectOfType<BattlefieldSceneController>();
             if (battlefieldController == null)
             {
-                // 没有 3D 战场，直接触发动画完成事件（让战报弹窗显示）
+                // 没有 3D 战场，直接触发动画完成事件（让 GameplayManager 处理战报）
                 eventService.SendMessage((EventID)WarBrokerEventID.OnBattleAnimationsComplete, null, null);
             }
         }
@@ -254,8 +254,8 @@ public class CampaignSystem : ILogic
         }
     }
 
-    /// <summary>战斗动画完成回调</summary>
-    private void OnBattleAnimationsComplete(object p1, object p2)
+    /// <summary>战报确认完成回调（玩家确认战报或无战报时触发）</summary>
+    private void OnBattleReportConfirmed(object p1, object p2)
     {
         if (waitingForBattleAnimations)
         {
@@ -724,7 +724,10 @@ public class CampaignSystem : ILogic
         // ATK、DEF 现货价格归零
         market.CurrentPrices[OrderType.ATK] = 0f;
         market.CurrentPrices[OrderType.DEF] = 0f;
-        // RET 价格保持不变（或可能暴涨）
+
+        // RET 价格暴涨至基础价×5 (GDD v7.0: 逃命需求达到顶峰)
+        var retBasePrice = resService.LoadResource<OrderConfig>(ConfigPaths.ORDER_CONFIG).GetConfig(OrderType.RET).BasePrice;
+        market.CurrentPrices[OrderType.RET] = retBasePrice * 5f;
 
         Debug.Log($"[政权崩溃] ATK 价格: ${market.CurrentPrices[OrderType.ATK]}");
         Debug.Log($"[政权崩溃] DEF 价格: ${market.CurrentPrices[OrderType.DEF]}");

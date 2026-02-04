@@ -19,7 +19,7 @@ MonoBehaviour:
   BankInterestRate: 0.05
   LoanRatio: 1.5
   FuturesMarginRate: 0.2
-  ForceLiquidationRate: 0.8
+  ForceLiquidationRate: 0.7
   MaxFuturesDuration: 3
   RandomModifierMin: 0.75
   RandomModifierMax: 1.25
@@ -34,10 +34,16 @@ MonoBehaviour:
   BaseRecoveryCost: 2
   RetHealHP: 1
   RetHealCost: 1
-  ReorganizeTurns: 3
+  ReorganizeTurns: 2
   DisobeyTrustThreshold: 50
   DisobeyChanceLow: 0.2
   DisobeyChanceVeryLow: 0.5
+  ReinforceCost: 1
+  OverrideCost: 2
+  ReinforceTrustChange: 5
+  ReinforceMoraleChange: 5
+  OverrideTrustChange: -10
+  OverrideMoraleChange: -5
   AuditSupplyShortage: 30
   AuditGeneralRouted: 20
   AuditFailureThreshold: 100

@@ -120,6 +120,32 @@ public class GameBalanceConfig : ScriptableObject
     [Range(0f, 1f)]
     public float DisobeyChanceVeryLow = 0.5f;
 
+    [Header("===== 意图干涉参数 =====")]
+
+    [Tooltip("强化消耗指令数")]
+    [Range(1, 5)]
+    public int ReinforceCost = 1;
+
+    [Tooltip("篡改消耗指令数")]
+    [Range(1, 10)]
+    public int OverrideCost = 3;
+
+    [Tooltip("强化信任度变化")]
+    [Range(0, 20)]
+    public int ReinforceTrustChange = 5;
+
+    [Tooltip("强化士气变化")]
+    [Range(0, 20)]
+    public int ReinforceMoraleChange = 5;
+
+    [Tooltip("篡改信任度变化")]
+    [Range(-50, 0)]
+    public int OverrideTrustChange = -15;
+
+    [Tooltip("篡改士气变化")]
+    [Range(-20, 0)]
+    public int OverrideMoraleChange = -5;
+
     [Header("===== 审计参数 =====")]
 
     [Tooltip("军需总部补足指令审计值")]

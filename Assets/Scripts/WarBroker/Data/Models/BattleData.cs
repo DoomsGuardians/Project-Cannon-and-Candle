@@ -83,6 +83,8 @@ public class BattleResult
     public int LineMovement;  // 保留用于UI显示（废弃，改用领土变化）
     public int AllyTroopChange;
     public int EnemyTroopChange;
+    public int AllyBaseRecovery;   // 己方大本营恢复量（用于单独播放动画）
+    public int EnemyBaseRecovery;  // 敌方大本营恢复量
     public string Description;
     public bool WasCrit;
     public bool WasFumble;

@@ -106,12 +106,13 @@ public class PlayerData
             inventoryValue += kvp.Value * market.CurrentPrices[kvp.Key];
         }
 
-        float futuresPnL = 0f;
+        // 期货价值 = 保证金 + 浮动盈亏 (GDD v7.0)
+        float futuresValue = 0f;
         foreach (var contract in FuturesPositions)
         {
-            futuresPnL += contract.CalculatePnL(market.CurrentPrices[contract.TargetOrder]);
+            futuresValue += contract.Margin + contract.CalculatePnL(market.CurrentPrices[contract.TargetOrder]);
         }
 
-        return Cash + inventoryValue + futuresPnL - BankDebt;
+        return Cash + inventoryValue + futuresValue - BankDebt;
     }
 }

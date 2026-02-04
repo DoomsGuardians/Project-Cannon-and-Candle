@@ -29,7 +29,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 275f5bdae320b4c4ab659c138a3011a0, type: 3}
   m_Name: KuwaharaRendererFeature
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   settings:
     shader: {fileID: 4800000, guid: c6234abe79462414fafabe558334bb2a, type: 3}
     renderPassEvent: 550
@@ -51,9 +51,9 @@ MonoBehaviour:
     hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
   m_RendererFeatures:
   - {fileID: 8849911736867365869}
-  - {fileID: -6234567890123456789}
   - {fileID: -7879600206679962541}
-  m_RendererFeatureMap: ed238af9d533d17ab1c2d3e4f5a6b7c8530cbf245c09a692
+  - {fileID: -6234567890123456789}
+  m_RendererFeatureMap: ed238af9d533d17a530cbf245c09a692b1c2d3e4f5a6b7c8
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -89,7 +89,7 @@ MonoBehaviour:
     passOperation: 2
     failOperation: 0
     zFailOperation: 0
-  m_ShadowTransparentReceive: 1
+  m_ShadowTransparentReceive: 0
   m_RenderingMode: 0
   m_DepthPrimingMode: 1
   m_CopyDepthMode: 1

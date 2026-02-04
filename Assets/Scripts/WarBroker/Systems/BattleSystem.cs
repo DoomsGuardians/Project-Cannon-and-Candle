@@ -445,12 +445,14 @@ public class BattleSystem : ILogic
         // 己方在 Grid 1（大本营）
         if (ally.GridPosition == 1 && campaignData.Battle.CurrentReserves >= balanceConfig.BaseRecoveryCost)
         {
+            result.AllyBaseRecovery = balanceConfig.BaseRecoveryHP;
             result.AllyTroopChange += balanceConfig.BaseRecoveryHP;
             campaignData.Battle.CurrentReserves -= balanceConfig.BaseRecoveryCost;
         }
         // 敌方在 Grid 5（敌方大本营）
         if (enemy.GridPosition == 5 && campaignData.Battle.EnemyReserves >= balanceConfig.BaseRecoveryCost)
         {
+            result.EnemyBaseRecovery = balanceConfig.BaseRecoveryHP;
             result.EnemyTroopChange += balanceConfig.BaseRecoveryHP;
             campaignData.Battle.EnemyReserves -= balanceConfig.BaseRecoveryCost;
         }

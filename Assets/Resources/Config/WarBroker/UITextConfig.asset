@@ -11,8 +11,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7e8d3c5a2b1f4e6a9c0d8f3e5a7b2c1d, type: 3}
   m_Name: UITextConfig
-  m_EditorClassIdentifier:
-  TooltipTurn: "\u5F53\u524D\u56DE\u5408 / \u6700\u5927\u56DE\u5408\u6570"
+  m_EditorClassIdentifier: 
+  TooltipTurn: "\u5F53\u524D\u661F\u671F / \u6700\u5927\u6218\u5F79\u5468\u671F"
   TooltipCash: "\u53EF\u7528\u4E8E\u91C7\u8D2D\u519B\u9700\u3001\u652F\u4ED8\u5229\u606F\u548C\u4ED3\u50A8\u8D39\u7528"
   TooltipNetWorth: "\u73B0\u91D1 + \u5E93\u5B58\u4EF7\u503C - \u8D1F\u503A"
   TooltipAudit: "\u521D\u59CB\u8D44\u4EA7\uFF0C\u7528\u4E8E\u8BA1\u7B97\u6700\u7EC8\u76C8\u4E8F"

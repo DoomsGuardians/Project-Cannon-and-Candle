@@ -175,8 +175,9 @@ public class GameplayManager : ManagerBase
         int turn = (int)param1;
         Debug.Log($"回合 {turn} 开始");
 
-        // 清空上回合的战斗结果
-        pendingBattleResults.Clear();
+        // 注意：不在这里清空 pendingBattleResults
+        // 因为 OnBattleAnimationsComplete 可能在新回合开始后才被调用（事件监听顺序问题）
+        // pendingBattleResults 会在 OnBattleAnimationsComplete 中显示战报后被清空
     }
 
     private void OnTurnEnd(object param1, object param2)
@@ -220,16 +221,28 @@ public class GameplayManager : ManagerBase
         var result = param1 as BattleResult;
         if (result != null)
         {
-            // 收集战斗结果，等动画完成后再显示
-            pendingBattleResults.Add(result);
+            // 只收集有意义的战斗结果（有兵力损失才需要显示战报）
+            bool hasCasualties = result.AllyTroopChange != 0 || result.EnemyTroopChange != 0;
+            if (hasCasualties)
+            {
+                pendingBattleResults.Add(result);
+                Debug.Log($"[GameplayManager] 收到战斗结果（有伤亡），当前待处理数量: {pendingBattleResults.Count}");
+            }
+            else
+            {
+                Debug.Log($"[GameplayManager] 忽略无伤亡的战斗结果");
+            }
         }
     }
 
     private void OnBattleAnimationsComplete(object param1, object param2)
     {
-        // 所有战斗动画播放完成，显示战报弹窗（使用队列）
+        Debug.Log($"[GameplayManager] OnBattleAnimationsComplete 被调用，待处理战斗结果数量: {pendingBattleResults.Count}");
+
+        // 所有战斗动画播放完成
         if (pendingBattleResults.Count > 0)
         {
+            // 有战报需要显示，弹出战报弹窗
             var results = new List<BattleResult>(pendingBattleResults);
             var hasGameEnd = pendingGameEndResult.HasValue;
             var isVictory = pendingGameEndResult ?? false;
@@ -238,20 +251,33 @@ public class GameplayManager : ManagerBase
             pendingBattleResults.Clear();
             if (hasGameEnd) pendingGameEndResult = null;
 
+            Debug.Log($"[GameplayManager] 准备显示战报弹窗，战斗结果数量: {results.Count}");
+
             // 使用队列显示战报弹窗
             uiService.ShowPopupQueued<BattleResultPopup>("BattleResultPopup", popup =>
             {
+                Debug.Log("[GameplayManager] BattleResultPopup 回调被执行");
                 popup.SetBattleResults(results);
 
-                // 如果有待显示的结算弹窗，设置回调
-                if (hasGameEnd)
+                // 设置关闭回调：发送战报确认事件
+                popup.SetOnCloseCallback(() =>
                 {
-                    popup.SetOnCloseCallback(() =>
+                    // 先发送战报确认事件，让 CampaignSystem 进入结算阶段
+                    eventService.SendMessage((EventID)WarBrokerEventID.OnBattleReportConfirmed, null, null);
+
+                    // 如果有待显示的结算弹窗，显示它
+                    if (hasGameEnd)
                     {
                         ShowCampaignEndPopup(isVictory);
-                    });
-                }
+                    }
+                });
             });
+        }
+        else
+        {
+            // 没有战报需要显示，直接发送战报确认事件
+            Debug.Log("[GameplayManager] 无战报，直接发送战报确认事件");
+            eventService.SendMessage((EventID)WarBrokerEventID.OnBattleReportConfirmed, null, null);
         }
     }
 

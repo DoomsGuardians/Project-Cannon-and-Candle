@@ -11,19 +11,6 @@ public class IntentSystem
     private GameBalanceConfig balanceConfig;
     private CampaignRuntimeData campaignData;
 
-    // 强化消耗
-    private const int ReinforceCost = 1;
-    // 篡改消耗
-    private const int OverrideCost = 3;
-    // 强化信任度变化
-    private const int ReinforceTrustChange = 5;
-    // 强化士气变化
-    private const int ReinforceMoraleChange = 5;
-    // 篡改信任度变化
-    private const int OverrideTrustChange = -15;
-    // 篡改士气变化
-    private const int OverrideMoraleChange = -5;
-
     public void Init(GameBalanceConfig config)
     {
         balanceConfig = config;
@@ -57,19 +44,19 @@ public class IntentSystem
         }
 
         // 检查玩家库存
-        if (!player.Inventory.ContainsKey(orderType) || player.Inventory[orderType] < ReinforceCost)
+        if (!player.Inventory.ContainsKey(orderType) || player.Inventory[orderType] < balanceConfig.ReinforceCost)
         {
             Debug.LogWarning($"强化失败：{orderType} 库存不足");
             return false;
         }
 
         // 执行强化
-        player.Inventory[orderType] -= ReinforceCost;
+        player.Inventory[orderType] -= balanceConfig.ReinforceCost;
         general.FinalIntent = orderType;
         general.AssignedOrder = orderType;  // 同步更新AssignedOrder，战斗系统使用此字段
         general.IntentSource = IntentSource.Reinforced;
-        general.Trust = Mathf.Clamp(general.Trust + ReinforceTrustChange, 0, 100);
-        general.Morale = Mathf.Clamp(general.Morale + ReinforceMoraleChange, 0, 100);
+        general.Trust = Mathf.Clamp(general.Trust + balanceConfig.ReinforceTrustChange, 0, 100);
+        general.Morale = Mathf.Clamp(general.Morale + balanceConfig.ReinforceMoraleChange, 0, 100);
 
         Debug.Log($"[IntentSystem] 强化成功: {general.Name} -> {orderType}, AssignedOrder={general.AssignedOrder}");
 
@@ -91,19 +78,19 @@ public class IntentSystem
         }
 
         // 检查玩家库存
-        if (!player.Inventory.ContainsKey(orderType) || player.Inventory[orderType] < OverrideCost)
+        if (!player.Inventory.ContainsKey(orderType) || player.Inventory[orderType] < balanceConfig.OverrideCost)
         {
-            Debug.LogWarning($"篡改失败：{orderType} 库存不足（需要 {OverrideCost}）");
+            Debug.LogWarning($"篡改失败：{orderType} 库存不足（需要 {balanceConfig.OverrideCost}）");
             return false;
         }
 
         // 执行篡改
-        player.Inventory[orderType] -= OverrideCost;
+        player.Inventory[orderType] -= balanceConfig.OverrideCost;
         general.FinalIntent = orderType;
         general.AssignedOrder = orderType;  // 同步更新AssignedOrder，战斗系统使用此字段
         general.IntentSource = IntentSource.Overridden;
-        general.Trust = Mathf.Clamp(general.Trust + OverrideTrustChange, 0, 100);
-        general.Morale = Mathf.Clamp(general.Morale + OverrideMoraleChange, 0, 100);
+        general.Trust = Mathf.Clamp(general.Trust + balanceConfig.OverrideTrustChange, 0, 100);
+        general.Morale = Mathf.Clamp(general.Morale + balanceConfig.OverrideMoraleChange, 0, 100);
 
         Debug.Log($"[IntentSystem] 篡改成功: {general.Name} -> {orderType}, AssignedOrder={general.AssignedOrder}");
 
@@ -489,8 +476,8 @@ public class IntentSystem
     }
 
     /// <summary>获取强化消耗</summary>
-    public int GetReinforceCost() => ReinforceCost;
+    public int GetReinforceCost() => balanceConfig.ReinforceCost;
 
     /// <summary>获取篡改消耗</summary>
-    public int GetOverrideCost() => OverrideCost;
+    public int GetOverrideCost() => balanceConfig.OverrideCost;
 }
