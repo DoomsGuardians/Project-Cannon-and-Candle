@@ -46,7 +46,7 @@ MonoBehaviour:
     m_Value: 0.1
   focusRange:
     m_OverrideState: 1
-    m_Value: 40
+    m_Value: 20
   blurStrength:
     m_OverrideState: 1
     m_Value: 30
@@ -71,7 +71,7 @@ MonoBehaviour:
     m_Value: 0.75
   intensity:
     m_OverrideState: 1
-    m_Value: 1.2
+    m_Value: 1
   scatter:
     m_OverrideState: 1
     m_Value: 0.75
@@ -118,13 +118,13 @@ MonoBehaviour:
     m_Value: 1
   contrast:
     m_OverrideState: 1
-    m_Value: 1.5
+    m_Value: 2
   linearStart:
     m_OverrideState: 1
-    m_Value: 0.22
+    m_Value: 0.1
   linearLength:
     m_OverrideState: 1
-    m_Value: 0.65
+    m_Value: 0.9
   toeStrength:
     m_OverrideState: 1
     m_Value: 1.33
