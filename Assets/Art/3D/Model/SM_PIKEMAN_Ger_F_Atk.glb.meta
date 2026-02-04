@@ -1,0 +1,107 @@
+fileFormatVersion: 2
+guid: e1cc33cb1e269584e9d3dd83cdd58dc1
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BakedMaterial.001
+    second: {fileID: 2100000, guid: e38ce92c51a009f45bad305b74ea4c5b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BakedMaterial.010
+    second: {fileID: 2100000, guid: 35a0e0f38e84848428d2ff16bd40e1bb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BakedMaterial.014
+    second: {fileID: 2100000, guid: 2adf7a85262d2324696b735471cec33e, type: 2}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 804e1ce4c496647cfa3f1a1134187c71, type: 3}
+  _removeEmptyRootObjects: 1
+  _scaleFactor: 1
+  _deduplicateResources: 0
+  _maximumLod: 300
+  _readWriteEnabled: 1
+  _generateColliders: 0
+  _addColliders: 0
+  _swapUvs: 0
+  _generateLightmapUVs: 0
+  _importBlendShapeNames: 1
+  _blendShapeFrameWeight:
+    _option: 0
+    _multiplier: 1
+  _importNormals: 0
+  _importTangents: 0
+  _importCamera: 2
+  _importAnimations: 2
+  _mecanimHumanoidFlip: 0
+  _addAnimatorComponent: 0
+  _animationLoopTime: 1
+  _animationLoopPose: 0
+  _importMaterials: 1
+  _enableGpuInstancing: 1
+  _texturesReadWriteEnabled: 1
+  _generateMipMaps: 1
+  _useSceneNameIdentifier: 1
+  _textureCompression: -50
+  _gltfAsset: '<b>Generator: </b>Khronos glTF Blender I/O v5.0.21
+
+    <b>Version:
+    </b>2.0
+
+    
+
+    <b>Extras: </b>
+
+'
+  optimizeGameObjects: 0
+  materials:
+  - {fileID: -7685430155244682534, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+  - {fileID: 6884150716867026820, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+  - {fileID: 3059983838170971389, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+  textures:
+  - {fileID: 7168873233637659261, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+  - {fileID: -6163441024374782125, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+  - {fileID: -432606208261407632, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+  hasSceneData: 1
+  hasAnimationData: 0
+  hasMaterialData: 1
+  hasTextureData: 1
+  animations: []
+  _extensions: []
+  _textures:
+  - texture: {fileID: 7168873233637659261, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 1
+    shouldBeNormalMap: 1
+  - texture: {fileID: -6163441024374782125, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 0
+    shouldBeNormalMap: 0
+  - texture: {fileID: -432606208261407632, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 1
+    shouldBeNormalMap: 0
+  - texture: {fileID: 7168873233637659261, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 1
+    shouldBeNormalMap: 1
+  - texture: {fileID: -6163441024374782125, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 0
+    shouldBeNormalMap: 0
+  - texture: {fileID: -432606208261407632, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 1
+    shouldBeNormalMap: 0
+  - texture: {fileID: 7168873233637659261, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 1
+    shouldBeNormalMap: 1
+  - texture: {fileID: -6163441024374782125, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 0
+    shouldBeNormalMap: 0
+  - texture: {fileID: -432606208261407632, guid: e1cc33cb1e269584e9d3dd83cdd58dc1, type: 3}
+    shouldBeLinear: 1
+    shouldBeNormalMap: 0
+  _mainAssetIdentifier: scenes/Scene
+  _importPlugins: []
