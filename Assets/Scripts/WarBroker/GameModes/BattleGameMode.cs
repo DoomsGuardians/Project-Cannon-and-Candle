@@ -98,6 +98,10 @@ public class BattleGameMode : GameModeBase
                 }
             }
         }
+
+        // 启动音乐播放（因为 MusicPlayerManager 在 OnEnterState 之后才注册，需要手动触发）
+        var musicManager = managerService.GetManager<MusicPlayerManager>();
+        musicManager?.OnShow();
     }
 
     public override void OnUpdate() { }

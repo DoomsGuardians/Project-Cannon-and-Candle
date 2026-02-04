@@ -335,14 +335,26 @@ public class BattleSystem : ILogic
         int enemyMoraleDamageBonus = GetMoraleDamageBonus(enemy.Morale);
         int enemyMoraleDefenseBonus = GetMoraleDefenseBonus(enemy.Morale);
 
-        // 应用士气修正到 HP 变化
-        // 己方造成的伤害影响敌方 HP
-        enemyHPChange -= allyMoraleDamageBonus;
-        // 敌方造成的伤害影响己方 HP
-        allyHPChange -= enemyMoraleDamageBonus;
-        // 防御修正
-        allyHPChange += allyMoraleDefenseBonus;
-        enemyHPChange += enemyMoraleDefenseBonus;
+        // 应用士气修正到 HP 变化（仅对伤害生效，回血不受影响）
+        // 己方造成的伤害影响敌方 HP（只有敌方受伤时才应用）
+        if (enemyHPChange < 0)
+        {
+            enemyHPChange -= allyMoraleDamageBonus;
+        }
+        // 敌方造成的伤害影响己方 HP（只有己方受伤时才应用）
+        if (allyHPChange < 0)
+        {
+            allyHPChange -= enemyMoraleDamageBonus;
+        }
+        // 防御修正（只有受伤时才应用）
+        if (allyHPChange < 0)
+        {
+            allyHPChange += allyMoraleDefenseBonus;
+        }
+        if (enemyHPChange < 0)
+        {
+            enemyHPChange += enemyMoraleDefenseBonus;
+        }
 
         // 应用随机修正（仅对伤害部分）
         if (allyHPChange < 0)
@@ -384,60 +396,63 @@ public class BattleSystem : ILogic
         bool bothATK = (allyOrder == OrderType.ATK && enemyOrder == OrderType.ATK);
 
         // 更新 GridPosition 并处理领土占领
-        if (allyOrder == OrderType.RET && enemyOrder == OrderType.RET)
+        // 核心逻辑：只有涉及 RET 的情况才会移动，战斗（ATK/DEF 接触）时位置不变
+
+        bool allyIsRET = allyOrder == OrderType.RET;
+        bool enemyIsRET = enemyOrder == OrderType.RET;
+
+        if (allyIsRET && enemyIsRET)
         {
-            // RET vs RET：双方各自后撤一格，不占领任何格子
+            // RET vs RET：双方各自后撤一格
             ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
             enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
         }
-        else if (bothATK)
+        else if (allyIsRET)
         {
-            // ATK vs ATK：双方僵持，都不移动，只交换伤害
-            // 不改变任何位置，不占领任何格子
-        }
-        else
-        {
-            // 处理己方移动和占领
-            if (allyOrder == OrderType.ATK)
-            {
-                int allyTargetGrid = Mathf.Min(5, ally.GridPosition + 1);
-                // 确保不会越过敌方
-                if (allyTargetGrid < enemy.GridPosition)
-                {
-                    ally.GridPosition = allyTargetGrid;
-                    result.AllyCapturedGrid = allyTargetGrid;
-                    // 敌方被推回
-                    enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
-                }
-            }
-            else if (allyOrder == OrderType.RET)
-            {
-                // RET 只移动，不丢失领土
-                ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
-            }
-            // DEF: 不移动，不变化
-
-            // 处理敌方移动和占领
+            // 己方 RET：己方后撤
+            ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
+            // 敌方如果是 ATK，追击前进
             if (enemyOrder == OrderType.ATK)
             {
                 int enemyTargetGrid = Mathf.Max(1, enemy.GridPosition - 1);
-                // 确保不会越过己方
                 if (enemyTargetGrid > ally.GridPosition)
                 {
                     enemy.GridPosition = enemyTargetGrid;
                     result.EnemyCapturedGrid = enemyTargetGrid;
-                    // 己方被推回（如果己方不是ATK）
-                    if (allyOrder != OrderType.ATK)
-                    {
-                        ally.GridPosition = Mathf.Max(1, ally.GridPosition - 1);
-                    }
                 }
             }
-            else if (enemyOrder == OrderType.RET)
+            // 敌方如果是 DEF，不动
+        }
+        else if (enemyIsRET)
+        {
+            // 敌方 RET：敌方后撤
+            enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
+            // 己方如果是 ATK，追击前进
+            if (allyOrder == OrderType.ATK)
             {
-                // RET 只移动，不丢失领土
-                enemy.GridPosition = Mathf.Min(5, enemy.GridPosition + 1);
+                int allyTargetGrid = Mathf.Min(5, ally.GridPosition + 1);
+                if (allyTargetGrid < enemy.GridPosition)
+                {
+                    ally.GridPosition = allyTargetGrid;
+                    result.AllyCapturedGrid = allyTargetGrid;
+                }
             }
+            // 己方如果是 DEF，不动
+        }
+        // 其他情况（ATK vs ATK, ATK vs DEF, DEF vs ATK, DEF vs DEF）：战斗，位置不变
+
+        // 大本营恢复：战斗结束后，在大本营的部队可以恢复兵力
+        // 己方在 Grid 1（大本营）
+        if (ally.GridPosition == 1 && campaignData.Battle.CurrentReserves >= balanceConfig.BaseRecoveryCost)
+        {
+            result.AllyTroopChange += balanceConfig.BaseRecoveryHP;
+            campaignData.Battle.CurrentReserves -= balanceConfig.BaseRecoveryCost;
+        }
+        // 敌方在 Grid 5（敌方大本营）
+        if (enemy.GridPosition == 5 && campaignData.Battle.EnemyReserves >= balanceConfig.BaseRecoveryCost)
+        {
+            result.EnemyTroopChange += balanceConfig.BaseRecoveryHP;
+            campaignData.Battle.EnemyReserves -= balanceConfig.BaseRecoveryCost;
         }
     }
 
@@ -609,11 +624,13 @@ public class BattleSystem : ILogic
     #region 补员
 
     /// <summary>
-    /// GDD v7.0: 处理溃败将军的重组
-    /// 基地休整已移至战斗结算阶段（ProcessDisengaged/ProcessEngaged）
+    /// GDD v7.0: 处理溃败将军的重组（在战斗结算前调用）
+    /// 返回本回合复活的将军列表，用于播放复活动画
     /// </summary>
-    public void ApplyReinforcements()
+    public List<(GeneralData general, bool isAlly)> ProcessRespawns()
     {
+        var respawnedGenerals = new List<(GeneralData, bool)>();
+
         // 玩家方将军
         foreach (var general in campaignData.Battle.AllyGenerals)
         {
@@ -625,7 +642,10 @@ public class BattleSystem : ILogic
                 // 重整完成，复活将军
                 if (general.ReorganizeTurns <= 0)
                 {
-                    RespawnGeneral(general, isAlly: true);
+                    if (TryRespawnGeneral(general, isAlly: true))
+                    {
+                        respawnedGenerals.Add((general, true));
+                    }
                 }
             }
         }
@@ -641,14 +661,29 @@ public class BattleSystem : ILogic
                 // 重整完成，复活将军
                 if (general.ReorganizeTurns <= 0)
                 {
-                    RespawnGeneral(general, isAlly: false);
+                    if (TryRespawnGeneral(general, isAlly: false))
+                    {
+                        respawnedGenerals.Add((general, false));
+                    }
                 }
             }
         }
+
+        return respawnedGenerals;
     }
 
-    /// <summary>复活将军</summary>
-    private void RespawnGeneral(GeneralData general, bool isAlly)
+    /// <summary>
+    /// GDD v7.0: 处理溃败将军的重组
+    /// 基地休整已移至战斗结算阶段（ProcessDisengaged/ProcessEngaged）
+    /// </summary>
+    public void ApplyReinforcements()
+    {
+        // 复活逻辑已移至 ProcessRespawns，在战斗结算前调用
+        // 此方法保留用于兼容性，但不再处理复活
+    }
+
+    /// <summary>尝试复活将军，返回是否成功</summary>
+    private bool TryRespawnGeneral(GeneralData general, bool isAlly)
     {
         // 设置初始兵力（从配置读取）
         int respawnHP = balanceConfig.RespawnHP;
@@ -660,7 +695,7 @@ public class BattleSystem : ILogic
         {
             // 后备役不足，继续等待
             general.ReorganizeTurns = 1;
-            return;
+            return false;
         }
 
         // 扣除后备役
@@ -676,6 +711,8 @@ public class BattleSystem : ILogic
 
         // 发送复活事件
         eventService.SendMessage((EventID)WarBrokerEventID.OnGeneralRespawned, general, isAlly);
+
+        return true;
     }
 
     #endregion

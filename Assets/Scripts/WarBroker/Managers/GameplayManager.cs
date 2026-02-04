@@ -227,26 +227,31 @@ public class GameplayManager : ManagerBase
 
     private void OnBattleAnimationsComplete(object param1, object param2)
     {
-        // 所有战斗动画播放完成，显示战报弹窗
+        // 所有战斗动画播放完成，显示战报弹窗（使用队列）
         if (pendingBattleResults.Count > 0)
         {
-            var popup = uiService.ShowWindow<BattleResultPopup>("BattleResultPopup");
-            if (popup != null)
+            var results = new List<BattleResult>(pendingBattleResults);
+            var hasGameEnd = pendingGameEndResult.HasValue;
+            var isVictory = pendingGameEndResult ?? false;
+
+            // 清除待处理状态
+            pendingBattleResults.Clear();
+            if (hasGameEnd) pendingGameEndResult = null;
+
+            // 使用队列显示战报弹窗
+            uiService.ShowPopupQueued<BattleResultPopup>("BattleResultPopup", popup =>
             {
-                popup.SetBattleResults(new List<BattleResult>(pendingBattleResults));
+                popup.SetBattleResults(results);
 
                 // 如果有待显示的结算弹窗，设置回调
-                if (pendingGameEndResult.HasValue)
+                if (hasGameEnd)
                 {
-                    bool isVictory = pendingGameEndResult.Value;
                     popup.SetOnCloseCallback(() =>
                     {
                         ShowCampaignEndPopup(isVictory);
                     });
-                    pendingGameEndResult = null;
                 }
-            }
-            pendingBattleResults.Clear();
+            });
         }
     }
 
@@ -255,8 +260,11 @@ public class GameplayManager : ManagerBase
         var eventConfig = param1 as RandomEventConfig;
         if (eventConfig != null)
         {
-            var popup = uiService.ShowWindow<EventPopup>("EventPopup");
-            popup?.SetEventData(eventConfig);
+            // 使用队列显示事件弹窗
+            uiService.ShowPopupQueued<EventPopup>("EventPopup", popup =>
+            {
+                popup.SetEventData(eventConfig);
+            });
         }
     }
 

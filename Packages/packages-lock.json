@@ -179,6 +179,18 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "org.khronos.unitygltf": {
+      "version": "2.18.5",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "2.0.0",
+        "com.unity.modules.imageconversion": "1.0.0",
+        "com.unity.shadergraph": "10.0.0",
+        "com.unity.mathematics": "1.0.0"
+      },
+      "url": "https://packages.needle.tools"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,

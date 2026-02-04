@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 using DG.Tweening;
+using WarBroker.Battlefield;
 
 /// <summary>
 /// 3D 将军单位
@@ -36,6 +37,21 @@ public class GeneralUnit3D : MonoBehaviour
     [SerializeField] private float soldierRiseDuration = 0.4f;
     [SerializeField] private float soldierRiseDelay = 0.08f;
     [SerializeField] private float moveDuration = 0.5f;
+
+    [Header("增强动画设置")]
+    [SerializeField] private float anticipationDistance = 0.2f;  // 预备动作后退距离
+    [SerializeField] private float anticipationDuration = 0.1f;  // 预备动作时长
+    [SerializeField] private float arcHeightMultiplier = 0.08f;  // 抛物线高度系数（降低）
+    [SerializeField] private float landingSquashAmount = 0.15f;  // 落地压缩量
+    [SerializeField] private float landingSquashDuration = 0.15f; // 落地压缩时长
+
+    [Header("特效接口 - 由美术配置")]
+    [SerializeField] private ParticleSystem gunfireEffect;      // 锡兵开枪火药
+    [SerializeField] private ParticleSystem cannonEffect;       // 将军底座开炮
+    [SerializeField] private ParticleSystem explosionEffect;    // 爆炸特效
+    [SerializeField] private ParticleSystem landingDustEffect;  // 落地尘土
+    [SerializeField] private ParticleSystem healEffect;         // 恢复特效
+    [SerializeField] private ParticleSystem chargeEffect;       // 冲锋特效
 
     [Header("意图气泡渐隐")]
     [SerializeField] private float bubbleFadeStartDistance = 8f;  // 开始渐隐的距离
@@ -213,9 +229,13 @@ public class GeneralUnit3D : MonoBehaviour
     }
 
     /// <summary>播放锡兵倒下动画（随机选择锡兵倒下）</summary>
-    public Sequence PlaySoldierFallAnimation(int casualties)
+    /// <param name="casualties">伤亡数量</param>
+    /// <param name="externalSequence">外部 Sequence（可选，传入则直接插入动画）</param>
+    /// <param name="startTime">插入起始时间（仅当 externalSequence 不为 null 时有效）</param>
+    /// <returns>动画时长</returns>
+    public float PlaySoldierFallAnimation(int casualties, Sequence externalSequence = null, float startTime = 0f)
     {
-        if (soldierSlots == null || casualties <= 0) return null;
+        if (soldierSlots == null || casualties <= 0) return 0f;
 
         // 收集当前存活的锡兵索引
         var aliveIndices = new System.Collections.Generic.List<int>();
@@ -229,39 +249,56 @@ public class GeneralUnit3D : MonoBehaviour
         Shuffle(aliveIndices);
 
         int actualCasualties = Mathf.Min(casualties, aliveIndices.Count);
-        if (actualCasualties <= 0) return null;
+        if (actualCasualties <= 0) return 0f;
 
-        currentAnimation?.Kill();
-        currentAnimation = DOTween.Sequence();
+        // 使用外部 Sequence 或创建新的
+        Sequence seq = externalSequence ?? DOTween.Sequence();
+        float baseTime = externalSequence != null ? startTime : 0f;
 
         for (int i = 0; i < actualCasualties; i++)
         {
             int idx = aliveIndices[i];
             var soldier = soldierSlots[idx].gameObject;
-            float delay = i * soldierFallDelay;
+            float delay = baseTime + i * soldierFallDelay;
 
             // 锡兵倒下动画：旋转90度 + 缩小
-            currentAnimation.Insert(delay, soldier.transform
+            seq.Insert(delay, soldier.transform
                 .DORotate(new Vector3(90f, 0f, Random.Range(-30f, 30f)), soldierFallDuration)
                 .SetEase(Ease.OutQuad));
-            currentAnimation.Insert(delay, soldier.transform
+            seq.Insert(delay, soldier.transform
                 .DOScale(0.5f, soldierFallDuration)
                 .SetEase(Ease.OutQuad));
 
             int capturedIdx = idx;
-            currentAnimation.InsertCallback(delay + soldierFallDuration, () =>
+            seq.InsertCallback(delay + soldierFallDuration, () =>
             {
                 if (soldierSlots[capturedIdx] != null)
                     soldierSlots[capturedIdx].gameObject.SetActive(false);
             });
         }
 
-        currentAnimation.OnComplete(() =>
-        {
-            currentSoldierCount = Mathf.Max(0, currentSoldierCount - actualCasualties);
-        });
+        float totalDuration = (actualCasualties - 1) * soldierFallDelay + soldierFallDuration;
 
-        return currentAnimation;
+        // 只有独立 Sequence 才设置 OnComplete
+        if (externalSequence == null)
+        {
+            int capturedCasualties = actualCasualties;
+            seq.OnComplete(() =>
+            {
+                currentSoldierCount = Mathf.Max(0, currentSoldierCount - capturedCasualties);
+            });
+        }
+        else
+        {
+            // 外部 Sequence 时，用 callback 更新计数
+            int capturedCasualties = actualCasualties;
+            seq.InsertCallback(baseTime + totalDuration, () =>
+            {
+                currentSoldierCount = Mathf.Max(0, currentSoldierCount - capturedCasualties);
+            });
+        }
+
+        return totalDuration;
     }
 
     /// <summary>随机打乱列表</summary>
@@ -275,9 +312,13 @@ public class GeneralUnit3D : MonoBehaviour
     }
 
     /// <summary>播放锡兵恢复动画（锡兵从地面弹出）</summary>
-    public Sequence PlaySoldierRiseAnimation(int reinforcements)
+    /// <param name="reinforcements">增援数量</param>
+    /// <param name="externalSequence">外部 Sequence（可选，传入则直接插入动画）</param>
+    /// <param name="startTime">插入起始时间（仅当 externalSequence 不为 null 时有效）</param>
+    /// <returns>动画时长</returns>
+    public float PlaySoldierRiseAnimation(int reinforcements, Sequence externalSequence = null, float startTime = 0f)
     {
-        if (soldierSlots == null || reinforcements <= 0) return null;
+        if (soldierSlots == null || reinforcements <= 0) return 0f;
 
         // 找出当前未显示但需要显示的锡兵索引
         var inactiveIndices = new System.Collections.Generic.List<int>();
@@ -288,18 +329,20 @@ public class GeneralUnit3D : MonoBehaviour
         }
 
         int actualReinforcements = Mathf.Min(reinforcements, inactiveIndices.Count);
-        if (actualReinforcements <= 0) return null;
+        if (actualReinforcements <= 0) return 0f;
 
         // 取前 actualReinforcements 个（按顺序填充）
         var toActivate = inactiveIndices.GetRange(0, actualReinforcements);
 
-        var seq = DOTween.Sequence();
+        // 使用外部 Sequence 或创建新的
+        Sequence seq = externalSequence ?? DOTween.Sequence();
+        float baseTime = externalSequence != null ? startTime : 0f;
 
         for (int i = 0; i < toActivate.Count; i++)
         {
             int idx = toActivate[i];
             var soldier = soldierSlots[idx].gameObject;
-            float delay = i * soldierRiseDelay;
+            float delay = baseTime + i * soldierRiseDelay;
 
             // 先设置初始状态：缩小 + 稍微下沉
             soldier.transform.localScale = Vector3.zero;
@@ -325,12 +368,28 @@ public class GeneralUnit3D : MonoBehaviour
                 .SetEase(Ease.OutBack));
         }
 
-        seq.OnComplete(() =>
-        {
-            currentSoldierCount = Mathf.Min(soldierSlots.Length, currentSoldierCount + actualReinforcements);
-        });
+        float totalDuration = (actualReinforcements - 1) * soldierRiseDelay + soldierRiseDuration;
 
-        return seq;
+        // 只有独立 Sequence 才设置 OnComplete
+        if (externalSequence == null)
+        {
+            int capturedReinforcements = actualReinforcements;
+            seq.OnComplete(() =>
+            {
+                currentSoldierCount = Mathf.Min(soldierSlots.Length, currentSoldierCount + capturedReinforcements);
+            });
+        }
+        else
+        {
+            // 外部 Sequence 时，用 callback 更新计数
+            int capturedReinforcements = actualReinforcements;
+            seq.InsertCallback(baseTime + totalDuration, () =>
+            {
+                currentSoldierCount = Mathf.Min(soldierSlots.Length, currentSoldierCount + capturedReinforcements);
+            });
+        }
+
+        return totalDuration;
     }
 
     /// <summary>播放单位移动动画</summary>
@@ -396,6 +455,147 @@ public class GeneralUnit3D : MonoBehaviour
         // 重新填充
         UpdateSoldierCount(troops);
     }
+
+    #region 增强动画方法
+
+    /// <summary>
+    /// 播放增强移动动画 - 带抛物线轨迹和落地冲击
+    /// 返回独立的 Sequence（注意：不要嵌套到其他 Sequence 中，会导致 OnComplete 问题）
+    /// </summary>
+    public Sequence PlayEnhancedMoveAnimation(
+        Vector3 targetLocalPosition,
+        bool withAnticipation = true,
+        bool withImpact = true,
+        float? heightMultiplier = null)
+    {
+        var seq = DOTween.Sequence();
+        InsertEnhancedMoveAnimation(seq, 0f, targetLocalPosition, withAnticipation, withImpact, heightMultiplier);
+        return seq;
+    }
+
+    /// <summary>
+    /// 将增强移动动画插入到外部 Sequence 中（推荐使用，避免嵌套 Sequence 问题）
+    /// </summary>
+    /// <param name="sequence">外部 Sequence</param>
+    /// <param name="startTime">插入的起始时间</param>
+    /// <param name="targetLocalPosition">目标本地坐标</param>
+    /// <param name="withAnticipation">是否包含预备动作</param>
+    /// <param name="withImpact">是否包含落地冲击</param>
+    /// <param name="heightMultiplier">抛物线高度系数</param>
+    /// <returns>动画结束时间（相对于 startTime）</returns>
+    public float InsertEnhancedMoveAnimation(
+        Sequence sequence,
+        float startTime,
+        Vector3 targetLocalPosition,
+        bool withAnticipation = true,
+        bool withImpact = true,
+        float? heightMultiplier = null)
+    {
+        Vector3 startPos = transform.localPosition;
+        Vector3 moveDirection = (targetLocalPosition - startPos).normalized;
+        float distance = Vector3.Distance(startPos, targetLocalPosition);
+        float arcHeight = distance * (heightMultiplier ?? arcHeightMultiplier);
+
+        float mainMoveDuration = moveDuration;
+        float riseTime = mainMoveDuration * 0.6f;
+        float slamTime = mainMoveDuration * 0.4f;
+
+        float baseY = targetLocalPosition.y;
+        float peakY = baseY + arcHeight;
+
+        float t = startTime;
+
+        // 1. 预备动作
+        if (withAnticipation && moveDirection != Vector3.zero)
+        {
+            Vector3 anticipationPos = startPos - moveDirection * anticipationDistance;
+            sequence.Insert(t, transform.DOLocalMove(anticipationPos, anticipationDuration).SetEase(Ease.OutQuad));
+            sequence.Insert(t, transform.DOScaleY(0.9f, anticipationDuration).SetEase(Ease.OutQuad));
+            t += anticipationDuration;
+        }
+
+        // 2. 上升阶段
+        Vector3 peakPos = new Vector3(targetLocalPosition.x, peakY, targetLocalPosition.z);
+        sequence.Insert(t, transform.DOLocalMove(peakPos, riseTime).SetEase(Ease.OutQuad));
+        if (withAnticipation)
+        {
+            sequence.Insert(t, transform.DOScaleY(1f, riseTime * 0.5f).SetEase(Ease.OutQuad));
+        }
+        t += riseTime;
+
+        // 3. 下砸阶段
+        sequence.Insert(t, transform.DOLocalMoveY(baseY, slamTime).SetEase(Ease.InQuart));
+        t += slamTime;
+
+        // 4. 落地冲击
+        if (withImpact)
+        {
+            sequence.InsertCallback(t, () =>
+            {
+                TriggerLandingDust();
+                ScreenShakeController.Instance?.ShakeOnCollision();
+            });
+            float strongSquash = landingSquashAmount * 1.5f;
+            sequence.Insert(t, transform.DOScaleY(1f - strongSquash, landingSquashDuration * 0.3f).SetEase(Ease.OutQuad));
+            sequence.Insert(t + landingSquashDuration * 0.3f, transform.DOScaleY(1f, landingSquashDuration * 0.7f).SetEase(Ease.OutBounce));
+            t += landingSquashDuration;
+        }
+
+        return t - startTime;
+    }
+
+    /// <summary>
+    /// 获取增强移动动画的总时长（用于计算 delay）
+    /// </summary>
+    public float GetEnhancedMoveDuration(bool withAnticipation = true, bool withImpact = true)
+    {
+        float duration = moveDuration;
+        if (withAnticipation) duration += anticipationDuration;
+        if (withImpact) duration += landingSquashDuration;
+        return duration;
+    }
+
+    #endregion
+
+    #region 特效触发方法
+
+    /// <summary>触发开枪火药特效</summary>
+    public void TriggerGunfire()
+    {
+        gunfireEffect?.Play();
+    }
+
+    /// <summary>触发开炮特效</summary>
+    public void TriggerCannon()
+    {
+        cannonEffect?.Play();
+    }
+
+    /// <summary>触发爆炸特效</summary>
+    public void TriggerExplosion()
+    {
+        explosionEffect?.Play();
+    }
+
+    /// <summary>触发落地尘土特效</summary>
+    public void TriggerLandingDust()
+    {
+        landingDustEffect?.Play();
+    }
+
+    /// <summary>触发恢复特效</summary>
+    public void TriggerHeal()
+    {
+        healEffect?.Play();
+    }
+
+    /// <summary>触发冲锋特效</summary>
+    public void TriggerCharge()
+    {
+        chargeEffect?.Play();
+    }
+
+    #endregion
 
     private void OnMouseDown()
     {

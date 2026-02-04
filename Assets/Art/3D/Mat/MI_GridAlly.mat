@@ -42,13 +42,13 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Blend: 1
-    - _DstBlend: 10
-    - _DstBlendAlpha: 10
-    - _SrcBlend: 1
+    - _Blend: 2
+    - _DstBlend: 1
+    - _DstBlendAlpha: 1
+    - _SrcBlend: 5
     - _Surface: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.37421376, g: 0.5369505, b: 1, a: 0.101960786}
-    - _Color: {r: 0.37421376, g: 0.5369505, b: 1, a: 0.101960786}
+    - _BaseColor: {r: 0.37421376, g: 0.5369505, b: 1, a: 0.14901961}
+    - _Color: {r: 0.37421376, g: 0.5369505, b: 1, a: 0.14901961}
   m_BuildTextureStacks: []

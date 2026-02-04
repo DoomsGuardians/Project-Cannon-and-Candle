@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using WarBroker.Battlefield;
 
 /// <summary>
 /// 3D 战场场景控制器
@@ -21,6 +23,11 @@ public class BattlefieldSceneController : MonoBehaviour
     [Header("动画配置")]
     [SerializeField] private float animationDelay = 0.3f;  // 动画间隔
     [SerializeField] private float actionPauseDuration = 0.6f;  // 每组行动后的停顿时间
+
+    [Header("特殊效果配置")]
+    [SerializeField] private float criticalTimeScale = 0.3f;  // 暴击时间减速
+    [SerializeField] private float criticalSlowDuration = 0.2f;  // 暴击减速持续时间
+    [SerializeField] private CanvasGroup screenFlashOverlay;  // 屏幕闪白遮罩（可选）
 
     [Header("相机")]
     [SerializeField] private BattlefieldCameraController battlefieldCamera;
@@ -347,92 +354,21 @@ public class BattlefieldSceneController : MonoBehaviour
             battlefieldCamera.SmoothFollowBattle(allyTransform, enemyTransform);
         }
 
-        Debug.Log($"[BattleAnim] {result.Position}: Ally {result.AllyOldPosition}->{result.AllyNewPosition}, Enemy {result.EnemyOldPosition}->{result.EnemyNewPosition}");
+        Debug.Log($"[BattleAnim] {result.Position}: {result.AllyOrder} vs {result.EnemyOrder}, Ally {result.AllyOldPosition}->{result.AllyNewPosition}, Enemy {result.EnemyOldPosition}->{result.EnemyNewPosition}");
 
         // 等待 Cinemachine 过渡完成后再开始战斗动画
         float cameraDelay = battlefieldCamera != null ? battlefieldCamera.GetBlendDuration() : 0.5f;
-
         float delay = cameraDelay;
 
-        // 1. 移动动画（使用新的位置信息）
-        bool allyMoved = result.AllyOldPosition != result.AllyNewPosition;
-        bool enemyMoved = result.EnemyOldPosition != result.EnemyNewPosition;
+        // 根据指令组合选择不同的动画序列
+        delay = AnimateByOrderCombination(result, allyUnit, enemyUnit, delay);
 
-        if (allyMoved || enemyMoved)
-        {
-            if (allyUnit != null && allyMoved)
-            {
-                // 使用本地坐标，与 UpdateUnitPosition 一致
-                float targetZ = (result.AllyNewPosition - 3) * gridGap;
-                Vector3 newLocalPos = new Vector3(0, 0, targetZ);
-                Debug.Log($"[BattleAnim] Ally moving to localPos: {newLocalPos}, current: {allyUnit.transform.localPosition}");
-                currentSequence.Insert(delay, allyUnit.PlayMoveAnimation(newLocalPos));
-            }
-            if (enemyUnit != null && enemyMoved)
-            {
-                float targetZ = (result.EnemyNewPosition - 3) * gridGap;
-                Vector3 newLocalPos = new Vector3(0, 0, targetZ);
-                Debug.Log($"[BattleAnim] Enemy moving to localPos: {newLocalPos}, current: {enemyUnit.transform.localPosition}");
-                currentSequence.Insert(delay, enemyUnit.PlayMoveAnimation(newLocalPos));
-            }
-            delay += 0.6f;
-        }
+        // 受伤动画（锡兵倒下）
+        delay = AnimateTroopChanges(result, allyUnit, enemyUnit, delay);
 
-        // 2. 受击震动
-        if (allyUnit != null && result.AllyTroopChange < 0)
-        {
-            currentSequence.Insert(delay, allyUnit.PlayHitShake());
-        }
-        if (enemyUnit != null && result.EnemyTroopChange < 0)
-        {
-            currentSequence.Insert(delay, enemyUnit.PlayHitShake());
-        }
-        if (result.AllyTroopChange < 0 || result.EnemyTroopChange < 0)
-        {
-            delay += 0.3f;
-        }
-
-        // 3. 锡兵倒下动画
-        if (allyUnit != null && result.AllyTroopChange < 0)
-        {
-            var fallAnim = allyUnit.PlaySoldierFallAnimation(-result.AllyTroopChange);
-            if (fallAnim != null)
-                currentSequence.Insert(delay, fallAnim);
-        }
-        if (enemyUnit != null && result.EnemyTroopChange < 0)
-        {
-            var fallAnim = enemyUnit.PlaySoldierFallAnimation(-result.EnemyTroopChange);
-            if (fallAnim != null)
-                currentSequence.Insert(delay, fallAnim);
-        }
-        if (result.AllyTroopChange < 0 || result.EnemyTroopChange < 0)
-        {
-            delay += 0.5f;
-        }
-
-        // 4. 锡兵恢复动画（兵力增加时播放弹出效果）
-        if (allyUnit != null && result.AllyTroopChange > 0)
-        {
-            var riseAnim = allyUnit.PlaySoldierRiseAnimation(result.AllyTroopChange);
-            if (riseAnim != null)
-                currentSequence.Insert(delay, riseAnim);
-        }
-        if (enemyUnit != null && result.EnemyTroopChange > 0)
-        {
-            var riseAnim = enemyUnit.PlaySoldierRiseAnimation(result.EnemyTroopChange);
-            if (riseAnim != null)
-                currentSequence.Insert(delay, riseAnim);
-        }
-        if (result.AllyTroopChange > 0 || result.EnemyTroopChange > 0)
-        {
-            delay += 0.5f;
-        }
-
-        // 添加动画间隔
-        currentSequence.AppendInterval(animationDelay);
-
-        // 添加行动后停顿，让玩家看清结果
-        currentSequence.AppendInterval(actionPauseDuration);
+        // 添加动画间隔和行动后停顿 - 使用 Insert 确保在所有动画之后
+        float totalDuration = delay + animationDelay + actionPauseDuration;
+        currentSequence.InsertCallback(totalDuration, () => { }); // 确保序列持续到这个时间点
 
         // 动画完成后播放下一个
         currentSequence.OnComplete(() =>
@@ -448,6 +384,221 @@ public class BattlefieldSceneController : MonoBehaviour
             // 播放下一个动画
             PlayNextAnimation();
         });
+    }
+
+    /// <summary>根据指令组合选择动画</summary>
+    private float AnimateByOrderCombination(BattleResult result, GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, float delay)
+    {
+        // 计算目标位置
+        Vector3 allyTargetLocal = new Vector3(0, 0, (result.AllyNewPosition - 3) * gridGap);
+        Vector3 enemyTargetLocal = new Vector3(0, 0, (result.EnemyNewPosition - 3) * gridGap);
+
+        // 判断是否发生了战斗接触（有伤亡 = 有接触）
+        bool hasContact = result.AllyTroopChange < 0 || result.EnemyTroopChange < 0;
+
+        // 如果没有接触，只播放简单移动动画
+        if (!hasContact)
+        {
+            return AnimateSimpleMove(allyUnit, enemyUnit, allyTargetLocal, enemyTargetLocal, delay, result);
+        }
+
+        // 有接触时，根据指令组合分发到不同的动画方法
+        switch (result.AllyOrder)
+        {
+            case OrderType.ATK:
+                switch (result.EnemyOrder)
+                {
+                    case OrderType.ATK:
+                        return AnimateATKvsATK(allyUnit, enemyUnit, allyTargetLocal, enemyTargetLocal, delay, result);
+                    case OrderType.DEF:
+                        return AnimateATKvsDEF(allyUnit, enemyUnit, allyTargetLocal, enemyTargetLocal, delay, result);
+                    case OrderType.RET:
+                        return AnimateATKvsRET(allyUnit, enemyUnit, allyTargetLocal, enemyTargetLocal, delay, result);
+                }
+                break;
+            case OrderType.DEF:
+                switch (result.EnemyOrder)
+                {
+                    case OrderType.ATK:
+                        return AnimateDEFvsATK(allyUnit, enemyUnit, allyTargetLocal, enemyTargetLocal, delay, result);
+                    case OrderType.DEF:
+                        return AnimateDEFvsDEF(allyUnit, enemyUnit, delay, result);
+                    case OrderType.RET:
+                        return AnimateDEFvsRET(allyUnit, enemyUnit, enemyTargetLocal, delay, result);
+                }
+                break;
+            case OrderType.RET:
+                switch (result.EnemyOrder)
+                {
+                    case OrderType.ATK:
+                        return AnimateRETvsATK(allyUnit, enemyUnit, allyTargetLocal, enemyTargetLocal, delay, result);
+                    case OrderType.DEF:
+                        return AnimateRETvsDEF(allyUnit, enemyUnit, allyTargetLocal, delay, result);
+                    case OrderType.RET:
+                        return AnimateRETvsRET(allyUnit, enemyUnit, allyTargetLocal, enemyTargetLocal, delay, result);
+                }
+                break;
+        }
+
+        // 默认：简单移动
+        return AnimateSimpleMove(allyUnit, enemyUnit, allyTargetLocal, enemyTargetLocal, delay, result);
+    }
+
+    /// <summary>处理兵力变化动画</summary>
+    private float AnimateTroopChanges(BattleResult result, GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, float delay)
+    {
+        // 暴击特效
+        if (result.WasCrit)
+        {
+            delay = PlayCriticalHitEffect(allyUnit, enemyUnit, delay, result);
+        }
+        // 失误特效
+        else if (result.WasFumble)
+        {
+            delay = PlayFumbleEffect(allyUnit, enemyUnit, delay, result);
+        }
+
+        // 锡兵倒下动画
+        float fallDuration = 0f;
+        if (allyUnit != null && result.AllyTroopChange < 0)
+        {
+            float duration = allyUnit.PlaySoldierFallAnimation(-result.AllyTroopChange, currentSequence, delay);
+            fallDuration = Mathf.Max(fallDuration, duration);
+        }
+        if (enemyUnit != null && result.EnemyTroopChange < 0)
+        {
+            float duration = enemyUnit.PlaySoldierFallAnimation(-result.EnemyTroopChange, currentSequence, delay);
+            fallDuration = Mathf.Max(fallDuration, duration);
+        }
+        if (fallDuration > 0)
+        {
+            delay += fallDuration;
+        }
+
+        // 锡兵恢复动画（兵力增加时播放弹出效果）
+        float riseDuration = 0f;
+        if (allyUnit != null && result.AllyTroopChange > 0)
+        {
+            float duration = allyUnit.PlaySoldierRiseAnimation(result.AllyTroopChange, currentSequence, delay);
+            riseDuration = Mathf.Max(riseDuration, duration);
+            currentSequence.InsertCallback(delay, () => allyUnit.TriggerHeal());
+        }
+        if (enemyUnit != null && result.EnemyTroopChange > 0)
+        {
+            float duration = enemyUnit.PlaySoldierRiseAnimation(result.EnemyTroopChange, currentSequence, delay);
+            riseDuration = Mathf.Max(riseDuration, duration);
+            currentSequence.InsertCallback(delay, () => enemyUnit.TriggerHeal());
+        }
+        if (riseDuration > 0)
+        {
+            delay += riseDuration;
+        }
+
+        return delay;
+    }
+
+    /// <summary>播放暴击特效：时间减速 + 屏幕闪白 + 强震动</summary>
+    private float PlayCriticalHitEffect(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, float delay, BattleResult result)
+    {
+        // 确定攻击方和受击方
+        bool allyIsAttacker = result.AllyOrder == OrderType.ATK;
+        GeneralUnit3D attacker = allyIsAttacker ? allyUnit : enemyUnit;
+        GeneralUnit3D victim = allyIsAttacker ? enemyUnit : allyUnit;
+
+        // 1. 时间减速效果
+        currentSequence.InsertCallback(delay, () =>
+        {
+            StartCoroutine(CriticalTimeSlowCoroutine());
+        });
+
+        // 2. 屏幕闪白
+        if (screenFlashOverlay != null)
+        {
+            currentSequence.Insert(delay, screenFlashOverlay.DOFade(0.6f, 0.05f));
+            currentSequence.Insert(delay + 0.05f, screenFlashOverlay.DOFade(0f, 0.15f));
+        }
+
+        // 3. 屏幕震动
+        currentSequence.InsertCallback(delay, () =>
+        {
+            ScreenShakeController.Instance?.ShakeOnCollision();
+        });
+
+        // 4. 受击方剧烈震动
+        if (victim != null)
+        {
+            currentSequence.Insert(delay, victim.transform.DOShakePosition(0.3f, 0.4f, 20));
+            currentSequence.Insert(delay, victim.transform.DOShakeRotation(0.3f, new Vector3(10f, 5f, 10f), 15));
+        }
+
+        // 5. 攻击方爆炸特效
+        if (attacker != null)
+        {
+            currentSequence.InsertCallback(delay, () =>
+            {
+                attacker.TriggerCannon();
+                attacker.TriggerExplosion();
+            });
+        }
+
+        delay += 0.35f;
+        return delay;
+    }
+
+    /// <summary>播放失误特效：绊倒动画 + 尴尬停顿</summary>
+    private float PlayFumbleEffect(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, float delay, BattleResult result)
+    {
+        // 确定失误方（攻击方失误）
+        bool allyIsAttacker = result.AllyOrder == OrderType.ATK;
+        GeneralUnit3D fumbler = allyIsAttacker ? allyUnit : enemyUnit;
+
+        if (fumbler != null)
+        {
+            // 直接插入绊倒动画，避免嵌套 Sequence
+            // 向前倾斜
+            currentSequence.Insert(delay, fumbler.transform
+                .DORotate(new Vector3(25f, 0f, Random.Range(-10f, 10f)), 0.15f)
+                .SetEase(Ease.OutQuad));
+            delay += 0.15f;
+
+            // 尴尬停顿
+            delay += 0.2f;
+
+            // 恢复
+            currentSequence.Insert(delay, fumbler.transform
+                .DORotate(Vector3.zero, 0.25f)
+                .SetEase(Ease.OutBack));
+            delay += 0.25f;
+        }
+
+        return delay;
+    }
+
+    /// <summary>暴击时间减速协程</summary>
+    private System.Collections.IEnumerator CriticalTimeSlowCoroutine()
+    {
+        float originalTimeScale = Time.timeScale;
+        Time.timeScale = criticalTimeScale;
+
+        // 使用真实时间等待
+        float elapsed = 0f;
+        while (elapsed < criticalSlowDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        // 平滑恢复时间
+        float recoverDuration = 0.1f;
+        float recoverElapsed = 0f;
+        while (recoverElapsed < recoverDuration)
+        {
+            recoverElapsed += Time.unscaledDeltaTime;
+            Time.timeScale = Mathf.Lerp(criticalTimeScale, originalTimeScale, recoverElapsed / recoverDuration);
+            yield return null;
+        }
+
+        Time.timeScale = originalTimeScale;
     }
 
     /// <summary>检查溃败并播放溃败动画</summary>
@@ -507,6 +658,448 @@ public class BattlefieldSceneController : MonoBehaviour
             unit.ResetSoldiers(general.Troops);
             unit.Show();
         }
+    }
+
+    #endregion
+
+    #region 指令组合动画
+
+    /// <summary>ATK vs ATK - 遭遇战：双方冲向中间猛烈撞击，弹飞后落地</summary>
+    private float AnimateATKvsATK(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 allyTarget, Vector3 enemyTarget, float delay, BattleResult result)
+    {
+        if (allyUnit == null || enemyUnit == null) return AnimateSimpleMove(allyUnit, enemyUnit, allyTarget, enemyTarget, delay, result);
+
+        Vector3 allyStart = allyUnit.transform.localPosition;
+        Vector3 enemyStart = enemyUnit.transform.localPosition;
+        Vector3 collisionPoint = (allyStart + enemyStart) / 2f;
+
+        // 1. 蓄力：向后微退 + 压缩
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMove(allyStart + Vector3.back * 0.4f, 0.15f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(enemyStart + Vector3.forward * 0.4f, 0.15f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(0.8f, 0.15f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(0.8f, 0.15f).SetEase(Ease.OutQuad));
+        delay += 0.15f;
+
+        // 2. 猛烈冲锋：极快速度冲向中点
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMove(collisionPoint + Vector3.back * 0.3f, 0.12f).SetEase(Ease.InQuart));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(collisionPoint + Vector3.forward * 0.3f, 0.12f).SetEase(Ease.InQuart));
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(1f, 0.08f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(1f, 0.08f).SetEase(Ease.OutQuad));
+        currentSequence.InsertCallback(delay + 0.05f, () => { allyUnit.TriggerCharge(); enemyUnit.TriggerCharge(); });
+        delay += 0.12f;
+
+        // 3. 碰撞瞬间：震动 + 特效
+        currentSequence.InsertCallback(delay, () =>
+        {
+            ScreenShakeController.Instance?.ShakeOnCollision();
+            allyUnit.TriggerGunfire();
+            enemyUnit.TriggerGunfire();
+            allyUnit.TriggerExplosion();
+        });
+        delay += 0.02f;
+
+        // 4. 弹飞抛物线：快速上升到最高点（减速）
+        float flyHeight = 2.5f;
+        float riseTime = 0.2f;
+        float hangTime = 0.08f; // 最高点停顿
+        float fallTime = 0.18f;
+
+        // 水平方向快速弹开
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveX(allyStart.x, riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveZ(allyStart.z, riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveX(enemyStart.x, riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveZ(enemyStart.z, riseTime).SetEase(Ease.OutQuad));
+
+        // 垂直方向：快速上升减速到最高点
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveY(flyHeight, riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveY(flyHeight, riseTime).SetEase(Ease.OutQuad));
+
+        // 空中旋转
+        currentSequence.Insert(delay, allyUnit.transform.DORotate(new Vector3(-25f, 0, Random.Range(-15f, 15f)), riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DORotate(new Vector3(-25f, 180f, Random.Range(-15f, 15f)), riseTime).SetEase(Ease.OutQuad));
+        delay += riseTime;
+
+        // 5. 最高点停顿
+        delay += hangTime;
+
+        // 6. 重力加速下落
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveY(0f, fallTime).SetEase(Ease.InQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveY(0f, fallTime).SetEase(Ease.InQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DORotate(Vector3.zero, fallTime * 0.8f).SetEase(Ease.InQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DORotate(new Vector3(0, 180f, 0), fallTime * 0.8f).SetEase(Ease.InQuad));
+        delay += fallTime;
+
+        // 7. 落地冲击
+        currentSequence.InsertCallback(delay, () =>
+        {
+            ScreenShakeController.Instance?.ShakeOnCollision();
+            allyUnit.TriggerLandingDust();
+            enemyUnit.TriggerLandingDust();
+        });
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(0.7f, 0.06f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(0.7f, 0.06f).SetEase(Ease.OutQuad));
+        delay += 0.06f;
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(1f, 0.18f).SetEase(Ease.OutBounce));
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(1f, 0.18f).SetEase(Ease.OutBounce));
+        delay += 0.18f;
+
+        return delay;
+    }
+
+    /// <summary>ATK vs DEF - 攻城战：进攻方猛烈撞击防守方，ATK弹飞，DEF被击退后回位</summary>
+    private float AnimateATKvsDEF(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 allyTarget, Vector3 enemyTarget, float delay, BattleResult result)
+    {
+        if (allyUnit == null || enemyUnit == null) return AnimateSimpleMove(allyUnit, enemyUnit, allyTarget, enemyTarget, delay, result);
+
+        Vector3 allyStart = allyUnit.transform.localPosition;
+        Vector3 enemyStart = enemyUnit.transform.localPosition;
+        Vector3 collisionPoint = enemyStart + Vector3.back * 0.5f;
+
+        // 1. DEF准备防御姿态
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(0.85f, 0.12f).SetEase(Ease.OutQuad));
+
+        // ATK蓄力
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMove(allyStart + Vector3.back * 0.4f, 0.12f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(0.8f, 0.12f).SetEase(Ease.OutQuad));
+        delay += 0.12f;
+
+        // 2. ATK猛烈冲锋
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMove(collisionPoint, 0.1f).SetEase(Ease.InQuart));
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(1f, 0.06f).SetEase(Ease.OutQuad));
+        currentSequence.InsertCallback(delay + 0.04f, () => allyUnit.TriggerCharge());
+        delay += 0.1f;
+
+        // 3. 碰撞瞬间
+        currentSequence.InsertCallback(delay, () =>
+        {
+            ScreenShakeController.Instance?.ShakeOnCollision();
+            allyUnit.TriggerGunfire();
+            enemyUnit.TriggerGunfire();
+            allyUnit.TriggerExplosion();
+        });
+        delay += 0.02f;
+
+        // 4. DEF被击退 + ATK弹飞抛物线
+        float flyHeight = 2.2f;
+        float knockbackDist = 1.8f;
+        float riseTime = 0.18f;
+        float hangTime = 0.06f;
+        float fallTime = 0.15f;
+
+        // ATK水平弹回
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveX(allyStart.x, riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveZ(allyStart.z, riseTime).SetEase(Ease.OutQuad));
+
+        // ATK垂直上升（减速到最高点）
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveY(flyHeight, riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DORotate(new Vector3(-30f, 0, Random.Range(-20f, 20f)), riseTime).SetEase(Ease.OutQuad));
+
+        // DEF被击退
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveZ(enemyStart.z + knockbackDist, 0.12f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(0.9f, 0.08f).SetEase(Ease.OutQuad));
+        delay += riseTime;
+
+        // 5. 最高点停顿
+        delay += hangTime;
+
+        // 6. ATK重力加速下落 + DEF回位
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveY(0f, fallTime).SetEase(Ease.InQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DORotate(Vector3.zero, fallTime * 0.8f).SetEase(Ease.InQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(enemyStart, 0.2f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(1f, 0.15f).SetEase(Ease.OutBack));
+        delay += fallTime;
+
+        // 7. ATK落地冲击
+        currentSequence.InsertCallback(delay, () =>
+        {
+            ScreenShakeController.Instance?.ShakeOnCollision();
+            allyUnit.TriggerLandingDust();
+        });
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(0.7f, 0.06f).SetEase(Ease.OutQuad));
+        delay += 0.06f;
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(1f, 0.18f).SetEase(Ease.OutBounce));
+        delay += 0.18f;
+
+        return delay;
+    }
+
+    /// <summary>ATK vs RET - 追击战：进攻方追击撤退方</summary>
+    private float AnimateATKvsRET(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 allyTarget, Vector3 enemyTarget, float delay, BattleResult result)
+    {
+        if (allyUnit == null || enemyUnit == null) return AnimateSimpleMove(allyUnit, enemyUnit, allyTarget, enemyTarget, delay, result);
+
+        // 1. 撤退方转身
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.15f).SetEase(Ease.OutQuad));
+        delay += 0.15f;
+
+        // 2. 追击：ATK追击，RET逃跑
+        float moveDuration = allyUnit.InsertEnhancedMoveAnimation(currentSequence, delay, allyTarget, true, false, 0.1f);
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(enemyTarget, 0.45f).SetEase(Ease.InQuad));
+        currentSequence.InsertCallback(delay + 0.1f, () => allyUnit.TriggerCharge());
+        delay += Mathf.Max(moveDuration, 0.5f);
+
+        // 3. 撤退方转回
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.15f).SetEase(Ease.OutQuad));
+
+        // 4. ATK胜利姿态：轻微跳跃
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveY(0.3f, 0.12f).SetEase(Ease.OutQuad));
+        delay += 0.12f;
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveY(0f, 0.12f).SetEase(Ease.InQuad));
+        delay += 0.12f;
+        currentSequence.InsertCallback(delay, () => ScreenShakeController.Instance?.ShakeOnLanding());
+        delay += 0.1f;
+
+        return delay;
+    }
+
+    /// <summary>DEF vs ATK - 防守反击：敌方猛烈撞击，敌方弹飞，己方被击退后回位</summary>
+    private float AnimateDEFvsATK(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 allyTarget, Vector3 enemyTarget, float delay, BattleResult result)
+    {
+        if (allyUnit == null || enemyUnit == null) return AnimateSimpleMove(allyUnit, enemyUnit, allyTarget, enemyTarget, delay, result);
+
+        Vector3 allyStart = allyUnit.transform.localPosition;
+        Vector3 enemyStart = enemyUnit.transform.localPosition;
+        Vector3 collisionPoint = allyStart + Vector3.forward * 0.5f;
+
+        // 1. 己方准备防御姿态
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(0.85f, 0.12f).SetEase(Ease.OutQuad));
+
+        // 敌方蓄力
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(enemyStart + Vector3.forward * 0.4f, 0.12f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(0.8f, 0.12f).SetEase(Ease.OutQuad));
+        delay += 0.12f;
+
+        // 2. 敌方猛烈冲锋
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(collisionPoint, 0.1f).SetEase(Ease.InQuart));
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(1f, 0.06f).SetEase(Ease.OutQuad));
+        currentSequence.InsertCallback(delay + 0.04f, () => enemyUnit.TriggerCharge());
+        delay += 0.1f;
+
+        // 3. 碰撞瞬间
+        currentSequence.InsertCallback(delay, () =>
+        {
+            ScreenShakeController.Instance?.ShakeOnCollision();
+            allyUnit.TriggerGunfire();
+            enemyUnit.TriggerGunfire();
+            enemyUnit.TriggerExplosion();
+        });
+        delay += 0.02f;
+
+        // 4. 己方被击退 + 敌方弹飞抛物线
+        float flyHeight = 2.2f;
+        float knockbackDist = 1.8f;
+        float riseTime = 0.18f;
+        float hangTime = 0.06f;
+        float fallTime = 0.15f;
+
+        // 敌方水平弹回
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveX(enemyStart.x, riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveZ(enemyStart.z, riseTime).SetEase(Ease.OutQuad));
+
+        // 敌方垂直上升（减速到最高点）
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveY(flyHeight, riseTime).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DORotate(new Vector3(-30f, 180f, Random.Range(-20f, 20f)), riseTime).SetEase(Ease.OutQuad));
+
+        // 己方被击退
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveZ(allyStart.z - knockbackDist, 0.12f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(0.9f, 0.08f).SetEase(Ease.OutQuad));
+        delay += riseTime;
+
+        // 5. 最高点停顿
+        delay += hangTime;
+
+        // 6. 敌方重力加速下落 + 己方回位
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveY(0f, fallTime).SetEase(Ease.InQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DORotate(new Vector3(0, 180f, 0), fallTime * 0.8f).SetEase(Ease.InQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMove(allyStart, 0.2f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DOScaleY(1f, 0.15f).SetEase(Ease.OutBack));
+        delay += fallTime;
+
+        // 7. 敌方落地冲击
+        currentSequence.InsertCallback(delay, () =>
+        {
+            ScreenShakeController.Instance?.ShakeOnCollision();
+            enemyUnit.TriggerLandingDust();
+        });
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(0.7f, 0.06f).SetEase(Ease.OutQuad));
+        delay += 0.06f;
+        currentSequence.Insert(delay, enemyUnit.transform.DOScaleY(1f, 0.18f).SetEase(Ease.OutBounce));
+        delay += 0.18f;
+
+        return delay;
+    }
+
+    /// <summary>DEF vs DEF - 对峙：双方原地摇摆，无接触</summary>
+    private float AnimateDEFvsDEF(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, float delay, BattleResult result)
+    {
+        if (allyUnit == null || enemyUnit == null) return delay;
+
+        Vector3 allyStart = allyUnit.transform.localPosition;
+        Vector3 enemyStart = enemyUnit.transform.localPosition;
+
+        // 对峙摇摆动画
+        float swayDuration = 0.15f;
+        float swayDistance = 0.12f;
+
+        for (int i = 0; i < 3; i++)
+        {
+            float t = delay + i * swayDuration * 2;
+            currentSequence.Insert(t, allyUnit.transform.DOLocalMoveZ(allyStart.z + swayDistance, swayDuration).SetEase(Ease.InOutSine));
+            currentSequence.Insert(t, enemyUnit.transform.DOLocalMoveZ(enemyStart.z - swayDistance, swayDuration).SetEase(Ease.InOutSine));
+            currentSequence.Insert(t + swayDuration, allyUnit.transform.DOLocalMoveZ(allyStart.z - swayDistance * 0.5f, swayDuration).SetEase(Ease.InOutSine));
+            currentSequence.Insert(t + swayDuration, enemyUnit.transform.DOLocalMoveZ(enemyStart.z + swayDistance * 0.5f, swayDuration).SetEase(Ease.InOutSine));
+        }
+        delay += swayDuration * 6;
+
+        // 回到原位
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMove(allyStart, swayDuration).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(enemyStart, swayDuration).SetEase(Ease.OutQuad));
+        delay += swayDuration + 0.1f;
+
+        return delay;
+    }
+
+    /// <summary>DEF vs RET - 安全撤退：DEF警戒，RET有序后撤</summary>
+    private float AnimateDEFvsRET(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 enemyTarget, float delay, BattleResult result)
+    {
+        if (enemyUnit == null) return delay;
+
+        Vector3 allyStart = allyUnit?.transform.localPosition ?? Vector3.zero;
+
+        // 1. DEF保持警戒：小幅前后移动
+        if (allyUnit != null)
+        {
+            currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveZ(allyStart.z + 0.15f, 0.2f).SetEase(Ease.OutQuad));
+            currentSequence.Insert(delay + 0.2f, allyUnit.transform.DOLocalMoveZ(allyStart.z, 0.2f).SetEase(Ease.InOutQuad));
+        }
+
+        // 2. RET有序撤退
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.1f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay + 0.1f, enemyUnit.transform.DOLocalMove(enemyTarget, 0.45f).SetEase(Ease.InOutQuad));
+        currentSequence.Insert(delay + 0.55f, enemyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.1f).SetEase(Ease.OutQuad));
+
+        // 触发恢复特效
+        currentSequence.InsertCallback(delay + 0.3f, () => enemyUnit.TriggerHeal());
+
+        delay += 0.7f;
+        return delay;
+    }
+
+    /// <summary>RET vs ATK - 被追击：己方狼狈撤退</summary>
+    private float AnimateRETvsATK(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 allyTarget, Vector3 enemyTarget, float delay, BattleResult result)
+    {
+        if (allyUnit == null || enemyUnit == null) return AnimateSimpleMove(allyUnit, enemyUnit, allyTarget, enemyTarget, delay, result);
+
+        // 1. 己方转身准备撤退
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.1f).SetEase(Ease.OutQuad));
+        delay += 0.1f;
+
+        // 2. 敌方追击，己方狼狈逃跑
+        float moveDuration = enemyUnit.InsertEnhancedMoveAnimation(currentSequence, delay, enemyTarget, true, false, 0.1f);
+        currentSequence.InsertCallback(delay + 0.1f, () => enemyUnit.TriggerCharge());
+
+        // 己方带摇晃的撤退
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalMove(allyTarget, 0.4f).SetEase(Ease.InQuad));
+        currentSequence.Insert(delay, allyUnit.transform.DOShakeRotation(0.4f, new Vector3(0, 8f, 5f), 5));
+        delay += Mathf.Max(moveDuration, 0.45f);
+
+        // 3. 己方转回
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.15f).SetEase(Ease.OutQuad));
+
+        // 4. 敌方胜利姿态
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveY(0.3f, 0.12f).SetEase(Ease.OutQuad));
+        delay += 0.12f;
+        currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveY(0f, 0.12f).SetEase(Ease.InQuad));
+        delay += 0.12f;
+        currentSequence.InsertCallback(delay, () => ScreenShakeController.Instance?.ShakeOnLanding());
+        delay += 0.1f;
+
+        return delay;
+    }
+
+    /// <summary>RET vs DEF - 从容撤退：己方平稳后撤</summary>
+    private float AnimateRETvsDEF(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 allyTarget, float delay, BattleResult result)
+    {
+        if (allyUnit == null) return delay;
+
+        Vector3 enemyStart = enemyUnit?.transform.localPosition ?? Vector3.zero;
+
+        // 1. 己方转身撤退
+        currentSequence.Insert(delay, allyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.12f).SetEase(Ease.OutQuad));
+        currentSequence.Insert(delay + 0.12f, allyUnit.transform.DOLocalMove(allyTarget, 0.4f).SetEase(Ease.InOutQuad));
+
+        // 2. 敌方原地观望
+        if (enemyUnit != null)
+        {
+            currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveZ(enemyStart.z - 0.1f, 0.25f).SetEase(Ease.OutQuad));
+            currentSequence.Insert(delay + 0.25f, enemyUnit.transform.DOLocalMoveZ(enemyStart.z, 0.25f).SetEase(Ease.InOutQuad));
+        }
+
+        // 3. 己方转回 + 恢复特效
+        currentSequence.Insert(delay + 0.52f, allyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.12f).SetEase(Ease.OutQuad));
+        currentSequence.InsertCallback(delay + 0.3f, () => allyUnit.TriggerHeal());
+
+        delay += 0.7f;
+        return delay;
+    }
+
+    /// <summary>RET vs RET - 双方脱离：同时后撤</summary>
+    private float AnimateRETvsRET(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 allyTarget, Vector3 enemyTarget, float delay, BattleResult result)
+    {
+        // 1. 双方同时转身
+        if (allyUnit != null)
+            currentSequence.Insert(delay, allyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.12f).SetEase(Ease.OutQuad));
+        if (enemyUnit != null)
+            currentSequence.Insert(delay, enemyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.12f).SetEase(Ease.OutQuad));
+        delay += 0.12f;
+
+        // 2. 双方同时后撤
+        if (allyUnit != null)
+            currentSequence.Insert(delay, allyUnit.transform.DOLocalMove(allyTarget, 0.45f).SetEase(Ease.InOutQuad));
+        if (enemyUnit != null)
+            currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(enemyTarget, 0.45f).SetEase(Ease.InOutQuad));
+
+        // 触发恢复特效
+        currentSequence.InsertCallback(delay + 0.2f, () =>
+        {
+            allyUnit?.TriggerHeal();
+            enemyUnit?.TriggerHeal();
+        });
+        delay += 0.45f;
+
+        // 3. 双方转回
+        if (allyUnit != null)
+            currentSequence.Insert(delay, allyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.12f).SetEase(Ease.OutQuad));
+        if (enemyUnit != null)
+            currentSequence.Insert(delay, enemyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.12f).SetEase(Ease.OutQuad));
+        delay += 0.15f;
+
+        return delay;
+    }
+
+    /// <summary>简单移动动画（无战斗接触时使用）</summary>
+    private float AnimateSimpleMove(GeneralUnit3D allyUnit, GeneralUnit3D enemyUnit, Vector3 allyTarget, Vector3 enemyTarget, float delay, BattleResult result)
+    {
+        bool allyMoved = result.AllyOldPosition != result.AllyNewPosition;
+        bool enemyMoved = result.EnemyOldPosition != result.EnemyNewPosition;
+
+        if (allyMoved || enemyMoved)
+        {
+            float maxDuration = 0f;
+            if (allyUnit != null && allyMoved)
+            {
+                float duration = allyUnit.InsertEnhancedMoveAnimation(currentSequence, delay, allyTarget, true, true);
+                maxDuration = Mathf.Max(maxDuration, duration);
+            }
+            if (enemyUnit != null && enemyMoved)
+            {
+                float duration = enemyUnit.InsertEnhancedMoveAnimation(currentSequence, delay, enemyTarget, true, true);
+                maxDuration = Mathf.Max(maxDuration, duration);
+            }
+            delay += maxDuration > 0 ? maxDuration : 0.8f;
+        }
+
+        return delay;
     }
 
     #endregion

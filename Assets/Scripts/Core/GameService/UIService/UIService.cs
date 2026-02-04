@@ -15,6 +15,20 @@ public class UIService : ILogic
     private Dictionary<string, WindowBase> windowDic = new Dictionary<string, WindowBase>();
     private List<WindowBase> windowList = new List<WindowBase>();
 
+    // Popup队列系统
+    private Queue<QueuedPopupRequest> popupQueue = new Queue<QueuedPopupRequest>();
+    private WindowBase currentQueuedPopup = null;
+    private bool isProcessingQueue = false;
+
+    /// <summary>
+    /// 队列中的Popup请求
+    /// </summary>
+    private class QueuedPopupRequest
+    {
+        public string WindowName;
+        public Action<WindowBase> OnShowCallback;
+    }
+
     // 新增管理器
     private UILayerManager layerManager;
     private UIOrderManager orderManager;
@@ -180,6 +194,13 @@ public class UIService : ILogic
 
             window.OnHide();
             window.SetVisible(false);
+
+            // 检查是否是队列中的Popup，如果是则处理下一个
+            if (currentQueuedPopup != null && currentQueuedPopup.Name == name)
+            {
+                currentQueuedPopup = null;
+                ProcessNextQueuedPopup();
+            }
         }
     }
 
@@ -201,6 +222,14 @@ public class UIService : ILogic
 
                 window.OnHide();
                 window.SetVisible(false);
+
+                // 检查是否是队列中的Popup，如果是则处理下一个
+                if (currentQueuedPopup != null && currentQueuedPopup.Name == name)
+                {
+                    currentQueuedPopup = null;
+                    ProcessNextQueuedPopup();
+                }
+
                 onComplete?.Invoke();
             });
         }
@@ -382,7 +411,118 @@ public class UIService : ILogic
         // 清理管理器状态
         occlusionManager?.Clear();
         orderManager?.ResetAll();
+
+        // 清理Popup队列
+        ClearPopupQueue();
     }
+
+    #endregion
+
+    #region Popup队列系统
+
+    /// <summary>
+    /// 将Popup加入队列显示
+    /// 如果当前没有队列中的Popup正在显示，则立即显示
+    /// 否则等待当前Popup关闭后再显示
+    /// </summary>
+    /// <typeparam name="T">窗口类型</typeparam>
+    /// <param name="name">窗口名称</param>
+    /// <param name="onShowCallback">窗口显示后的回调，用于设置数据</param>
+    public void ShowPopupQueued<T>(string name, Action<T> onShowCallback = null) where T : WindowBase
+    {
+        var request = new QueuedPopupRequest
+        {
+            WindowName = name,
+            OnShowCallback = onShowCallback != null ? (w) => onShowCallback(w as T) : null
+        };
+
+        popupQueue.Enqueue(request);
+        Debug.Log($"[UIService] Popup入队: {name}, 队列长度: {popupQueue.Count}");
+
+        // 如果当前没有正在处理的队列Popup，开始处理
+        if (!isProcessingQueue)
+        {
+            ProcessNextQueuedPopup();
+        }
+    }
+
+    /// <summary>
+    /// 处理队列中的下一个Popup
+    /// </summary>
+    private void ProcessNextQueuedPopup()
+    {
+        if (popupQueue.Count == 0)
+        {
+            isProcessingQueue = false;
+            currentQueuedPopup = null;
+            Debug.Log("[UIService] Popup队列已清空");
+            return;
+        }
+
+        isProcessingQueue = true;
+        var request = popupQueue.Dequeue();
+
+        if (windowDic.TryGetValue(request.WindowName, out var window))
+        {
+            currentQueuedPopup = window;
+
+            window.SetVisible(true);
+            window.OnShow();
+
+            // 处理全屏窗口覆盖
+            if (window.IsFullScreen && occlusionManager != null)
+            {
+                var visibleWindows = GetVisibleWindows();
+                occlusionManager.OnFullScreenWindowOpened(window, visibleWindows);
+            }
+
+            // 调用回调设置数据
+            request.OnShowCallback?.Invoke(window);
+
+            Debug.Log($"[UIService] 显示队列Popup: {request.WindowName}, 剩余队列: {popupQueue.Count}");
+        }
+        else
+        {
+            Debug.LogWarning($"[UIService] 队列Popup未找到: {request.WindowName}");
+            // 继续处理下一个
+            ProcessNextQueuedPopup();
+        }
+    }
+
+    /// <summary>
+    /// 通知队列系统当前Popup已关闭
+    /// 在Popup的HideWindow调用后自动检测，或手动调用
+    /// </summary>
+    public void OnQueuedPopupClosed(string name)
+    {
+        if (currentQueuedPopup != null && currentQueuedPopup.Name == name)
+        {
+            Debug.Log($"[UIService] 队列Popup已关闭: {name}");
+            currentQueuedPopup = null;
+            ProcessNextQueuedPopup();
+        }
+    }
+
+    /// <summary>
+    /// 清空Popup队列
+    /// </summary>
+    public void ClearPopupQueue()
+    {
+        popupQueue.Clear();
+        currentQueuedPopup = null;
+        isProcessingQueue = false;
+        Debug.Log("[UIService] Popup队列已清空");
+    }
+
+    /// <summary>
+    /// 获取当前队列中的Popup数量
+    /// </summary>
+    public int QueuedPopupCount => popupQueue.Count;
+
+    /// <summary>
+    /// 是否有队列Popup正在显示
+    /// </summary>
+    public bool HasQueuedPopupShowing => currentQueuedPopup != null && currentQueuedPopup.isVisible;
 
     #endregion
 }

@@ -213,6 +213,18 @@ public class CampaignSystem : ILogic
     /// </summary>
     private void ExecuteBattleResolution()
     {
+        // Step 0: 先处理复活（在战斗结算前）
+        // 这样复活的部队可以参与本回合的战斗防守
+        var respawnedGenerals = battleSystem.ProcessRespawns();
+        if (respawnedGenerals.Count > 0)
+        {
+            Debug.Log($"[CampaignSystem] 本回合复活了 {respawnedGenerals.Count} 名将军");
+            foreach (var (general, isAlly) in respawnedGenerals)
+            {
+                Debug.Log($"[CampaignSystem] 复活: {general.GeneralId} ({(isAlly ? "我方" : "敌方")}) 在格子 {general.GridPosition}");
+            }
+        }
+
         // 战斗结算（包含抗命检查、战术揭示、伤害计算、战线移动）
         var victorOrders = new Dictionary<string, OrderType>();
         foreach (var enemy in Data.Battle.EnemyGenerals)
