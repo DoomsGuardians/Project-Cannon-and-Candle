@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ca90665134a8b4409e5af7895939db4, type: 3}
+  m_Name: SoldierTypeConfig
+  m_EditorClassIdentifier: 
+  soldierTypes:
+  - type: 0
+    displayName: Pikeman_Ger_F
+    prefab: {fileID: 4606680377294528649, guid: 25344c8623056f3459d26008fb9785bd, type: 3}
+  - type: 0
+    displayName: Pikeman_Ger
+    prefab: {fileID: 2993756352788163436, guid: 6a46e77b73b6af845b449f949df7dd25, type: 3}
+  - type: 1
+    displayName: Musketeer_Ger
+    prefab: {fileID: 4606680377294528649, guid: 612f7093ff0a17346aaf211c6d988a37, type: 3}

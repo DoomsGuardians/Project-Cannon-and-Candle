@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2424490653193733119}
   - component: {fileID: 5523773463056799641}
   - component: {fileID: 4664038046438055927}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Particles Small
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4850,7 +4850,7 @@ GameObject:
   - component: {fileID: 1330407285396604431}
   - component: {fileID: 5815789030879992457}
   - component: {fileID: 5518207109400388546}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Particles 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9747,7 +9747,7 @@ GameObject:
   - component: {fileID: 6127267668588963535}
   - component: {fileID: 5732882422810804133}
   - component: {fileID: 7512609722341238820}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Smoke Longer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14635,7 +14635,7 @@ GameObject:
   - component: {fileID: 718958670948792882}
   - component: {fileID: 157988271969427331}
   - component: {fileID: 6215879691714005557}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Smoke Shockwave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19523,7 +19523,7 @@ GameObject:
   - component: {fileID: 7850710462640976089}
   - component: {fileID: 162131370555628223}
   - component: {fileID: 3059067245527760476}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Explosion 11 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24411,7 +24411,7 @@ GameObject:
   - component: {fileID: 2269181182567825354}
   - component: {fileID: 8434669379060665359}
   - component: {fileID: 8775328247189258384}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Smoke Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29299,7 +29299,7 @@ GameObject:
   - component: {fileID: 931511103777488416}
   - component: {fileID: 8618373178610198444}
   - component: {fileID: 826771666402048770}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Debris
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34188,7 +34188,7 @@ GameObject:
   - component: {fileID: 729556077879752060}
   - component: {fileID: 1082246667713068589}
   - component: {fileID: 5310555662368438882}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39076,7 +39076,7 @@ GameObject:
   - component: {fileID: 6743030948866749560}
   - component: {fileID: 8449419384691094926}
   - component: {fileID: 3121384687940881139}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43974,7 +43974,7 @@ GameObject:
   - component: {fileID: 4025695463972120563}
   - component: {fileID: 5277817160023688011}
   - component: {fileID: 3607667905794273622}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48862,7 +48862,7 @@ GameObject:
   - component: {fileID: 7793094725662865755}
   - component: {fileID: 2347282473433341589}
   - component: {fileID: 8760596995055028933}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Smoke Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53692,7 +53692,7 @@ GameObject:
   - component: {fileID: 6542331751891903567}
   - component: {fileID: 7036004582157597230}
   - component: {fileID: 2274082545863004516}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Explosion 11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58580,7 +58580,7 @@ GameObject:
   - component: {fileID: 6671405630517425712}
   - component: {fileID: 3388981742098327537}
   - component: {fileID: 2894541203231273824}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: 'Bubble Distorsion '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63480,7 +63480,7 @@ GameObject:
   - component: {fileID: 4127647502567907294}
   - component: {fileID: 3702968077628198755}
   - component: {fileID: 782584850468850220}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Explosion 11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68322,7 +68322,7 @@ GameObject:
   - component: {fileID: 7491508817664437626}
   - component: {fileID: 8735543234253155142}
   - component: {fileID: 4282021463770829439}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Explosion Heat Distortion Burst
   m_TagString: Untagged
   m_Icon: {fileID: 0}

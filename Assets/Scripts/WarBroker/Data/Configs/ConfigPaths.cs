@@ -12,5 +12,5 @@ public static class ConfigPaths
     public const string MUSIC_CONFIG = "Config/WarBroker/MusicConfig";
     public const string SPECTATOR_MODE = "Config/WarBroker/SpectatorModeConfig";
     public const string SOLDIER_TYPE = "Config/WarBroker/SoldierTypeConfig";
-    public const string BATTLEFIELD = "Config/WarBroker/BattlefieldConfig";
+    public const string CAMPAIGN_LIST = "Config/WarBroker/CampaignListConfig";
 }

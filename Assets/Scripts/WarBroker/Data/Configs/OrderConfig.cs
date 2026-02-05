@@ -9,6 +9,9 @@ public class OrderConfigItem
 {
     public OrderType OrderType;
 
+    [Tooltip("指令图标")]
+    public Sprite Icon;
+
     [Tooltip("基础价格")]
     public float BasePrice;
 
@@ -40,4 +43,6 @@ public class OrderConfig : ScriptableObject
         }
         return null;
     }
+
+    public OrderConfigItem GetOrder(OrderType type) => GetConfig(type);
 }

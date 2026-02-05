@@ -15,12 +15,17 @@ MonoBehaviour:
   CampaignId: Campaign_Tutorial
   CampaignName: "\u6559\u7A0B\u6218\u5F79\uFF1A\u6ED1\u94C1\u5362"
   Description: "\u521D\u59CB\u6218\u5F79\uFF0C\u5B66\u4E60\u5E02\u573A\u4EA4\u6613\u3001\u6307\u4EE4\u5206\u914D\u4E0E\u6218\u573A\u7BA1\u7406\u7684\u57FA\u672C\u64CD\u4F5C\u3002"
+  Thumbnail: {fileID: 0}
+  TicketPrice: 0
   MaxTurns: 20
   InitialCash: 500
   InitialAtkInventory: 2
   InitialDefInventory: 2
   InitialRetInventory: 2
   InitialReserves: 60
+  BattlefieldSceneName: Battle_tutorial
+  LaneCount: 3
+  GridCount: 5
   InitialFrontlinePosition: 3
   GeneralConfig: {fileID: 11400000, guid: 976ca2edd99e01b4c89f75361caeef09, type: 2}
   AllyFrontlineAssignments:

@@ -44,8 +44,8 @@ public class BattlefieldSceneController : MonoBehaviour
     [Header("相机")]
     [SerializeField] private BattlefieldCameraController battlefieldCamera;
 
-    // 战场根节点引用
-    private BattlefieldRoot battlefieldRoot;
+    [Header("战场根节点")]
+    [SerializeField] private BattlefieldRoot battlefieldRoot;
 
     // 单位容器（所有单位的父级）
     private Transform unitsContainer;
@@ -93,6 +93,35 @@ public class BattlefieldSceneController : MonoBehaviour
             eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnTurnEnd);
             eventService.AddEventListening((EventID)WarBrokerEventID.OnIntentChanged, OnIntentChanged);
             eventService.AddEventListening((EventID)WarBrokerEventID.OnGeneralRespawned, OnGeneralRespawned);
+            eventService.AddEventListening((EventID)WarBrokerEventID.OnPhaseBannerComplete, OnPhaseBannerComplete);
+        }
+    }
+
+    private void Update()
+    {
+        // 统一处理将军单位的点击检测
+        HandleUnitClick();
+    }
+
+    /// <summary>处理将军单位点击</summary>
+    private void HandleUnitClick()
+    {
+        if (!Input.GetMouseButtonDown(0)) return;
+        if (Camera.main == null) return;
+
+        // 检查是否可以进行游戏输入
+        var inputService = GameRoot.Instance?.inputService;
+        if (inputService != null && !inputService.CanStartGameplayInput())
+            return;
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
+        {
+            var unit = hit.collider.GetComponent<GeneralUnit3D>();
+            if (unit != null)
+            {
+                OnGeneralClicked(unit);
+            }
         }
     }
 
@@ -133,6 +162,27 @@ public class BattlefieldSceneController : MonoBehaviour
     public void Initialize(BattleData data)
     {
         battleData = data;
+
+        // 如果没有在 Inspector 中配置，尝试自动查找
+        if (battlefieldRoot == null)
+        {
+            battlefieldRoot = FindObjectOfType<BattlefieldRoot>();
+            if (battlefieldRoot == null)
+            {
+                Debug.LogError("[BattlefieldSceneController] BattlefieldRoot not found in scene!");
+                return;
+            }
+        }
+
+        // 从 BattlefieldRoot 获取单位容器
+        unitsContainer = battlefieldRoot.unitsContainer;
+        if (unitsContainer == null)
+        {
+            // 如果没有配置，自动创建
+            var containerGO = new GameObject("UnitsContainer");
+            unitsContainer = containerGO.transform;
+            unitsContainer.SetParent(battlefieldRoot.transform);
+        }
 
         ClearAllUnits();
         SpawnAllUnits();
@@ -182,7 +232,6 @@ public class BattlefieldSceneController : MonoBehaviour
         if (unit != null)
         {
             unit.Initialize(general, isAlly);
-            unit.OnClicked = OnGeneralClicked;
 
             // 设置位置
             UpdateUnitPosition(unit, general, isAlly);
@@ -197,11 +246,21 @@ public class BattlefieldSceneController : MonoBehaviour
 
         int laneIndex = (int)general.Position;
         // GridPosition 是 1-based，转换为 0-based 索引
-        Vector3 gridPos = battlefieldRoot.GetGridPosition(laneIndex, general.GridPosition - 1);
+        int gridIndex = general.GridPosition - 1;
+        Vector3 gridPos = battlefieldRoot.GetGridPosition(laneIndex, gridIndex);
         unit.transform.localPosition = gridPos;
 
-        // 面向对方（沿Z轴对峙）
-        unit.transform.localRotation = Quaternion.Euler(0, isAlly ? 0 : 180, 0);
+        // 使用格子的旋转，敌方额外旋转 180 度
+        Transform gridAnchor = battlefieldRoot.GetGridAnchor(laneIndex, gridIndex);
+        if (gridAnchor != null)
+        {
+            unit.transform.rotation = isAlly ? gridAnchor.rotation : gridAnchor.rotation * Quaternion.Euler(0, 180, 0);
+        }
+        else
+        {
+            // 后备：使用固定朝向
+            unit.transform.localRotation = Quaternion.Euler(0, isAlly ? 0 : 180, 0);
+        }
     }
 
     /// <summary>获取格子的本地坐标</summary>
@@ -273,6 +332,19 @@ public class BattlefieldSceneController : MonoBehaviour
     {
         if (unit == null) return;
 
+        // 检查当前阶段，非玩家阶段不允许操作
+        var campaignSystem = GameRoot.Instance?.campaignSystem;
+        var currentPhase = campaignSystem?.Data?.CurrentPhase ?? TurnPhase.BattlePhase;
+        bool isPlayerPhase = currentPhase == TurnPhase.TurnStart
+                          || currentPhase == TurnPhase.EventPhase
+                          || currentPhase == TurnPhase.MarketPhase;
+
+        if (!isPlayerPhase)
+        {
+            // 非玩家阶段，不允许打开面板和聚焦
+            return;
+        }
+
         // 取消之前的选中
         if (selectedUnit != null)
         {
@@ -283,16 +355,27 @@ public class BattlefieldSceneController : MonoBehaviour
         selectedUnit = unit;
         selectedUnit.SetSelected(true);
 
-        // 只有己方将军可以打开详情面板
-        if (unit.IsAlly && unit.Data != null)
+        if (unit.Data != null)
         {
-            OnGeneralSelected?.Invoke(unit.Data);
-
-            // 打开将军详情面板
-            var detailPanel = uiService?.ShowWindow<GeneralDetailPanel>("GeneralDetailPanel");
-            if (detailPanel != null)
+            if (unit.IsAlly)
             {
-                detailPanel.SetGeneral(unit.Data);
+                // 己方将军：打开完整详情面板
+                OnGeneralSelected?.Invoke(unit.Data);
+
+                var detailPanel = uiService?.ShowWindow<GeneralDetailPanel>("GeneralDetailPanel");
+                if (detailPanel != null)
+                {
+                    detailPanel.SetGeneral(unit.Data, true);
+                }
+            }
+            else
+            {
+                // 敌方将军：打开简略面板
+                var detailPanel = uiService?.ShowWindow<GeneralDetailPanel>("GeneralDetailPanel");
+                if (detailPanel != null)
+                {
+                    detailPanel.SetGeneral(unit.Data, false);
+                }
             }
         }
 
@@ -808,10 +891,33 @@ public class BattlefieldSceneController : MonoBehaviour
 
     private void OnIntentChanged(object p1, object p2)
     {
-        // 更新所有己方单位的意图气泡
+        // 更新所有己方单位的意图气泡和士兵姿态
         foreach (var kvp in allyUnits)
         {
-            kvp.Value?.UpdateIntentBubble();
+            kvp.Value?.UpdateDisplay();
+        }
+    }
+
+    private void OnPhaseBannerComplete(object p1, object p2)
+    {
+        var phase = (TurnPhase)p1;
+
+        if (phase == TurnPhase.BattlePhase)
+        {
+            // 战斗阶段横幅结束后隐藏气泡
+            foreach (var kvp in allyUnits)
+            {
+                kvp.Value?.HideIntentBubble();
+            }
+        }
+        else if (phase == TurnPhase.MarketPhase)
+        {
+            // 玩家阶段横幅结束后：更新士兵姿态并显示新的意图气泡
+            foreach (var kvp in allyUnits)
+            {
+                kvp.Value?.UpdateDisplay();
+                kvp.Value?.ShowIntentBubble();
+            }
         }
     }
 

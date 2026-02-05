@@ -14,14 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Orders:
   - OrderType: 0
+    Icon: {fileID: 21300000, guid: 5088a4158db83fa4dab214e9a171f995, type: 3}
     BasePrice: 40
     ProductionPerTurn: 3
     InitialStock: 10
   - OrderType: 1
+    Icon: {fileID: 21300000, guid: b9637943c04bcbf47b038cec35937b80, type: 3}
     BasePrice: 35
     ProductionPerTurn: 3
     InitialStock: 10
   - OrderType: 2
+    Icon: {fileID: 21300000, guid: d36a31444e82f83468630e6981369ee9, type: 3}
     BasePrice: 25
     ProductionPerTurn: 2
     InitialStock: 8

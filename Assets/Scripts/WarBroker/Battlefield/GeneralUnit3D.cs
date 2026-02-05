@@ -9,19 +9,18 @@ using WarBroker.Battlefield;
 /// 3D 将军单位
 /// 显示将军的锡兵、意图气泡等
 /// </summary>
+[RequireComponent(typeof(Collider))]
 public class GeneralUnit3D : MonoBehaviour
 {
     [Header("锡兵显示")]
     [SerializeField] private Transform[] soldierSlots;  // 20个锡兵位置槽
     [SerializeField] private GameObject soldierPrefab;  // 备用，动态创建时使用（旧版兼容）
-    [SerializeField] private Material allySoldierMaterial;
-    [SerializeField] private Material enemySoldierMaterial;
 
     [Header("意图气泡 (World Space UI)")]
     [SerializeField] private Canvas intentBubbleCanvas;
     [SerializeField] private CanvasGroup intentBubbleCanvasGroup;
     [SerializeField] private Image intentBubbleImage;
-    [SerializeField] private TMP_Text intentText;
+    [SerializeField] private Image intentIconImage;  // 指令图标
 
     [Header("选中效果")]
     [SerializeField] private GameObject selectionIndicator;
@@ -62,6 +61,8 @@ public class GeneralUnit3D : MonoBehaviour
 
     private int currentSoldierCount = 0;
     private Sequence currentAnimation;
+    private bool isBubbleEnabled = true;  // 气泡是否允许显示
+    private OrderConfig orderConfig;  // 指令配置（用于获取图标）
 
     // 动态加载的士兵实例
     private TinSoldier[] soldiers;
@@ -69,12 +70,14 @@ public class GeneralUnit3D : MonoBehaviour
     private bool useDynamicSoldiers = false;
     private OrderType? lastSoldierPose;
 
-    public System.Action<GeneralUnit3D> OnClicked;
 
     private void Awake()
     {
         if (selectionIndicator != null)
             selectionIndicator.SetActive(false);
+
+        // 加载指令配置
+        orderConfig = Resources.Load<OrderConfig>(ConfigPaths.ORDER_CONFIG);
 
         // 初始化时隐藏所有锡兵
         if (soldierSlots != null)
@@ -145,22 +148,13 @@ public class GeneralUnit3D : MonoBehaviour
         soldiers = new TinSoldier[soldierSlots.Length];
         useDynamicSoldiers = true;
 
-        Material soldierMat = IsAlly ? allySoldierMaterial : enemySoldierMaterial;
-
         for (int i = 0; i < soldierSlots.Length && i < soldierTypes.Length; i++)
         {
             if (soldierSlots[i] == null) continue;
 
             var soldierType = soldierTypes[i];
-            var prefabPath = soldierTypeConfig.GetPrefabPath(soldierType);
-            if (string.IsNullOrEmpty(prefabPath)) continue;
-
-            var prefab = resService.LoadResource<GameObject>(prefabPath);
-            if (prefab == null)
-            {
-                Debug.LogWarning($"[GeneralUnit3D] 未找到兵种 Prefab: {prefabPath}");
-                continue;
-            }
+            var prefab = soldierTypeConfig.GetPrefab(soldierType);
+            if (prefab == null) continue;
 
             // 清除 slot 下的旧子物体
             foreach (Transform child in soldierSlots[i])
@@ -178,7 +172,6 @@ public class GeneralUnit3D : MonoBehaviour
             if (tinSoldier != null)
             {
                 tinSoldier.Initialize(soldierType);
-                tinSoldier.SetMaterial(soldierMat);
                 soldiers[i] = tinSoldier;
             }
 
@@ -202,10 +195,19 @@ public class GeneralUnit3D : MonoBehaviour
         // 清除旧的事件
         trigger.triggers.Clear();
 
-        // 添加点击事件
+        // 添加点击事件 - 通过 BattlefieldSceneController 处理
         var entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerClick;
-        entry.callback.AddListener((data) => { OnClicked?.Invoke(this); });
+        entry.callback.AddListener((data) =>
+        {
+            // 检查是否可以进行游戏输入
+            var inputService = GameRoot.Instance?.inputService;
+            if (inputService != null && !inputService.CanStartGameplayInput())
+                return;
+
+            var controller = FindObjectOfType<BattlefieldSceneController>();
+            controller?.OnGeneralClicked(this);
+        });
         trigger.triggers.Add(entry);
     }
 
@@ -215,15 +217,15 @@ public class GeneralUnit3D : MonoBehaviour
         if (Data == null) return;
 
         UpdateSoldierCount(Data.Troops);
-        UpdateSoldierPose(Data.FinalIntent);
+        UpdateSoldierPose(Data.FinalIntent, true);
         UpdateIntentBubble();
     }
 
     /// <summary>更新所有士兵的姿态</summary>
-    public void UpdateSoldierPose(OrderType? intent)
+    public void UpdateSoldierPose(OrderType? intent, bool force = false)
     {
         if (!useDynamicSoldiers || soldiers == null) return;
-        if (lastSoldierPose == intent) return;
+        if (!force && lastSoldierPose == intent) return;
 
         lastSoldierPose = intent;
 
@@ -231,7 +233,7 @@ public class GeneralUnit3D : MonoBehaviour
         {
             if (soldier != null)
             {
-                soldier.SetPose(intent);
+                soldier.SetPose(intent, force);
             }
         }
     }
@@ -278,6 +280,13 @@ public class GeneralUnit3D : MonoBehaviour
             return;
         }
 
+        // 气泡被禁用时不显示
+        if (!isBubbleEnabled)
+        {
+            intentBubbleCanvas.gameObject.SetActive(false);
+            return;
+        }
+
         if (Data == null || !Data.FinalIntent.HasValue && !Data.DefaultIntent.HasValue)
         {
             intentBubbleCanvas.gameObject.SetActive(false);
@@ -286,11 +295,15 @@ public class GeneralUnit3D : MonoBehaviour
 
         intentBubbleCanvas.gameObject.SetActive(true);
 
-        // 显示意图类型
+        // 显示意图图标
         var intent = Data.FinalIntent ?? Data.DefaultIntent;
-        if (intentText != null && intent.HasValue)
+        if (intentIconImage != null && intent.HasValue && orderConfig != null)
         {
-            intentText.text = intent.Value.ToString();
+            var orderData = orderConfig.GetOrder(intent.Value);
+            if (orderData != null && orderData.Icon != null)
+            {
+                intentIconImage.sprite = orderData.Icon;
+            }
         }
 
         // 根据意图来源设置颜色
@@ -302,6 +315,70 @@ public class GeneralUnit3D : MonoBehaviour
                 IntentSource.Overridden => overriddenIntentColor,
                 _ => defaultIntentColor
             };
+        }
+    }
+
+    /// <summary>隐藏意图气泡（带动画）</summary>
+    public void HideIntentBubble(float duration = 0.1f)
+    {
+        isBubbleEnabled = false;
+
+        if (intentBubbleCanvas == null || !intentBubbleCanvas.gameObject.activeSelf) return;
+
+        if (intentBubbleCanvasGroup != null)
+        {
+            intentBubbleCanvasGroup.DOFade(0f, duration).OnComplete(() =>
+            {
+                if (intentBubbleCanvas != null)
+                    intentBubbleCanvas.gameObject.SetActive(false);
+            });
+        }
+        else
+        {
+            intentBubbleCanvas.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>显示意图气泡（带动画）</summary>
+    public void ShowIntentBubble(float duration = 0.6f)
+    {
+        isBubbleEnabled = true;
+
+        if (intentBubbleCanvas == null || !IsAlly) return;
+        if (Data == null || !Data.FinalIntent.HasValue && !Data.DefaultIntent.HasValue) return;
+
+        // 更新图标
+        var intent = Data.FinalIntent ?? Data.DefaultIntent;
+        if (intentIconImage != null && intent.HasValue && orderConfig != null)
+        {
+            var orderData = orderConfig.GetOrder(intent.Value);
+            if (orderData != null && orderData.Icon != null)
+            {
+                intentIconImage.sprite = orderData.Icon;
+            }
+        }
+
+        // 更新颜色
+        if (intentBubbleImage != null)
+        {
+            intentBubbleImage.color = Data.IntentSource switch
+            {
+                IntentSource.Reinforced => reinforcedIntentColor,
+                IntentSource.Overridden => overriddenIntentColor,
+                _ => defaultIntentColor
+            };
+        }
+
+        // 淡入显示
+        if (intentBubbleCanvasGroup != null)
+        {
+            intentBubbleCanvasGroup.alpha = 0f;
+        }
+        intentBubbleCanvas.gameObject.SetActive(true);
+
+        if (intentBubbleCanvasGroup != null)
+        {
+            intentBubbleCanvasGroup.DOFade(1f, duration);
         }
     }
 
@@ -673,16 +750,6 @@ public class GeneralUnit3D : MonoBehaviour
     }
 
     #endregion
-
-    private void OnMouseDown()
-    {
-        // 使用InputService检查是否可以进行游戏输入
-        var inputService = GameRoot.Instance?.inputService;
-        if (inputService != null && !inputService.CanStartGameplayInput())
-            return;
-
-        OnClicked?.Invoke(this);
-    }
 
     private void OnDestroy()
     {

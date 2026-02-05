@@ -147,4 +147,39 @@ public class StageSystem : ILogic
             LoadStage(currentStageConfig.stageID);
         }
     }
+
+    /// <summary>
+    /// 直接加载场景（不通过 StageID）
+    /// </summary>
+    /// <param name="sceneName">场景名称</param>
+    /// <param name="gameMode">游戏模式</param>
+    /// <param name="doneLoadTask">加载完成回调</param>
+    public void LoadScene(string sceneName, GameMode gameMode, Action doneLoadTask = null)
+    {
+        // 禁用输入
+        gameRoot.CancelInput();
+
+        // 通知 Manager 退出
+        managerService.OnSceneExit();
+
+        // 卸载当前场景的 MonoItem
+        monoItemSystem?.UnloadMonoItems();
+
+        // 创建临时的 StageConfigItem
+        currentStageConfig = new StageConfigItem
+        {
+            sceneName = sceneName,
+            gameMode = gameMode
+        };
+
+        // 构建加载完成回调
+        doneLoadTask += OnStageLoaded;
+
+        // 加载场景
+        resService.LoadScene(sceneName, UnityEngine.SceneManagement.LoadSceneMode.Single, () =>
+        {
+            this.Log($"Loaded scene: {sceneName}");
+            doneLoadTask?.Invoke();
+        });
+    }
 }

@@ -172,11 +172,12 @@ public class InputService : ILogic
     }
 
     /// <summary>
-    /// 检查是否可以开始新的游戏输入（不在UI上且没有进行UI交互）
+    /// 检查是否可以开始新的游戏输入（不在Screen Space UI上且没有进行UI交互）
+    /// World Space UI（如将军气泡）不会阻挡游戏输入
     /// </summary>
     public bool CanStartGameplayInput()
     {
-        return !IsPointerOverUI && !IsUIInteracting;
+        return !IsPointerOverScreenSpaceUI() && !IsUIInteracting;
     }
 
     /// <summary>

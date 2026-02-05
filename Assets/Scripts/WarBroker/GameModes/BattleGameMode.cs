@@ -61,22 +61,11 @@ public class BattleGameMode : GameModeBase
 
     private void InitBattlefield()
     {
-        // 查找场景中的BattlefieldSceneController
+        // 场景已由 StageSystem 加载，直接查找 BattlefieldSceneController
         battlefieldController = GameObject.FindObjectOfType<BattlefieldSceneController>();
         if (battlefieldController == null)
         {
-            // 如果场景中没有，尝试从prefab实例化
-            var prefab = resService.LoadResource<GameObject>("Prefabs/WarBroker/Battlefield/BattlefieldSceneController");
-            if (prefab != null)
-            {
-                var obj = GameObject.Instantiate(prefab);
-                obj.name = "BattlefieldSceneController";
-                battlefieldController = obj.GetComponent<BattlefieldSceneController>();
-            }
-            else
-            {
-                Debug.LogWarning("[BattleGameMode] BattlefieldSceneController not found in scene or prefab.");
-            }
+            Debug.LogWarning("[BattleGameMode] BattlefieldSceneController not found in scene.");
         }
     }
 

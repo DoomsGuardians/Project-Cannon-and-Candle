@@ -47,7 +47,7 @@ public class MainMenuWindow : WindowBase
 
     private void OnStartGame()
     {
-        GameRoot.Instance.stageSystem.LoadStage(2);
+        uIService.ShowWindow<CampaignSelectPopup>("CampaignSelectPopup");
     }
 
     private void OnSpectatorMode()

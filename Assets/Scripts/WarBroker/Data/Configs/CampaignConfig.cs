@@ -15,6 +15,13 @@ public class CampaignConfig : ScriptableObject
     [TextArea(3, 5)]
     public string Description;
 
+    [Tooltip("战役缩略图")]
+    public Sprite Thumbnail;
+
+    [Tooltip("门票价格（进入战役需要支付的费用）")]
+    [Range(0, 10000)]
+    public float TicketPrice = 100f;
+
     [Header("===== 回合设置 =====")]
     [Tooltip("最大回合数")]
     [Range(6, 60)]
@@ -39,7 +46,18 @@ public class CampaignConfig : ScriptableObject
     public int InitialReserves = 60;
 
     [Header("===== 战场设置 =====")]
-    [Tooltip("初始战线位置 (1-5)")]
+    [Tooltip("战场场景名称（留空则不加载额外场景）")]
+    public string BattlefieldSceneName;
+
+    [Tooltip("战线数量")]
+    [Range(1, 5)]
+    public int LaneCount = 3;
+
+    [Tooltip("每条战线的格子数量")]
+    [Range(3, 9)]
+    public int GridCount = 5;
+
+    [Tooltip("初始战线位置")]
     [Range(1, 5)]
     public int InitialFrontlinePosition = 3;
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// 兵种配置
-/// 定义每种兵种的显示名称和Prefab路径
+/// 定义每种兵种的显示名称和Prefab
 /// </summary>
 [CreateAssetMenu(fileName = "SoldierTypeConfig", menuName = "WarBroker/SoldierTypeConfig")]
 public class SoldierTypeConfig : ScriptableObject
@@ -13,24 +13,23 @@ public class SoldierTypeConfig : ScriptableObject
     {
         public SoldierType type;
         public string displayName;
-        [Tooltip("Prefab路径，如 Prefabs/WarBroker/Battlefield/TinSoldier_Pikeman")]
-        public string prefabPath;
+        public GameObject prefab;
     }
 
     [Header("兵种配置列表")]
     public SoldierTypeData[] soldierTypes;
 
     /// <summary>
-    /// 获取指定兵种的Prefab路径
+    /// 获取指定兵种的Prefab
     /// </summary>
-    public string GetPrefabPath(SoldierType type)
+    public GameObject GetPrefab(SoldierType type)
     {
         if (soldierTypes == null) return null;
 
         foreach (var data in soldierTypes)
         {
             if (data.type == type)
-                return data.prefabPath;
+                return data.prefab;
         }
 
         Debug.LogWarning($"[SoldierTypeConfig] 未找到兵种 {type} 的配置");

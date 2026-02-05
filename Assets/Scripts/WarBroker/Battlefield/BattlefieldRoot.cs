@@ -19,6 +19,10 @@ public class BattlefieldRoot : MonoBehaviour
     [Tooltip("所有战线的锚点配置")]
     public LaneAnchors[] lanes;
 
+    [Header("单位容器")]
+    [Tooltip("所有单位的父级容器")]
+    public Transform unitsContainer;
+
     /// <summary>
     /// 获取战线数量
     /// </summary>
@@ -57,6 +61,26 @@ public class BattlefieldRoot : MonoBehaviour
             return Vector3.zero;
         }
         return anchors[gridIndex].position;
+    }
+
+    /// <summary>
+    /// 获取指定格子的锚点 Transform
+    /// </summary>
+    /// <param name="laneIndex">战线索引（0-based）</param>
+    /// <param name="gridIndex">格子索引（0-based，0是红方大本营）</param>
+    /// <returns>格子锚点 Transform</returns>
+    public Transform GetGridAnchor(int laneIndex, int gridIndex)
+    {
+        if (lanes == null || laneIndex < 0 || laneIndex >= lanes.Length)
+            return null;
+
+        var lane = lanes[laneIndex];
+        var anchors = lane.gridAnchors;
+
+        if (anchors == null || gridIndex < 0 || gridIndex >= anchors.Length)
+            return null;
+
+        return anchors[gridIndex];
     }
 
     /// <summary>

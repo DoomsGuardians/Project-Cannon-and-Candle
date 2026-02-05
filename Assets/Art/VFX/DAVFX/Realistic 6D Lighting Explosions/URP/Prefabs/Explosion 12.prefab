@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5477931976526606581}
   - component: {fileID: 7721154786119167465}
   - component: {fileID: 8801676217686706891}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Particles 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4908,7 +4908,7 @@ GameObject:
   - component: {fileID: 5455427424512984834}
   - component: {fileID: 6857022488540548881}
   - component: {fileID: 7571425838779624664}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Explosion 12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9796,7 +9796,7 @@ GameObject:
   - component: {fileID: 8031740525169562064}
   - component: {fileID: 1857242589337592077}
   - component: {fileID: 2580784991618287165}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Smoke Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14684,7 +14684,7 @@ GameObject:
   - component: {fileID: 7526915596160298042}
   - component: {fileID: 7933011475984402171}
   - component: {fileID: 6832056483340548720}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Smoke Shockwave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19572,7 +19572,7 @@ GameObject:
   - component: {fileID: 3721918973288125746}
   - component: {fileID: 1532059368953637071}
   - component: {fileID: 8729318209288685370}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Debris
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24461,7 +24461,7 @@ GameObject:
   - component: {fileID: 2452984551347025324}
   - component: {fileID: 667146398650998346}
   - component: {fileID: 2034292744441325127}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29349,7 +29349,7 @@ GameObject:
   - component: {fileID: 7491829535322354530}
   - component: {fileID: 4700138592520893367}
   - component: {fileID: 7424459728605672809}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: 'Bubble Distorsion '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34249,7 +34249,7 @@ GameObject:
   - component: {fileID: 5659335511967901042}
   - component: {fileID: 5151492393214273304}
   - component: {fileID: 3556772863367492479}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Explosion Heat Distortion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39146,7 +39146,7 @@ GameObject:
   - component: {fileID: 2115202994369442421}
   - component: {fileID: 5923967307387547998}
   - component: {fileID: 7017070470125525545}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Smoke Longer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44034,7 +44034,7 @@ GameObject:
   - component: {fileID: 617798839231327343}
   - component: {fileID: 5537756449992012092}
   - component: {fileID: 4038714848035819003}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48932,7 +48932,7 @@ GameObject:
   - component: {fileID: 10741978342225996}
   - component: {fileID: 3740719830256230712}
   - component: {fileID: 9185039943018529043}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Raising Smoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53878,7 +53878,7 @@ GameObject:
   - component: {fileID: 9080154078446169660}
   - component: {fileID: 5552438050226724405}
   - component: {fileID: 8269980656271554365}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Explosion 12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58721,7 +58721,7 @@ GameObject:
   - component: {fileID: 2459476521800660532}
   - component: {fileID: 5873832350495207148}
   - component: {fileID: 5619767928212636794}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63609,7 +63609,7 @@ GameObject:
   - component: {fileID: 4026593740550135532}
   - component: {fileID: 9033141910628415488}
   - component: {fileID: 8737626559244587765}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Smoke Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -68439,7 +68439,7 @@ GameObject:
   - component: {fileID: 6670376461659066341}
   - component: {fileID: 3306501025050057592}
   - component: {fileID: 3769589949637232798}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Particles Small
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73278,7 +73278,7 @@ GameObject:
   - component: {fileID: 2007750419956007761}
   - component: {fileID: 1793994080213040232}
   - component: {fileID: 1464260559090291944}
-  m_Layer: 6
+  m_Layer: 1
   m_Name: Explosion 12 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

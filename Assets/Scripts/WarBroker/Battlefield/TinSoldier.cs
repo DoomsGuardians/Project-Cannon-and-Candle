@@ -21,17 +21,18 @@ public class TinSoldier : MonoBehaviour
     public void Initialize(SoldierType type)
     {
         SoldierType = type;
-        // 默认显示防守姿态
-        SetPose(null);
+        // 默认显示防守姿态，强制刷新
+        SetPose(null, true);
     }
 
     /// <summary>
     /// 根据指令切换姿态
     /// </summary>
     /// <param name="intent">将军的最终意图，null表示默认姿态(DEF)</param>
-    public void SetPose(OrderType? intent)
+    /// <param name="force">是否强制刷新</param>
+    public void SetPose(OrderType? intent, bool force = false)
     {
-        if (currentPose == intent) return;
+        if (!force && currentPose == intent) return;
         currentPose = intent;
 
         // 隐藏所有模型
@@ -54,36 +55,6 @@ public class TinSoldier : MonoBehaviour
                 // 默认显示防守姿态
                 if (defModel != null) defModel.SetActive(true);
                 break;
-        }
-    }
-
-    /// <summary>
-    /// 设置士兵材质（用于区分敌我）
-    /// </summary>
-    public void SetMaterial(Material mat)
-    {
-        if (mat == null) return;
-
-        SetModelMaterial(atkModel, mat);
-        SetModelMaterial(defModel, mat);
-        SetModelMaterial(retModel, mat);
-    }
-
-    private void SetModelMaterial(GameObject model, Material mat)
-    {
-        if (model == null) return;
-
-        var renderer = model.GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            renderer.material = mat;
-        }
-
-        // 也处理子物体的渲染器
-        var childRenderers = model.GetComponentsInChildren<Renderer>();
-        foreach (var r in childRenderers)
-        {
-            r.material = mat;
         }
     }
 }

@@ -95,6 +95,7 @@ public class GameplayWindow : WindowBase
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnStart, OnTurnStart);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnTurnEnd);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnPhaseChange, OnPhaseChange);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnPhaseBannerComplete, OnPhaseBannerComplete);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnRandomEvent, OnRandomEvent);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTradeExecuted, OnFinanceChanged);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnFuturesOpened, OnFinanceChanged);
@@ -430,10 +431,10 @@ public class GameplayWindow : WindowBase
 
     private void OnTurnStart(object param1, object param2)
     {
-        // 重新启用结束回合按钮
+        // 回合开始时禁用结束回合按钮，等 phase banner 完成后再启用
         if (btnEndTurn != null)
         {
-            btnEndTurn.interactable = true;
+            btnEndTurn.interactable = false;
         }
 
         // 重置阶段横幅追踪
@@ -453,6 +454,12 @@ public class GameplayWindow : WindowBase
     {
         if (phaseBanner != null && param1 is TurnPhase phase)
         {
+            // 进入战斗阶段前先关闭打开的面板
+            if (phase == TurnPhase.BattlePhase)
+            {
+                CloseCurrentPanel();
+            }
+
             var data = gameplayManager.GetCampaignData();
             int turnNumber = data?.CurrentTurn ?? 1;
             // 显示横幅，动画期间会自动锁定输入
@@ -466,6 +473,34 @@ public class GameplayWindow : WindowBase
         {
             RefreshUI();
         }
+    }
+
+    private void OnPhaseBannerComplete(object param1, object param2)
+    {
+        if (param1 is TurnPhase phase)
+        {
+            // 玩家阶段横幅完成后启用结束回合按钮
+            if (phase == TurnPhase.MarketPhase)
+            {
+                if (btnEndTurn != null)
+                {
+                    btnEndTurn.interactable = true;
+                }
+            }
+        }
+    }
+
+    /// <summary>关闭当前打开的面板</summary>
+    private void CloseCurrentPanel()
+    {
+        if (!string.IsNullOrEmpty(currentPanel))
+        {
+            uIService.HideWindow(currentPanel);
+            currentPanel = null;
+        }
+
+        // 也关闭将军详情面板
+        uIService.HideWindow("GeneralDetailPanel");
     }
 
     private void OnInventoryPreview(object param1, object param2)

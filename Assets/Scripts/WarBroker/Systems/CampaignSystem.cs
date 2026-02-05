@@ -55,9 +55,6 @@ public class CampaignSystem : ILogic
 
     public void InitNewCampaign(string campaignId, MarketSystem market, BattleSystem battle)
     {
-        marketSystem = market;
-        battleSystem = battle;
-
         var campaignConfig = resService.LoadResource<CampaignConfig>(
             ConfigPaths.CAMPAIGN_PREFIX + campaignId);
 
@@ -66,6 +63,20 @@ public class CampaignSystem : ILogic
             Debug.LogError($"Campaign config not found: {campaignId}");
             return;
         }
+
+        InitNewCampaign(campaignConfig, market, battle);
+    }
+
+    public void InitNewCampaign(CampaignConfig campaignConfig, MarketSystem market, BattleSystem battle)
+    {
+        if (campaignConfig == null)
+        {
+            Debug.LogError("CampaignConfig is null");
+            return;
+        }
+
+        marketSystem = market;
+        battleSystem = battle;
 
         Data = new CampaignRuntimeData();
         Data.InitFromConfig(campaignConfig, orderConfig);

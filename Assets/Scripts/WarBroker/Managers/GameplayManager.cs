@@ -61,10 +61,22 @@ public class GameplayManager : ManagerBase
             return;
         }
 
-        campaignSystem.InitNewCampaign(CampaignId, marketSystem, battleSystem);
+        // 优先使用战役选择面板选中的配置
+        var selectedCampaign = CampaignSelectManager.SelectedCampaign;
+        if (selectedCampaign != null)
+        {
+            campaignSystem.InitNewCampaign(selectedCampaign, marketSystem, battleSystem);
+            CampaignSelectManager.SelectedCampaign = null; // 清除，避免下次误用
+        }
+        else
+        {
+            // 回退到 Inspector 配置的 CampaignId
+            campaignSystem.InitNewCampaign(CampaignId, marketSystem, battleSystem);
+        }
+
         if (campaignSystem.Data == null)
         {
-            Debug.LogError($"[GameplayManager] 战役配置加载失败: {CampaignId}");
+            Debug.LogError($"[GameplayManager] 战役配置加载失败");
             return;
         }
 

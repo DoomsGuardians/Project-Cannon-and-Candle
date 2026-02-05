@@ -148,7 +148,7 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _CLEARCOAT: 0
     - _CastShadows: 1
-    - _Cull: 0
+    - _Cull: 2
     - _DstBlend: 0
     - _IRIDESCENCE: 0
     - _NormalMapFormatXYZ: 0
@@ -193,7 +193,7 @@ Material:
     - iridescenceThicknessMinimum: 100
     - iridescenceThicknessTextureRotation: 0
     - iridescenceThicknessTextureTexCoord: 0
-    - metallicFactor: 0.4
+    - metallicFactor: 0.7
     - metallicRoughnessTextureRotation: 0
     - metallicRoughnessTextureTexCoord: 0
     - normalScale: 1
@@ -202,7 +202,7 @@ Material:
     - occlusionStrength: 1
     - occlusionTextureRotation: 0
     - occlusionTextureTexCoord: 0
-    - roughnessFactor: 0.85
+    - roughnessFactor: 0.9
     - sheenColorTextureRotation: 0
     - sheenColorTextureTexCoord: 0
     - sheenRoughnessFactor: 0
