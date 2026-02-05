@@ -37,11 +37,11 @@ MonoBehaviour:
     GeneralId: henrich
   EnemyFrontlineAssignments:
   - Position: 0
-    GeneralId: enemy_left
+    GeneralId: axel
   - Position: 1
-    GeneralId: enemy_center
+    GeneralId: gustav
   - Position: 2
-    GeneralId: enemy_right
+    GeneralId: lennart
   VictorInitialCash: 500
   VictorProfile: {fileID: 11400000, guid: b94556c4ff59f4e47952099b2e2a2188, type: 2}
   AvailableEvents:
@@ -75,4 +75,5 @@ MonoBehaviour:
     AllTroopChange: 0
     RandomTrustChange: 10
     Duration: 1
-  Commissions: []
+  Commissions:
+  - {fileID: 11400000, guid: f2b95a920d7099d469ebe5993aa2073d, type: 2}
