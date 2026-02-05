@@ -51,6 +51,7 @@ public class BattleGameMode : GameModeBase
         RegisterWindow<BattleResultPopup>("Prefabs/WarBroker/UI/Popups/BattleResultPopup", "BattleResultPopup");
         RegisterWindow<PausePopup>("Prefabs/WarBroker/UI/Popups/PausePopup", "PausePopup");
         RegisterWindow<SettingsWindow>("Prefabs/WarBroker/UI/Windows/SettingsWindow", "SettingsWindow");
+        RegisterWindow<VictorLetterPopup>("Prefabs/WarBroker/UI/Popups/VictorLetterPopup", "VictorLetterPopup");
 
         // 初始化3D战场
         InitBattlefield();

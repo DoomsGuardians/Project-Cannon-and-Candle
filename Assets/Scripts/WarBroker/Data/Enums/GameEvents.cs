@@ -51,4 +51,8 @@ public enum WarBrokerEventID
     OnReinforcementsComplete = 1100,  // 基地休整动画播放完成
     OnGeneralReinforced,              // 将军获得基地休整 (param1=GeneralData, param2=int恢复量)
     OnBattleReportConfirmed,          // 战报确认完成（玩家点击确认或无战报时自动触发）
+
+    // 信件对话事件
+    OnVictorTurnStart = 1200,         // Victor 回合开始（param1=VictorTurnVisualData）
+    OnVictorTurnComplete,             // Victor 回合信件播放完成
 }

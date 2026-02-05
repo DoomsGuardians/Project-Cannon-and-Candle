@@ -264,23 +264,31 @@ public class GameplayManager : ManagerBase
             // 记录战斗结果到存档系统
             saveSystem?.RecordBattleResult(result);
 
+            // 详细调试日志
+            Debug.Log($"[GameplayManager] OnBattleResult: {result.Position} - AllyTroopChange={result.AllyTroopChange}, EnemyTroopChange={result.EnemyTroopChange}");
+
             // 只收集有意义的战斗结果（有兵力损失才需要显示战报）
             bool hasCasualties = result.AllyTroopChange != 0 || result.EnemyTroopChange != 0;
             if (hasCasualties)
             {
                 pendingBattleResults.Add(result);
-                Debug.Log($"[GameplayManager] 收到战斗结果（有伤亡），当前待处理数量: {pendingBattleResults.Count}");
+                Debug.Log($"[GameplayManager] 战斗结果已加入待处理列表，当前数量: {pendingBattleResults.Count}");
             }
             else
             {
                 Debug.Log($"[GameplayManager] 忽略无伤亡的战斗结果");
             }
         }
+        else
+        {
+            Debug.LogWarning("[GameplayManager] OnBattleResult: 收到空的战斗结果!");
+        }
     }
 
     private void OnBattleAnimationsComplete(object param1, object param2)
     {
-        Debug.Log($"[GameplayManager] OnBattleAnimationsComplete 被调用，待处理战斗结果数量: {pendingBattleResults.Count}");
+        Debug.Log($"[GameplayManager] ========== OnBattleAnimationsComplete 被调用 ==========");
+        Debug.Log($"[GameplayManager] pendingBattleResults.Count = {pendingBattleResults.Count}");
 
         // 所有战斗动画播放完成
         if (pendingBattleResults.Count > 0)
@@ -295,16 +303,21 @@ public class GameplayManager : ManagerBase
             if (hasGameEnd) pendingGameEndResult = null;
 
             Debug.Log($"[GameplayManager] 准备显示战报弹窗，战斗结果数量: {results.Count}");
+            foreach (var r in results)
+            {
+                Debug.Log($"[GameplayManager] - {r.Position}: AllyChange={r.AllyTroopChange}, EnemyChange={r.EnemyTroopChange}");
+            }
 
             // 使用队列显示战报弹窗
             uiService.ShowPopupQueued<BattleResultPopup>("BattleResultPopup", popup =>
             {
-                Debug.Log("[GameplayManager] BattleResultPopup 回调被执行");
+                Debug.Log("[GameplayManager] BattleResultPopup 回调被执行，设置数据...");
                 popup.SetBattleResults(results);
 
                 // 设置关闭回调：发送战报确认事件
                 popup.SetOnCloseCallback(() =>
                 {
+                    Debug.Log("[GameplayManager] 战报弹窗关闭，发送 OnBattleReportConfirmed");
                     // 先发送战报确认事件，让 CampaignSystem 进入结算阶段
                     eventService.SendMessage((EventID)WarBrokerEventID.OnBattleReportConfirmed, null, null);
 
@@ -319,7 +332,7 @@ public class GameplayManager : ManagerBase
         else
         {
             // 没有战报需要显示，直接发送战报确认事件
-            Debug.Log("[GameplayManager] 无战报，直接发送战报确认事件");
+            Debug.Log("[GameplayManager] pendingBattleResults 为空，直接发送 OnBattleReportConfirmed");
             eventService.SendMessage((EventID)WarBrokerEventID.OnBattleReportConfirmed, null, null);
         }
     }

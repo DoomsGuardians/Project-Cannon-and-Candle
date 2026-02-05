@@ -25,6 +25,10 @@ public class CampaignSystem : ILogic
     // 是否等待战斗动画完成
     private bool waitingForBattleAnimations = false;
 
+    // Victor 回合状态追踪（用于等待信件确认）
+    private bool victorTurnCompleted = false;
+    private bool intentPhaseBannerCompleted = false;
+
     public void OnInit()
     {
         eventService = GameRoot.Instance.eventService;
@@ -43,6 +47,9 @@ public class CampaignSystem : ILogic
 
         // 监听阶段横幅动画完成事件
         eventService.AddEventListening((EventID)WarBrokerEventID.OnPhaseBannerComplete, OnPhaseBannerComplete);
+
+        // 监听 Victor 回合完成事件（信件确认后触发）
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnVictorTurnComplete, OnVictorTurnComplete);
     }
 
     public void OnEnterState() { }
@@ -186,11 +193,15 @@ public class CampaignSystem : ILogic
     {
         Data.CurrentPhase = TurnPhase.IntentPhase;
 
+        // 重置 Victor 回合状态标记
+        victorTurnCompleted = false;
+        intentPhaseBannerCompleted = false;
+
         // 执行维克多 AI
         ExecuteVictorAI();
 
         // 发送阶段切换事件（触发横幅动画）
-        // 战斗阶段将在横幅动画完成后自动进入（通过OnPhaseBannerComplete）
+        // 战斗阶段将在横幅动画完成且信件确认后进入
         eventService.SendMessage((EventID)WarBrokerEventID.OnPhaseChange, TurnPhase.IntentPhase, null);
     }
 
@@ -290,11 +301,12 @@ public class CampaignSystem : ILogic
                     }
                     break;
 
-                // 对手阶段横幅完成后，进入战斗阶段
+                // 对手阶段横幅完成后，等待信件确认再进入战斗阶段
                 case TurnPhase.IntentPhase:
                     if (Data.CurrentPhase == TurnPhase.IntentPhase)
                     {
-                        EnterBattlePhase();
+                        intentPhaseBannerCompleted = true;
+                        TryEnterBattlePhase();
                     }
                     break;
 
@@ -306,6 +318,30 @@ public class CampaignSystem : ILogic
                     }
                     break;
             }
+        }
+    }
+
+    /// <summary>
+    /// Victor 回合完成事件处理（信件确认后触发）
+    /// </summary>
+    private void OnVictorTurnComplete(object p1, object p2)
+    {
+        if (Data.CurrentPhase == TurnPhase.IntentPhase)
+        {
+            victorTurnCompleted = true;
+            TryEnterBattlePhase();
+        }
+    }
+
+    /// <summary>
+    /// 尝试进入战斗阶段
+    /// 需要同时满足：横幅完成 + Victor 回合完成（信件确认）
+    /// </summary>
+    private void TryEnterBattlePhase()
+    {
+        if (victorTurnCompleted && intentPhaseBannerCompleted)
+        {
+            EnterBattlePhase();
         }
     }
 
@@ -505,11 +541,38 @@ public class CampaignSystem : ILogic
     {
         var orders = new Dictionary<string, OrderType>();
 
+        // 记录执行前状态（用于可视化数据）
+        float cashBefore = victorAISystem.GetLedger().Cash;
+        float netWorthBefore = victorAISystem.GetVictorNetWorth();
+
         // 执行维克多回合（内部处理策略选择、金融操作、将军管理）
         var plan = victorAISystem.ExecuteTurn();
 
         Debug.Log($"[Victor] 策略: {plan.MainStrategy}, 原因: {plan.StrategyReason}");
         Debug.Log(victorAISystem.GetDebugInfo());
+
+        // 记录执行后状态
+        float cashAfter = victorAISystem.GetLedger().Cash;
+        float netWorthAfter = victorAISystem.GetVictorNetWorth();
+
+        // 构建将军ID到名称的映射
+        var generalIdToName = new Dictionary<string, string>();
+        foreach (var general in Data.Battle.EnemyGenerals)
+        {
+            generalIdToName[general.GeneralId] = general.Name;
+        }
+
+        // 构建可视化数据并发送事件
+        var visualData = VictorTurnVisualData.FromPlan(
+            plan,
+            Data.CurrentTurn,
+            cashBefore, cashAfter,
+            netWorthBefore, netWorthAfter,
+            generalIdToName);
+
+        eventService.SendMessage(
+            (EventID)(int)WarBrokerEventID.OnVictorTurnStart,
+            visualData, null);
 
         // 从将军数据中提取最终意图
         foreach (var general in Data.Battle.EnemyGenerals)

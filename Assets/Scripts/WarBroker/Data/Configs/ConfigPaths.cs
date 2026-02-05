@@ -13,4 +13,5 @@ public static class ConfigPaths
     public const string SPECTATOR_MODE = "Config/WarBroker/SpectatorModeConfig";
     public const string SOLDIER_TYPE = "Config/WarBroker/SoldierTypeConfig";
     public const string CAMPAIGN_LIST = "Config/WarBroker/CampaignListConfig";
+    public const string LETTER_DIALOGUE = "Config/WarBroker/LetterDialogueConfig";
 }
