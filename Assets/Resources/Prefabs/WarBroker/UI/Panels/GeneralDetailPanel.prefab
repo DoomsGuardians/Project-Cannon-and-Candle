@@ -2608,8 +2608,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 0, y: -4}
+  m_SizeDelta: {x: 116, y: 124}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8429528441290154427
 CanvasRenderer:
@@ -3437,13 +3437,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95db7a8503f28ca439394ec9291f68ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imgPortrait: {fileID: 6418997631817716932}
+  imgPortrait: {fileID: 8858980994401806209}
   txtName: {fileID: 6348679428573463834}
   txtPersonality: {fileID: 342118056095154983}
   txtPosition: {fileID: 2673908375604538110}
   sliderHP: {fileID: 8652265761646360674}
   txtHP: {fileID: 7672809124236953509}
-  statusArea: {fileID: 4568752415191858618}
   txtStatus: {fileID: 7672809124236953509}
   trustArea: {fileID: 4254709529912001653}
   txtTrust: {fileID: 1663673754246108233}

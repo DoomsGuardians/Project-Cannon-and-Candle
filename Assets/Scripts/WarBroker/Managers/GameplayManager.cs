@@ -9,6 +9,7 @@ public class GameplayManager : ManagerBase
     private MarketSystem marketSystem;
     private BattleSystem battleSystem;
     private CampaignSystem campaignSystem;
+    private SaveSystem saveSystem;
     private GameBalanceConfig balanceConfig;
 
     [Header("战役配置")]
@@ -24,6 +25,7 @@ public class GameplayManager : ManagerBase
         marketSystem = GameRoot.Instance.marketSystem;
         battleSystem = GameRoot.Instance.battleSystem;
         campaignSystem = GameRoot.Instance.campaignSystem;
+        saveSystem = GameRoot.Instance.saveSystem;
 
         balanceConfig = resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
     }
@@ -78,6 +80,13 @@ public class GameplayManager : ManagerBase
         {
             Debug.LogError($"[GameplayManager] 战役配置加载失败");
             return;
+        }
+
+        // 开始存档追踪
+        if (saveSystem != null)
+        {
+            var config = campaignSystem.Data.Config;
+            saveSystem.BeginCampaignTracking(config.CampaignId, config.CampaignName);
         }
 
         // 先注册事件，确保能接收到战斗结果
@@ -187,6 +196,12 @@ public class GameplayManager : ManagerBase
         int turn = (int)param1;
         Debug.Log($"回合 {turn} 开始");
 
+        // 记录回合开始快照
+        if (saveSystem != null && campaignSystem?.Data != null)
+        {
+            saveSystem.RecordTurnStart(turn, campaignSystem.Data);
+        }
+
         // 注意：不在这里清空 pendingBattleResults
         // 因为 OnBattleAnimationsComplete 可能在新回合开始后才被调用（事件监听顺序问题）
         // pendingBattleResults 会在 OnBattleAnimationsComplete 中显示战报后被清空
@@ -196,12 +211,25 @@ public class GameplayManager : ManagerBase
     {
         int turn = (int)param1;
         Debug.Log($"回合 {turn} 结束");
+
+        // 记录回合结束快照
+        if (saveSystem != null && campaignSystem?.Data != null)
+        {
+            saveSystem.RecordTurnEnd(campaignSystem.Data);
+        }
     }
 
     private void OnGameEnd(object param1, object param2)
     {
         bool isVictory = (bool)param1;
         Debug.Log($"游戏结束: {(isVictory ? "胜利" : "失败")}");
+
+        // 结束存档追踪
+        if (saveSystem != null && campaignSystem?.Data != null)
+        {
+            var result = campaignSystem.CurrentGameResult;
+            saveSystem.EndCampaignTracking(result, campaignSystem.Data);
+        }
 
         // 缓存结果，等战报显示完毕后再显示结算弹窗
         pendingGameEndResult = isVictory;
@@ -233,6 +261,9 @@ public class GameplayManager : ManagerBase
         var result = param1 as BattleResult;
         if (result != null)
         {
+            // 记录战斗结果到存档系统
+            saveSystem?.RecordBattleResult(result);
+
             // 只收集有意义的战斗结果（有兵力损失才需要显示战报）
             bool hasCasualties = result.AllyTroopChange != 0 || result.EnemyTroopChange != 0;
             if (hasCasualties)

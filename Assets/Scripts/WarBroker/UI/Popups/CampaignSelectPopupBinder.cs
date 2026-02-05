@@ -16,4 +16,5 @@ public class CampaignSelectPopupBinder : MonoBehaviour
 
     [Header("文本")]
     public TMP_Text txtTitle;
+    public TMP_Text txtTotalWealth;
 }

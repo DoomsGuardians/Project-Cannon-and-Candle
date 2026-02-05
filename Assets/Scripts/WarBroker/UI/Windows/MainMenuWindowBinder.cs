@@ -10,6 +10,7 @@ public class MainMenuWindowBinder : UIBinder
     public Button btnStart;
     public Button btnSpectator;
     public Button btnSettings;
+    public Button btnArchive;
     public Button btnQuit;
     public TMP_Text txtTitle;
     public TMP_Text txtVersion;

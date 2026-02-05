@@ -30,11 +30,11 @@ MonoBehaviour:
   GeneralConfig: {fileID: 11400000, guid: 976ca2edd99e01b4c89f75361caeef09, type: 2}
   AllyFrontlineAssignments:
   - Position: 0
-    GeneralId: ally_left
+    GeneralId: adam
   - Position: 1
-    GeneralId: ally_center
+    GeneralId: arnim
   - Position: 2
-    GeneralId: ally_right
+    GeneralId: henrich
   EnemyFrontlineAssignments:
   - Position: 0
     GeneralId: enemy_left

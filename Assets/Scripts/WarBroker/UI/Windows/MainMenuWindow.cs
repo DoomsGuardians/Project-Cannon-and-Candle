@@ -3,11 +3,11 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 主菜单窗口：开始游戏、观战模式、设置、退出
+/// 主菜单窗口：开始游戏、观战模式、档案、设置、退出
 /// </summary>
 public class MainMenuWindow : WindowBase
 {
-    private Button btnStart, btnSpectator, btnSettings, btnQuit;
+    private Button btnStart, btnSpectator, btnSettings, btnArchive, btnQuit;
     private TMP_Text txtTitle, txtVersion;
 
     public override void OnAwake()
@@ -21,6 +21,7 @@ public class MainMenuWindow : WindowBase
             btnStart = binder.btnStart;
             btnSpectator = binder.btnSpectator;
             btnSettings = binder.btnSettings;
+            btnArchive = binder.btnArchive;
             btnQuit = binder.btnQuit;
             txtTitle = binder.txtTitle;
             txtVersion = binder.txtVersion;
@@ -37,6 +38,7 @@ public class MainMenuWindow : WindowBase
         AddButtonListener(btnStart, OnStartGame);
         AddButtonListener(btnSpectator, OnSpectatorMode);
         AddButtonListener(btnSettings, OnSettings);
+        AddButtonListener(btnArchive, OnArchive);
         AddButtonListener(btnQuit, OnQuit);
     }
 
@@ -59,6 +61,11 @@ public class MainMenuWindow : WindowBase
     private void OnSettings()
     {
         uIService.ShowWindow<SettingsWindow>("SettingsWindow");
+    }
+
+    private void OnArchive()
+    {
+        uIService.ShowWindow<ArchivePopup>("ArchivePopup");
     }
 
     private void OnQuit()

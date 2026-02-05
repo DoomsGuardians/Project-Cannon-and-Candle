@@ -16,10 +16,12 @@ public class CampaignSelectPopup : WindowBase
     private GameObject itemPrefab;
     private Button btnClose;
     private TMP_Text txtTitle;
+    private TMP_Text txtTotalWealth;
 
     private CampaignListConfig campaignListConfig;
     private CampaignConfig selectedCampaign;
     private TooltipPanel tooltipPanel;
+    private SaveSystem saveSystem;
 
     public override void OnAwake()
     {
@@ -35,7 +37,10 @@ public class CampaignSelectPopup : WindowBase
             itemPrefab = binder.itemPrefab;
             btnClose = binder.btnClose;
             txtTitle = binder.txtTitle;
+            txtTotalWealth = binder.txtTotalWealth;
         }
+
+        saveSystem = GameRoot.Instance.saveSystem;
     }
 
     public override void OnShow()
@@ -56,6 +61,14 @@ public class CampaignSelectPopup : WindowBase
     {
         if (txtTitle != null)
             txtTitle.text = "选择战役";
+
+        // 显示总资产
+        if (txtTotalWealth != null && saveSystem?.MetaData != null)
+        {
+            float wealth = saveSystem.MetaData.TotalWealth;
+            string sign = wealth >= 0 ? "" : "";
+            txtTotalWealth.text = $"累计资产: {sign}{wealth:N0}";
+        }
 
         ClearItems();
         CreateCampaignItems();

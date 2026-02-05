@@ -86,9 +86,6 @@ public class MarketPanel : WindowBase
 
     public override void OnShow()
     {
-        // 获取输入锁，锁定战场相机输入
-        InputRouter.Acquire(InputChannel.Gameplay, this);
-
         // Tab 切换监听
         if (tabSpot != null)
             AddToggleListener(tabSpot, OnTabChanged);
@@ -129,9 +126,6 @@ public class MarketPanel : WindowBase
 
     public override void OnHide()
     {
-        // 释放输入锁
-        InputRouter.Release(InputChannel.Gameplay, this);
-
         eventService.RemoveEventListeningByTarget(this);
     }
 
