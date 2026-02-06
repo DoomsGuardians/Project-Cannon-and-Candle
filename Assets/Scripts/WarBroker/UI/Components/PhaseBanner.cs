@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 using System;
+using System.Collections;
 
 /// <summary>
 /// 阶段横幅组件
@@ -27,6 +28,7 @@ public class PhaseBanner : MonoBehaviour
 
     private Sequence currentSequence;
     private UITextConfig textConfig;
+    private UIService uiService;
 
     // 记录上一次显示的阶段，避免重复显示
     private string lastShownPhase = "";
@@ -40,16 +42,22 @@ public class PhaseBanner : MonoBehaviour
     // 当前显示的阶段（用于发送完成事件）
     private TurnPhase currentPhase;
 
+    // 等待 Popup 的协程
+    private Coroutine waitForPopupCoroutine;
+
     private void Awake()
     {
         // 初始隐藏
         if (canvasGroup != null)
             canvasGroup.alpha = 0;
 
-        // 加载文本配置
-        var resService = GameRoot.Instance?.resService;
-        if (resService != null)
-            textConfig = resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
+        // 获取服务引用
+        var gameRoot = GameRoot.Instance;
+        if (gameRoot != null)
+        {
+            uiService = gameRoot.uIService;
+            textConfig = gameRoot.resService?.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
+        }
     }
 
     /// <summary>
@@ -80,13 +88,44 @@ public class PhaseBanner : MonoBehaviour
         // 设置文本
         SetPhaseText(phaseKey, turnNumber);
 
-        // 锁定输入
-        LockInput();
+        // 如果有 Popup 正在显示，等待 Popup 队列清空后再显示横幅
+        if (uiService != null && uiService.HasQueuedPopupShowing)
+        {
+            // 停止之前的等待协程
+            if (waitForPopupCoroutine != null)
+            {
+                StopCoroutine(waitForPopupCoroutine);
+            }
+            waitForPopupCoroutine = StartCoroutine(WaitForPopupQueueThenShow());
+            return true;
+        }
 
-        // 播放动画
+        // 锁定输入并播放动画
+        LockInput();
         PlayBannerAnimation();
 
         return true;
+    }
+
+    /// <summary>
+    /// 等待 Popup 队列清空后再显示横幅
+    /// </summary>
+    private IEnumerator WaitForPopupQueueThenShow()
+    {
+        // 等待所有队列 Popup 关闭
+        while (uiService != null && uiService.HasQueuedPopupShowing)
+        {
+            yield return null;
+        }
+
+        // 额外等待一帧，确保 UI 状态稳定
+        yield return null;
+
+        waitForPopupCoroutine = null;
+
+        // 锁定输入并播放动画
+        LockInput();
+        PlayBannerAnimation();
     }
 
     /// <summary>
@@ -218,6 +257,14 @@ public class PhaseBanner : MonoBehaviour
     private void OnDestroy()
     {
         currentSequence?.Kill();
+
+        // 停止等待协程
+        if (waitForPopupCoroutine != null)
+        {
+            StopCoroutine(waitForPopupCoroutine);
+            waitForPopupCoroutine = null;
+        }
+
         // 确保释放输入锁
         if (IsPlaying)
         {

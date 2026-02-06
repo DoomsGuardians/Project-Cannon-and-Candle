@@ -100,6 +100,13 @@ public class ManagerService : ILogic
     /// </summary>
     public void ClearAllManagers()
     {
+        // 先调用 OnExit，让 Manager 清理事件监听等资源
+        foreach (var manager in managerList)
+        {
+            manager.OnExit();
+        }
+
+        // 再调用 UnInit
         foreach (var manager in managerList)
         {
             manager.UnInit();

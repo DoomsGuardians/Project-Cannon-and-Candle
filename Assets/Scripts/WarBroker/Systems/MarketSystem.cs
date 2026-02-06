@@ -194,6 +194,13 @@ public class MarketSystem : ILogic
         // GDD v6.0: 期货固定 3 回合
         const int FUTURES_DURATION = 3;
 
+        // 检查持仓数量上限
+        if (player.FuturesPositions.Count >= balanceConfig.MaxFuturesPositions)
+        {
+            Debug.LogWarning($"期货持仓已达上限: {balanceConfig.MaxFuturesPositions}");
+            return false;
+        }
+
         float openPrice = market.CurrentPrices[orderType];
         float margin = openPrice * quantity * balanceConfig.FuturesMarginRate;
 
@@ -210,6 +217,7 @@ public class MarketSystem : ILogic
             Direction = direction,
             OpenPrice = openPrice,
             Quantity = quantity,
+            OpenTurn = campaignData.CurrentTurn,
             ExpirationTurn = campaignData.CurrentTurn + FUTURES_DURATION,
             Margin = margin
         };
@@ -231,6 +239,13 @@ public class MarketSystem : ILogic
 
         var contract = player.FuturesPositions.Find(c => c.ContractId == contractId);
         if (contract == null) return false;
+
+        // 防止同回合套利：开仓当回合不能平仓
+        if (contract.OpenTurn == campaignData.CurrentTurn)
+        {
+            Debug.LogWarning($"期货合约 {contractId} 开仓当回合不能平仓");
+            return false;
+        }
 
         float currentPrice = market.CurrentPrices[contract.TargetOrder];
         pnl = contract.CalculatePnL(currentPrice);
@@ -268,16 +283,24 @@ public class MarketSystem : ILogic
         }
     }
 
-    public void SettleExpiredFutures()
+    /// <summary>
+    /// 结算到期期货
+    /// </summary>
+    /// <returns>(结算数量, 总盈亏)</returns>
+    public (int count, float pnl) SettleExpiredFutures()
     {
         var player = campaignData.Player;
         var toSettle = player.FuturesPositions
             .FindAll(c => c.ExpirationTurn <= campaignData.CurrentTurn);
 
+        float totalPnl = 0f;
         foreach (var contract in toSettle)
         {
-            CloseFutures(contract.ContractId, out _);
+            CloseFutures(contract.ContractId, out float pnl);
+            totalPnl += pnl;
         }
+
+        return (toSettle.Count, totalPnl);
     }
 
     #endregion
@@ -309,6 +332,7 @@ public class MarketSystem : ILogic
             Direction = direction,
             OpenPrice = openPrice,
             Quantity = quantity,
+            OpenTurn = campaignData.CurrentTurn,
             ExpirationTurn = campaignData.CurrentTurn + FUTURES_DURATION,
             Margin = margin
         };
@@ -467,16 +491,26 @@ public class MarketSystem : ILogic
         return true;
     }
 
-    public void ApplyInterest()
+    /// <summary>
+    /// 计算并应用银行利息
+    /// </summary>
+    /// <returns>本次支付的利息金额</returns>
+    public float ApplyInterest()
     {
+        float interestPaid = campaignData.Player.BankDebt * balanceConfig.BankInterestRate;
         campaignData.Player.BankDebt *= (1 + balanceConfig.BankInterestRate);
+        return interestPaid;
     }
 
     #endregion
 
     #region 持有成本
 
-    public void ApplyStorageCost()
+    /// <summary>
+    /// 计算并应用仓储费用
+    /// </summary>
+    /// <returns>本次支付的仓储费</returns>
+    public float ApplyStorageCost()
     {
         var player = campaignData.Player;
         int totalInventory = 0;
@@ -484,8 +518,10 @@ public class MarketSystem : ILogic
         {
             totalInventory += kvp.Value;
         }
-        player.Cash -= totalInventory * balanceConfig.StorageCostPerUnit;
+        float cost = totalInventory * balanceConfig.StorageCostPerUnit;
+        player.Cash -= cost;
         eventService.SendMessage((EventID)WarBrokerEventID.OnCashChange, player.Cash, null);
+        return cost;
     }
 
     #endregion

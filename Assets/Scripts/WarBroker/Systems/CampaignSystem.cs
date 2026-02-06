@@ -85,6 +85,15 @@ public class CampaignSystem : ILogic
         marketSystem = market;
         battleSystem = battle;
 
+        // 重置所有回合状态标记（修复重新进入战役时的状态残留问题）
+        victorTurnCompleted = false;
+        intentPhaseBannerCompleted = false;
+        waitingForBattleAnimations = false;
+        pendingRandomEvent = null;
+        pendingSettlement = null;
+        CurrentGameResult = GameResult.InProgress;
+        GameEndReason = null;
+
         Data = new CampaignRuntimeData();
         Data.InitFromConfig(campaignConfig, orderConfig);
 
@@ -146,9 +155,21 @@ public class CampaignSystem : ILogic
         // Step 1: 时间推进
         // Week++ 已在上一回合结束时完成
 
-        // Step 2: 费用结算
-        marketSystem.ApplyInterest();      // 银行利息
-        marketSystem.ApplyStorageCost();   // 仓储费
+        // Step 2: 费用结算（第一回合跳过，因为没有"上周"）
+        var settlement = new TurnSettlementInfo();
+        if (Data.CurrentTurn > 1)
+        {
+            settlement.InterestPaid = marketSystem.ApplyInterest();      // 银行利息（每回合）
+
+            // 仓储费每3回合扣一次（与期货周期一致）
+            if ((Data.CurrentTurn - 1) % 3 == 0)
+            {
+                settlement.StorageCost = marketSystem.ApplyStorageCost();
+            }
+        }
+
+        // 缓存结算信息，等玩家阶段横幅完成后再显示
+        pendingSettlement = settlement;
 
         // Step 3: 随机事件抽取（不立即弹窗，等玩家阶段横幅完成后再弹）
         CheckRandomEvent();
@@ -166,6 +187,9 @@ public class CampaignSystem : ILogic
         // 自动进入阶段 II：玩家操盘
         EnterPlayerPhase();
     }
+
+    // 待显示的结算信息
+    private TurnSettlementInfo pendingSettlement = null;
 
     /// <summary>
     /// 阶段 II：玩家操盘 (GDD v6.0)
@@ -624,6 +648,14 @@ public class CampaignSystem : ILogic
     /// </summary>
     private void TriggerPendingRandomEvent()
     {
+        // 先发送结算通知（利息、仓储费）
+        if (pendingSettlement != null && pendingSettlement.HasSignificantChanges)
+        {
+            eventService.SendMessage((EventID)WarBrokerEventID.OnTurnSettlement, pendingSettlement, null);
+        }
+        pendingSettlement = null;
+
+        // 然后触发随机事件
         if (pendingRandomEvent == null) return;
 
         var selectedEvent = pendingRandomEvent;

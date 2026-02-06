@@ -48,6 +48,10 @@ public class GameBalanceConfig : ScriptableObject
     [Range(1, 5)]
     public int MaxFuturesDuration = 3;
 
+    [Tooltip("期货最大持仓数量")]
+    [Range(1, 20)]
+    public int MaxFuturesPositions = 10;
+
     [Header("===== 战斗参数 =====")]
 
     [Tooltip("随机修正最小值")]

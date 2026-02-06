@@ -145,15 +145,20 @@ public class FuturesMarketTab : MonoBehaviour
         var data = gameplayManager.GetCampaignData();
         if (data == null) return;
 
-        RefreshOrderRow(OrderType.ATK, txtAtkInfo, txtAtkPosition, data);
-        RefreshOrderRow(OrderType.DEF, txtDefInfo, txtDefPosition, data);
-        RefreshOrderRow(OrderType.RET, txtRetInfo, txtRetPosition, data);
+        // 检查是否达到持仓上限
+        int maxPositions = balanceConfig?.MaxFuturesPositions ?? 10;
+        bool canOpenNew = data.Player.FuturesPositions.Count < maxPositions;
+
+        RefreshOrderRow(OrderType.ATK, txtAtkInfo, txtAtkPosition, btnAtkLong, btnAtkShort, data, canOpenNew);
+        RefreshOrderRow(OrderType.DEF, txtDefInfo, txtDefPosition, btnDefLong, btnDefShort, data, canOpenNew);
+        RefreshOrderRow(OrderType.RET, txtRetInfo, txtRetPosition, btnRetLong, btnRetShort, data, canOpenNew);
 
         RefreshPositionList(data);
         RefreshSummary(data);
     }
 
-    private void RefreshOrderRow(OrderType type, TMP_Text infoText, TMP_Text positionText, CampaignRuntimeData data)
+    private void RefreshOrderRow(OrderType type, TMP_Text infoText, TMP_Text positionText,
+        Button btnLong, Button btnShort, CampaignRuntimeData data, bool canOpenNew)
     {
         float price = data.Market.CurrentPrices[type];
         float marginRate = balanceConfig != null ? balanceConfig.FuturesMarginRate : 0.3f;
@@ -164,6 +169,14 @@ public class FuturesMarketTab : MonoBehaviour
         {
             infoText.text = $"{type}: 价格 {price:F1} | 保证金 {margin:F1}";
         }
+
+        // 检查是否有足够资金开仓
+        bool hasEnoughCash = data.Player.Cash >= margin;
+        bool canOpen = canOpenNew && hasEnoughCash;
+
+        // 设置按钮状态
+        if (btnLong != null) btnLong.interactable = canOpen;
+        if (btnShort != null) btnShort.interactable = canOpen;
 
         // 持仓汇总
         if (positionText != null)
@@ -182,7 +195,10 @@ public class FuturesMarketTab : MonoBehaviour
                 }
             }
 
-            positionText.text = $"持仓: 多{longCount}/空{shortCount}";
+            // 显示持仓和上限状态
+            int maxPositions = balanceConfig?.MaxFuturesPositions ?? 10;
+            int currentPositions = data.Player.FuturesPositions.Count;
+            positionText.text = $"持仓: 多{longCount}/空{shortCount} ({currentPositions}/{maxPositions})";
         }
     }
 
@@ -247,11 +263,24 @@ public class FuturesMarketTab : MonoBehaviour
         if (binder.btnClose != null && parentWindow != null)
         {
             int contractId = contract.ContractId;
-            parentWindow.AddButtonListener(binder.btnClose, () => OnClosePosition(contractId));
 
-            // 为平仓按钮添加 Tooltip
-            string closeTooltip = textConfig?.TooltipBtnClose ?? "提前平仓，按当前价格结算盈亏";
-            AddTooltip(binder.btnClose, "平仓", closeTooltip);
+            // 当回合开仓的期货不能平仓（防止套利）
+            bool canClose = contract.OpenTurn != data.CurrentTurn;
+            binder.btnClose.interactable = canClose;
+
+            if (canClose)
+            {
+                parentWindow.AddButtonListener(binder.btnClose, () => OnClosePosition(contractId));
+
+                // 为平仓按钮添加 Tooltip
+                string closeTooltip = textConfig?.TooltipBtnClose ?? "提前平仓，按当前价格结算盈亏";
+                AddTooltip(binder.btnClose, "平仓", closeTooltip);
+            }
+            else
+            {
+                // 当回合开仓的期货显示禁用提示
+                AddTooltip(binder.btnClose, "无法平仓", "开仓当回合不能平仓，请等待下一星期");
+            }
         }
     }
 

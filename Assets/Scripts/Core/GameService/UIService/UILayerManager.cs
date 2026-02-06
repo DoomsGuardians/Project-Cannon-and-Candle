@@ -87,11 +87,12 @@ public class UILayerManager
 
         canvas.sortingOrder = LayerBaseOrders[layer];
 
-        // 添加 CanvasScaler
+        // 添加 CanvasScaler - 16:9 等比缩放
         CanvasScaler scaler = layerGo.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f; // 16:9 下宽高同步缩放
 
         // 添加 GraphicRaycaster
         layerGo.AddComponent<GraphicRaycaster>();

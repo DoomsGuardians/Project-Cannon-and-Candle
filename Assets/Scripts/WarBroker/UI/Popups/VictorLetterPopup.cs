@@ -37,6 +37,11 @@ public class VictorLetterPopup : WindowBase
     {
         base.OnAwake();
 
+        // 重置状态（修复重新进入战役时的状态残留问题）
+        lastLetterTurn = 0;
+        pendingLetterData = null;
+        currentData = null;
+
         // 加载配置
         config = resService.LoadResource<LetterDialogueConfig>(ConfigPaths.LETTER_DIALOGUE);
 
@@ -73,9 +78,10 @@ public class VictorLetterPopup : WindowBase
     {
         // 释放输入锁
         InputRouter.Release(InputChannel.Gameplay, this);
-
-        // 注意：不在这里移除事件监听，因为需要持续响应事件
     }
+
+    // 注意：事件监听会在 WindowBase.OnDestroy() 中通过
+    // eventService.RemoveEventListeningByTarget(this) 自动清理
 
     /// <summary>
     /// 监听 Victor 回合开始事件

@@ -48,6 +48,8 @@ public class GameplayManager : ManagerBase
         eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleResult, OnBattleResult);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleAnimationsComplete, OnBattleAnimationsComplete);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnRandomEvent, OnRandomEvent);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnForceLiquidation, OnForceLiquidation);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnSettlement, OnTurnSettlement);
     }
 
     private void UnregisterEvents()
@@ -348,6 +350,45 @@ public class GameplayManager : ManagerBase
                 popup.SetEventData(eventConfig);
             });
         }
+    }
+
+    private void OnForceLiquidation(object param1, object param2)
+    {
+        int contractId = (int)param1;
+        float pnl = (float)param2;
+
+        string title = "强制平仓";
+        string content = $"由于保证金不足，您的期货合约 #{contractId} 已被强制平仓。\n\n" +
+                         $"结算盈亏: <color={(pnl >= 0 ? "green" : "red")}>{pnl:+0.00;-0.00}</color>";
+
+        uiService.ShowPopupQueued<NotificationPopup>("NotificationPopup", popup =>
+        {
+            popup.SetNotification(title, content);
+        });
+    }
+
+    private void OnTurnSettlement(object param1, object param2)
+    {
+        var settlement = param1 as TurnSettlementInfo;
+        if (settlement == null || !settlement.HasSignificantChanges) return;
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("本周结算：");
+        sb.AppendLine();
+
+        if (settlement.InterestPaid > 0)
+            sb.AppendLine($"银行利息: <color=red>-{settlement.InterestPaid:F2}</color>");
+
+        if (settlement.StorageCost > 0)
+            sb.AppendLine($"仓储费用: <color=red>-{settlement.StorageCost:F2}</color>");
+
+        if (settlement.ExpiredFuturesCount > 0)
+            sb.AppendLine($"期货到期: {settlement.ExpiredFuturesCount} 份 (盈亏: <color={(settlement.ExpiredFuturesPnL >= 0 ? "green" : "red")}>{settlement.ExpiredFuturesPnL:+0.00;-0.00}</color>)");
+
+        uiService.ShowPopupQueued<NotificationPopup>("NotificationPopup", popup =>
+        {
+            popup.SetNotification("周报", sb.ToString());
+        });
     }
 
     #endregion

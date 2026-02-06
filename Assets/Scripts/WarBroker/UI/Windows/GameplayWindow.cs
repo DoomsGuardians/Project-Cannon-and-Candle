@@ -182,14 +182,28 @@ public class GameplayWindow : WindowBase
         {
             totalInventory += kvp.Value;
         }
-        float storageCost = totalInventory * (balanceConfig?.StorageCostPerUnit ?? 3f);
+
+        // 仓储费每3回合扣一次：当 CurrentTurn % 3 == 0 时，下一回合会扣
+        bool willChargeStorage = data.CurrentTurn % 3 == 0;
+        float storageCost = willChargeStorage ? totalInventory * (balanceConfig?.StorageCostPerUnit ?? 3f) : 0f;
         float totalCost = interest + storageCost;
 
-        return $"当前: {data.Player.Cash:F0}\n" +
-               $"<color=#FF6666>下星期固定支出:</color>\n" +
-               $"  利息: -{interest:F0}\n" +
-               $"  仓储费: -{storageCost:F0}\n" +
-               $"  <color=#FFCC00>合计: -{totalCost:F0}</color>";
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"当前: {data.Player.Cash:F0}");
+        sb.AppendLine($"<color=#FF6666>下星期固定支出:</color>");
+        sb.AppendLine($"  利息: -{interest:F0}");
+        if (willChargeStorage)
+        {
+            sb.AppendLine($"  仓储费: -{storageCost:F0}");
+        }
+        else
+        {
+            int turnsUntilStorage = 3 - (data.CurrentTurn % 3);
+            sb.AppendLine($"  仓储费: (还有{turnsUntilStorage}周)");
+        }
+        sb.Append($"  <color=#FFCC00>合计: -{totalCost:F0}</color>");
+
+        return sb.ToString();
     }
 
     private string GetEndTurnTooltipContent()
@@ -203,7 +217,10 @@ public class GameplayWindow : WindowBase
         {
             totalInventory += kvp.Value;
         }
-        float storageCost = totalInventory * (balanceConfig?.StorageCostPerUnit ?? 3f);
+
+        // 仓储费每3回合扣一次
+        bool willChargeStorage = data.CurrentTurn % 3 == 0;
+        float storageCost = willChargeStorage ? totalInventory * (balanceConfig?.StorageCostPerUnit ?? 3f) : 0f;
         float totalCost = interest + storageCost;
 
         if (totalCost > 0)
@@ -344,7 +361,10 @@ public class GameplayWindow : WindowBase
         {
             totalInventory += kvp.Value;
         }
-        float storageCost = totalInventory * (balanceConfig?.StorageCostPerUnit ?? 3f);
+
+        // 仓储费每3回合扣一次：当 CurrentTurn % 3 == 0 时，下一回合会扣
+        bool willChargeStorage = data.CurrentTurn % 3 == 0;
+        float storageCost = willChargeStorage ? totalInventory * (balanceConfig?.StorageCostPerUnit ?? 3f) : 0f;
         float totalCost = interest + storageCost;
 
         // 只显示数字，预计消耗用颜色标记
@@ -565,6 +585,7 @@ public class GameplayWindow : WindowBase
         panel.transform.SetParent(contentArea, false);
         panel.transform.SetAsLastSibling();
 
+        // 填充 contentArea（16:9 等比缩放，不会变形）
         if (panel.transform is RectTransform rect)
         {
             rect.anchorMin = Vector2.zero;
@@ -590,6 +611,7 @@ public class GameplayWindow : WindowBase
         if (panel == null || area == null) return;
 
         panel.SetParent(area, false);
+        // 填充目标区域
         panel.anchorMin = Vector2.zero;
         panel.anchorMax = Vector2.one;
         panel.offsetMin = Vector2.zero;

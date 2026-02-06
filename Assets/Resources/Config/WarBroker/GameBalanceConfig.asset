@@ -21,6 +21,7 @@ MonoBehaviour:
   FuturesMarginRate: 0.2
   ForceLiquidationRate: 0.7
   MaxFuturesDuration: 3
+  MaxFuturesPositions: 20
   RandomModifierMin: 0.75
   RandomModifierMax: 1.25
   CritChance: 0.05

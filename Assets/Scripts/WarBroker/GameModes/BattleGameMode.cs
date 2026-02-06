@@ -52,6 +52,7 @@ public class BattleGameMode : GameModeBase
         RegisterWindow<PausePopup>("Prefabs/WarBroker/UI/Popups/PausePopup", "PausePopup");
         RegisterWindow<SettingsWindow>("Prefabs/WarBroker/UI/Windows/SettingsWindow", "SettingsWindow");
         RegisterWindow<VictorLetterPopup>("Prefabs/WarBroker/UI/Popups/VictorLetterPopup", "VictorLetterPopup");
+        RegisterWindow<NotificationPopup>("Prefabs/WarBroker/UI/Popups/NotificationPopup", "NotificationPopup");
 
         // 初始化3D战场
         InitBattlefield();
@@ -163,7 +164,7 @@ public class BattleGameMode : GameModeBase
         {
             window.transform.SetParent(layerRoot, false);
 
-            // 确保RectTransform正确拉伸以适应不同分辨率
+            // 设置 RectTransform 填充整个 Canvas（16:9 等比缩放，不会变形）
             var rectTransform = obj.GetComponent<RectTransform>();
             if (rectTransform != null)
             {

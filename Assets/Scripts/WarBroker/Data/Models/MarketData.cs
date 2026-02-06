@@ -61,6 +61,7 @@ public class FuturesContract
     public FuturesDirection Direction;
     public float OpenPrice;
     public int Quantity;
+    public int OpenTurn;        // 开仓回合（防止同回合套利）
     public int ExpirationTurn;
     public float Margin;
 

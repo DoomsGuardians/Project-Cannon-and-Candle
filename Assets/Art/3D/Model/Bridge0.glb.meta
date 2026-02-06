@@ -2,7 +2,17 @@ fileFormatVersion: 2
 guid: cd9fa74b844910d4e8dcc8a5b7b63f58
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bridge_1.001
+    second: {fileID: 2100000, guid: 7df76e2a68696a042b01d7c5ea947689, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bridge_2.001
+    second: {fileID: 2100000, guid: 30ae04c5e9044b24f9537199092e55db, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -47,15 +57,15 @@ ScriptedImporter:
 '
   optimizeGameObjects: 0
   materials:
-  - {instanceID: 0}
-  - {instanceID: 0}
+  - {fileID: -4331925406388286896, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
+  - {fileID: 5650498345232739783, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
   textures:
-  - {instanceID: 0}
-  - {instanceID: 0}
-  - {instanceID: 0}
-  - {instanceID: 0}
-  - {instanceID: 0}
-  - {instanceID: 0}
+  - {fileID: 5817316546618748719, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
+  - {fileID: -3926687174140238800, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
+  - {fileID: 7876530471615878255, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
+  - {fileID: 3070409480593088962, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
+  - {fileID: -5635462105673884329, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
+  - {fileID: 8356977545115736127, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
   hasSceneData: 1
   hasAnimationData: 0
   hasMaterialData: 1
@@ -67,22 +77,22 @@ ScriptedImporter:
     used: 1
     required: 0
   _textures:
-  - texture: {instanceID: 0}
+  - texture: {fileID: 5817316546618748719, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
     shouldBeLinear: 1
     shouldBeNormalMap: 1
-  - texture: {instanceID: 0}
+  - texture: {fileID: -3926687174140238800, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
     shouldBeLinear: 1
     shouldBeNormalMap: 0
-  - texture: {instanceID: 0}
+  - texture: {fileID: 7876530471615878255, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
     shouldBeLinear: 0
     shouldBeNormalMap: 0
-  - texture: {instanceID: 0}
+  - texture: {fileID: 3070409480593088962, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
     shouldBeLinear: 1
     shouldBeNormalMap: 1
-  - texture: {instanceID: 0}
+  - texture: {fileID: -5635462105673884329, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
     shouldBeLinear: 1
     shouldBeNormalMap: 0
-  - texture: {instanceID: 0}
+  - texture: {fileID: 8356977545115736127, guid: cd9fa74b844910d4e8dcc8a5b7b63f58, type: 3}
     shouldBeLinear: 0
     shouldBeNormalMap: 0
   _mainAssetIdentifier: scenes/Scene

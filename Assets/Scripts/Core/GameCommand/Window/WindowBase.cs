@@ -111,6 +111,9 @@ public class WindowBase : WindowBehaviour
 
     public override void OnDestroy()
     {
+        // 移除所有事件监听，防止残留导致问题
+        eventService?.RemoveEventListeningByTarget(this);
+
         RemoveToggleListener();
         RemoveAllButtonListener();
         RemoveInputFieldListener();

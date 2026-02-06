@@ -55,4 +55,7 @@ public enum WarBrokerEventID
     // 信件对话事件
     OnVictorTurnStart = 1200,         // Victor 回合开始（param1=VictorTurnVisualData）
     OnVictorTurnComplete,             // Victor 回合信件播放完成
+
+    // 结算通知事件
+    OnTurnSettlement = 1300,          // 回合结算通知（param1=TurnSettlementInfo）
 }
