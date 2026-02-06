@@ -153,7 +153,8 @@ public class GeneralUnit3D : MonoBehaviour
             if (soldierSlots[i] == null) continue;
 
             var soldierType = soldierTypes[i];
-            var prefab = soldierTypeConfig.GetPrefab(soldierType);
+            // 根据阵营获取对应的 prefab
+            var prefab = soldierTypeConfig.GetPrefab(soldierType, IsAlly);
             if (prefab == null) continue;
 
             // 清除 slot 下的旧子物体

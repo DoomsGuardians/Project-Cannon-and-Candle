@@ -24,24 +24,16 @@ MonoBehaviour:
   InitialRetInventory: 2
   InitialReserves: 60
   BattlefieldSceneName: Battle_tutorial
-  LaneCount: 3
+  LaneCount: 1
   GridCount: 5
   InitialFrontlinePosition: 3
   GeneralConfig: {fileID: 11400000, guid: 976ca2edd99e01b4c89f75361caeef09, type: 2}
   AllyFrontlineAssignments:
-  - Position: 0
-    GeneralId: adam
   - Position: 2
     GeneralId: arnim
-  - Position: 4
-    GeneralId: henrich
   EnemyFrontlineAssignments:
-  - Position: 0
-    GeneralId: axel
   - Position: 2
     GeneralId: gustav
-  - Position: 4
-    GeneralId: lennart
   VictorInitialCash: 500
   VictorProfile: {fileID: 11400000, guid: b94556c4ff59f4e47952099b2e2a2188, type: 2}
   AvailableEvents:

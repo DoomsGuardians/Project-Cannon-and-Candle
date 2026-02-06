@@ -467,7 +467,7 @@ public class GeneralDetailPanel : WindowBase
                 if (btnText != null)
                 {
                     string icon = GetIntentIcon(intentType);
-                    btnText.text = $"强化 {icon}×{held}";
+                    btnText.text = $"强化 {icon}x{held}";
                 }
             }
         }
@@ -513,7 +513,7 @@ public class GeneralDetailPanel : WindowBase
         {
             int held = player.Inventory.ContainsKey(type) ? player.Inventory[type] : 0;
             string icon = GetIntentIcon(type);
-            btnText.text = $"篡改 {icon}×{held}";
+            btnText.text = $"篡改 {icon}x{held}";
         }
     }
 

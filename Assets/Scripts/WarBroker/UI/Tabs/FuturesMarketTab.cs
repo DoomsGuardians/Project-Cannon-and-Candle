@@ -214,7 +214,7 @@ public class FuturesMarketTab : MonoBehaviour
         if (binder.txtContract != null)
         {
             string dirText = contract.Direction == FuturesDirection.Long ? "多" : "空";
-            binder.txtContract.text = $"#{contract.ContractId} {contract.TargetOrder} {dirText}×{contract.Quantity}";
+            binder.txtContract.text = $"#{contract.ContractId} {contract.TargetOrder} {dirText}x{contract.Quantity}";
         }
 
         // 开仓价
