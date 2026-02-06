@@ -162,6 +162,17 @@ public class BattleGameMode : GameModeBase
         if (layerRoot != null)
         {
             window.transform.SetParent(layerRoot, false);
+
+            // 确保RectTransform正确拉伸以适应不同分辨率
+            var rectTransform = obj.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.anchorMin = Vector2.zero;
+                rectTransform.anchorMax = Vector2.one;
+                rectTransform.offsetMin = Vector2.zero;
+                rectTransform.offsetMax = Vector2.zero;
+                rectTransform.localScale = Vector3.one;
+            }
         }
     }
 

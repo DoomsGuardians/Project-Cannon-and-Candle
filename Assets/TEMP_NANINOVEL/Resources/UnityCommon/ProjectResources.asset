@@ -1,0 +1,1293 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45d8a631b468ced42a5044c8442a4f42, type: 3}
+  m_Name: ProjectResources
+  m_EditorClassIdentifier: 
+  resourcePaths:
+  - Path: Audio/SFX/SFX_GeneralMovement
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_9
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/SGBlackboard
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-Black
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: LightCapBottomRight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: MetalGlossChannelSwap
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/CustomVariablesConfiguration
+    Type: Naninovel.CustomVariablesConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/BattleRoot2
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: MetalGlossOcclusionChannelSwap
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-Regular
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: SceneViewIcons/ParametricLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Items/CommissionItem
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Path/pointHovered
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/LetterDialogueConfig
+    Type: LetterDialogueConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ScriptEditor
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Shaders/BlitNoAlpha
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/Blackboard/SGBlackboardRow
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Styles/TabbedView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: GraphView/Nodes/NodeChevronRight@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/IntegerControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: SceneViewIcons/SpriteLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/DigitalGlitch
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/ManagedTextConfiguration
+    Type: Naninovel.ManagedTextConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: GraphView
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/HelpBoxRow
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_EndTurn
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/Font
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/SearchSmallDownOff
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Land
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Gunfire0
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Confirm
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/settings_button
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/TextPrinters
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/CameraConfiguration
+    Type: Naninovel.CameraConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Resizable
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Sprite Assets
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/ScreenPositionSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Popups/CampaignSelectPopup
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/TS_Musketeer_Ger
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/PixelCacheProfiler
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/castle
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/sg_graph_icon_gray_dark
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ScriptGotoIcon
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/TextPrinters/Bubble
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_3
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/CubemapSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Path/pointRemovePreview
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/MasterPreviewView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Config/WarBroker/UITextConfig
+    Type: UITextConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Audio/BGM/BGM_SoldierDays
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/SettingsIcons_hover@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Gunfire2
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/terrian2
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/RedirectNode
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: XCTheme-Default
+    Type: XCharts.Runtime.Theme, XCharts.Runtime, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: SceneViewIcons/PointLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/EngineConfiguration
+    Type: Naninovel.EngineConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_19
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: LightCapDown
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_BuyFuture
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Path/tangentNormal
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/SaveLoadUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: InspectorIcons
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: NormalChannel
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/BlurFilter
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Windows/MainMenuWindow
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/Commission_60Death
+    Type: CommissionConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls/TextureArraySlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Config/WarBroker/Commission_250Death
+    Type: CommissionConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/UI/ClickThroughPanel
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM/BGM_BaroqueApproaching
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: TestScenePrefab
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/Animate
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Characters/Victor/serious
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Searcher/SearchSmallDownOff
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Path/pointSelected
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/Snow
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/sg_subgraph_icon_gray_light
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ScriptGraph
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Config
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/TitleUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-ThinItalic
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Popups/ArchivePopup
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/DepthOfFieldComposition
+    Type: UnityEditor.ShaderInclude, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/Commission_WinTutorBattle
+    Type: CommissionConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Characters/Victor/smirk
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: GraphView/Nodes/PreviewCollapse
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/VariableInputUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_5
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_14
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/SettingsIcons
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/ShaderPort
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Fonts & Materials
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/PropertyNameReferenceField
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: InspectorIcons/PointLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/MusicConfig
+    Type: MusicConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: TangentContinuous
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/SearchSmallDownOn
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/Blackboard/SGBlackboardField
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: README
+    Type: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM/BGM_BaroqueDancing
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Panels/MarketPanel
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Popups/PausePopup
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/Commission_100Death
+    Type: CommissionConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Audio/BGM/BGM_SlowlyTelling
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/GameBalanceConfig
+    Type: GameBalanceConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/UI
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Path/pointPreview
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/DepthOfField
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/GraphSubWindow
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: GraphView/Nodes/NodeChevronUp@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_General
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Textures/Black
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: LightCapTopRight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Sprite Assets/EmojiOne
+    Type: TMPro.TMP_SpriteAsset, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/TabButton
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Styles/MaterialNodeView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Config/WarBroker/Campaign_Tutorial
+    Type: CampaignConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Searcher
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Event
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Hit
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/StickyNote
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Config/WarBroker/VictorProfile_Balanced
+    Type: VictorProfile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls/SliderControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Characters/Victor/Default
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Panels
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: LightCapTopLeft
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/TS_Pikeman_Ger_F
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/TextPrinters/Chat
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Standard (Specular setup)
+    Type: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: ShapeTool
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/TipsUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/DepthOfFieldDiskBlur
+    Type: UnityEditor.ShaderInclude, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Shaders
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: GraphView/Nodes/NodeChevronRight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-Medium
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: LightCapUp
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Panels/ObjectivePanel
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/DepthMask
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/SearchSmallDownOn@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Panels/TooltipPanel
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/TextPrinters/Dialogue
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: SceneViewIcons
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM/BGM_TrendingWorld
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Explosion0
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/PropertyNodeView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Shaders/TransitionalUI
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM/BGM_SwedishMarch
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM/BGM_DarkBaroque
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Gunfire1
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_8
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Idle
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Characters/Victor/confident
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/MaterialGraph
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: GraphView/Nodes/BlackboardFieldPillBackground
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Items/BattleResultItem
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/PopupControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_12
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/SettingsIcons@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/GradientSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Shaders/DepthOfField
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/ReorderableSlotListView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_2
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/EnumConversionControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Textures/Clouds
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/ColorRGBASlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Icons/Settings_Flyout_9slice@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/DielectricSpecularControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls/TextControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/UI/SettingsUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/HlslFunctionView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Popups/VictorLetterPopup
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/Meshy_AI_A_landscape_map_set_o_0206074114_texture
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Items/FuturesPositionItem
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Popups/CampaignEndPopup
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: DebugUIPersistentCanvas
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Path/pointNormal
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/CustomSlotLabelField
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Configuration/ScriptPlayerConfiguration
+    Type: Naninovel.ScriptPlayerConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: TangentContinuousPro
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/sg_graph_icon
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-Bold
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Sirenix
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/VictorProfile_Default
+    Type: VictorProfile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Spawn/ShakeBackground
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/Settings_Flyout_9slice
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_6
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Items/CampaignItem
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UnityGLTFSettings
+    Type: UnityGLTF.GLTFSettings, UnityGLTFScripts, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_4
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/Campaign_001
+    Type: CampaignConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/UI/RollbackUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: XCSettings
+    Type: XCharts.Runtime.XCSettings, XCharts.Runtime, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/2
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/GeneralConfig
+    Type: GeneralConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Explosion2
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/NaninovelCG
+    Type: UnityEditor.ShaderInclude, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/TS_Pikeman_Swe
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Searcher/SearchSmallDownOff@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Characters
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Cannon1
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/NodeSettings
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Fall
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/BooleanSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Items/ArchiveHistoryItem
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/DepthOfFieldDiskKernel
+    Type: UnityEditor.ShaderInclude, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Fonts & Materials/LiberationSans SDF - Drop Shadow
+    Type: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/DepthOfFieldCommon
+    Type: UnityEditor.ShaderInclude, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/sg_subgraph_icon_gray_dark
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_17
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/TextPrintersConfiguration
+    Type: Naninovel.TextPrintersConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: XCTheme-Dark
+    Type: XCharts.Runtime.Theme, XCharts.Runtime, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_16
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/InspectorView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Close
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: TangentLinear
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Popups
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Hover
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/LoadingUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Confirm
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Selectable
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: InspectorIcons/FreeformLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/GeneralBase
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Charge
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/SoldierTypeConfig
+    Type: SoldierTypeConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls/MultiFloatControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: InspectorIcons/SpriteLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: GraphView/Nodes/PreviewExpand@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/EnumControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Characters/Victor
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/Blackboard/SGBlackboardCategory
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/DefaultMixer
+    Type: UnityEditor.Audio.AudioMixerController, UnityEditor.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Icons/settingsbutton
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: SceneViewIcons/FreeformLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/EngineVersion
+    Type: Naninovel.EngineVersion, Elringus.Naninovel.Runtime, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/GraphEditorView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-Italic
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/TextPrinters/Fullscreen
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: LineBreaking Leading Characters
+    Type: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/Transparent
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Explosion1
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Popups/EventPopup
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/MultiFloatSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-Thin
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_TurnSwitch
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/BacklogUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Cannon0
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: StickyNote
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Configuration/ResourceProviderConfiguration
+    Type: Naninovel.ResourceProviderConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: GraphView/Nodes/NodeChevronUp
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/NodeSettings
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Configuration/InputConfiguration
+    Type: Naninovel.InputConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls/TextureSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_1
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: XCLang-ZH
+    Type: XCharts.Runtime.Lang, XCharts.Runtime, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Fonts & Materials/LiberationSans SDF - Outline
+    Type: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/ShakeCamera
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/CGGalleryUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: SearcherItem
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls/UVSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Textures/UnknownActor
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/ChannelMixerControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Config/WarBroker/VictorProfile_Hunter
+    Type: VictorProfile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Styles/MaterialGraphView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: GraphView/Nodes/NodeChevronDown@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM/README
+    Type: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/ColorMode
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-MediumItalic
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: InspectorIcons/ParametricLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-BlackItalic
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Style Sheets/Default Style Sheet
+    Type: TMPro.TMP_StyleSheet, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/TS_Pikeman_Swe_F
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/PropertyRow
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-Light
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/ShakeCharacter
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Sparkle
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Style Sheets
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/ChoiceHandlersConfiguration
+    Type: Naninovel.ChoiceHandlersConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/TS_Pikeman_Ger
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Searcher/Searcher
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Characters/Victor/cunning
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/ToggleControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/TinSoldier
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/Campaign_003
+    Type: CampaignConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Items
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_10
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/TransitionalTexture
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/SpectatorModeConfig
+    Type: SpectatorModeConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Characters/Victor/satisfied
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Path
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/MultiIntegerSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Shaders/FallbackError
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: SearcherWindow
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_7
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/Blackboard
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Searcher/SearcherItem
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: LineBreaking Following Characters
+    Type: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/MovieUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/GameplayManager
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/Blur
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/ExternalScriptsUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/ConfirmationUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ScriptEditorDark
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls/ColorControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: DOTweenSettings
+    Type: DG.Tweening.Core.DOTweenSettings, DOTween, Version=1.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Soldiers
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/SettingsIcons_hover
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/OrderConfig
+    Type: OrderConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: DecalGizmo
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/Campaign_002
+    Type: CampaignConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/FrontlineGrid
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/ToastUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/Commission_20Death
+    Type: CommissionConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: GraphView/Nodes/NodeChevronLeft
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: LightCapBottomLeft
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Windows/SettingsWindow
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/SearchSmallDownOff@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/PortInputView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Config/Stage
+    Type: GameStageConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: TangentLinearPro
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM/BGM_AcidFolk
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/EngineInitializationUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_15
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: GraphView/Nodes/NodeChevronDown
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Shaders/Checkerboard
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ChoiceHandlers
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: PixelPerfectCamera
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/PropertySheet
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Searcher/SearchSmallDownOn
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/BGM/BGM_GermanMarch
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/TabButtonStyles
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: UXML/GraphInspector
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Popups/BattleResultPopup
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Cinemachine
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/DigitalGlitch
+    Type: UnityEngine.Shader, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/EditMetaIcon
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/BattleRoot1
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/Campaign_004
+    Type: CampaignConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Styles/Controls/ChannelEnumMaskControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Shaders
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/ShakePrinter
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Searcher
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_18
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Buy
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/sg_graph_icon_gray_light
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Windows/SpectatorWindow
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/SunShafts
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/Texture3DSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/UI/ScriptNavigatorUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/GradientControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: GraphView/Nodes/PreviewExpand
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/ChannelEnumControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: GraphView/Nodes
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ScriptAssetIcon
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: GraphView/Nodes/PreviewCollapse@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Searcher/SearchSmallDownOn@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Standard (Specular setup)
+    Type: UnityEngine.ShaderVariantCollection, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Audio/SFX
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/CharactersConfiguration
+    Type: Naninovel.CharactersConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: TangentBroken
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/BattleRoot
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/ContinueInputUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_0
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/TransitionEffects
+    Type: UnityEditor.ShaderInclude, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: ShapeToolPro
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/SceneTransitionUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: GraphView/Nodes/BlackboardFieldExposed
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/AudioConfiguration
+    Type: Naninovel.AudioConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: UXML/GraphSubWindow
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Fonts & Materials/LiberationSans SDF - Fallback
+    Type: TMPro.TMP_FontAsset, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/Blackboard/SGBlackboard
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-LightItalic
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: GraphView/Nodes/NodeChevronLeft@2x
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Shaders/DepthOfFieldPrefilter
+    Type: UnityEditor.ShaderInclude, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/Resizable
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Prefabs/WarBroker/Battlefield/TS_Musketeer_Swe
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: DebugProbe
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ProjectStats
+    Type: Naninovel.ProjectStats, Elringus.Naninovel.Runtime, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ChoiceHandlers/ButtonArea
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Spawn/Rain
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Sirenix/GlobalSerializationConfig
+    Type: Sirenix.Serialization.GlobalSerializationConfig, Sirenix.Serialization.Config,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_13
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/TextPrinters/Wide
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/TypeCache
+    Type: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Searcher/SearcherWindow
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Btn
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/UI/PauseUI
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/NaninovelLogo
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Panels/InfoPanel
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: UXML/PixelCacheProfiler
+    Type: UnityEngine.UIElements.VisualTreeAsset, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/ChoiceHandlers/ChatReply
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/ChoiceHandlers/ButtonList
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Icons/sg_subgraph_icon
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Windows
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/CampaignListConfig
+    Type: CampaignListConfig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: TMP Settings
+    Type: TMPro.TMP_Settings, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Audio/SFX/SFX_Sell
+    Type: UnityEngine.AudioClip, UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Panels/GeneralDetailPanel
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Styles/Controls/ColorRGBSlotControlView
+    Type: UnityEngine.UIElements.StyleSheet, UnityEngine.UIElementsModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: Naninovel/Configuration/BackgroundsConfiguration
+    Type: Naninovel.BackgroundsConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - Path: SceneViewIcons/GlobalLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Textures
+    Type: UnityEditor.DefaultAsset, UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Fonts & Materials/LiberationSans SDF
+    Type: TMPro.TMP_FontAsset, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: InspectorIcons/GlobalLight
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Config/WarBroker/VictorProfile_Madman
+    Type: VictorProfile, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - Path: TangentBrokenPro
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: XCLang-EN
+    Type: XCharts.Runtime.Lang, XCharts.Runtime, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: DebugUICanvas
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Prefabs/WarBroker/UI/Windows/GamePlayWindow
+    Type: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: FlatSkin/Font/Roboto-BoldItalic
+    Type: UnityEngine.Font, UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Mascot_Talk_Anim/frame_11
+    Type: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  - Path: Naninovel/Configuration/LocalizationConfiguration
+    Type: Naninovel.LocalizationConfiguration, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
