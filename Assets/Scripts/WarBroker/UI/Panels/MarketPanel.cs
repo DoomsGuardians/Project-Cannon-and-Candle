@@ -41,12 +41,14 @@ public class MarketPanel : WindowBase
 
     private GameplayManager gameplayManager;
     private MarketSystem marketSystem;
+    private UITextConfig textConfig;
 
     public override void OnAwake()
     {
         base.OnAwake();
         gameplayManager = GameRoot.Instance.managerService.GetManager<GameplayManager>();
         marketSystem = GameRoot.Instance.marketSystem;
+        textConfig = resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
 
         var b = gameObject.GetComponent<MarketPanelBinder>();
         if (b != null)
@@ -105,6 +107,9 @@ public class MarketPanel : WindowBase
         AddButtonListener(btnBorrow, OnBorrow);
         AddButtonListener(btnRepay, OnRepay);
 
+        // 设置 Tooltip
+        SetupTooltips();
+
         // 初始化子 Tab
         spotTab?.Initialize(gameplayManager, this);
         futuresTab?.Initialize(gameplayManager, this);
@@ -127,6 +132,50 @@ public class MarketPanel : WindowBase
     public override void OnHide()
     {
         eventService.RemoveEventListeningByTarget(this);
+    }
+
+    private void SetupTooltips()
+    {
+        // 金额选择器按钮
+        if (btnDecrease != null)
+            AddTooltip(btnDecrease.gameObject, "", textConfig?.TooltipBtnDecrease ?? "减少金额 (-100)");
+        if (btnIncrease != null)
+            AddTooltip(btnIncrease.gameObject, "", textConfig?.TooltipBtnIncrease ?? "增加金额 (+100)");
+
+        // 快捷按钮
+        if (btn100 != null)
+            AddTooltip(btn100.gameObject, "", textConfig?.TooltipBtn100 ?? "设置金额为 100");
+        if (btn500 != null)
+            AddTooltip(btn500.gameObject, "", textConfig?.TooltipBtn500 ?? "设置金额为 500");
+        if (btnMax != null)
+            AddTooltip(btnMax.gameObject, "", textConfig?.TooltipBtnMax ?? "设置为当前可借最大额度");
+
+        // 操作按钮
+        if (btnBorrow != null)
+            AddTooltip(btnBorrow.gameObject, "借贷", textConfig?.TooltipBtnBorrow ?? "向银行借入指定金额，每星期需支付利息");
+        if (btnRepay != null)
+            AddTooltip(btnRepay.gameObject, "还款", textConfig?.TooltipBtnRepay ?? "偿还银行贷款，减少利息支出");
+    }
+
+    private void AddTooltip(GameObject target, string title, string content)
+    {
+        if (target == null) return;
+
+        var listener = target.GetComponent<UIListener>();
+        if (listener == null)
+            listener = target.AddComponent<UIListener>();
+
+        listener.onEnter = (eventData, l, args) =>
+        {
+            var tooltip = uIService.GetWindow<TooltipPanel>("TooltipPanel");
+            tooltip?.Show(title, content);
+        };
+
+        listener.onExit = (eventData, l, args) =>
+        {
+            var tooltip = uIService.GetWindow<TooltipPanel>("TooltipPanel");
+            tooltip?.Hide();
+        };
     }
 
     private void OnTabChanged(Toggle toggle, bool isOn)

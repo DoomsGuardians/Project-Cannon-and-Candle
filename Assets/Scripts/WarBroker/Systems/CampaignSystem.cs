@@ -766,13 +766,8 @@ public class CampaignSystem : ILogic
     /// <summary>获取战线名称</summary>
     private string GetFrontlineName(FrontlinePosition position)
     {
-        return position switch
-        {
-            FrontlinePosition.Left => "左翼",
-            FrontlinePosition.Center => "中军",
-            FrontlinePosition.Right => "右翼",
-            _ => position.ToString()
-        };
+        int laneCount = Data?.Battle?.Frontlines?.Count ?? 3;
+        return position.ToDisplayName(laneCount);
     }
 
     /// <summary>旧接口兼容</summary>

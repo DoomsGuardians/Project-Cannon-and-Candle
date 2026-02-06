@@ -16,6 +16,7 @@ public class EventPopup : WindowBase
     private TMP_Text txtEffects;
     private Button btnConfirm;
     private TMP_Text txtBtnConfirm;
+    private Image imgIllustration;
 
     private RandomEventConfig eventConfig;
     private UITextConfig textConfig;
@@ -35,6 +36,7 @@ public class EventPopup : WindowBase
             txtEffects = binder.txtEffects;
             btnConfirm = binder.btnConfirm;
             txtBtnConfirm = binder.txtBtnConfirm;
+            imgIllustration = binder.imgIllustration;
         }
     }
 
@@ -74,6 +76,12 @@ public class EventPopup : WindowBase
         if (txtEffects != null)
             txtEffects.text = BuildEffectsText();
 
+        // 更新插图（如果配置了插图则显示，否则保持默认）
+        if (imgIllustration != null && eventConfig.Illustration != null)
+        {
+            imgIllustration.sprite = eventConfig.Illustration;
+        }
+
         // 更新按钮文本
         if (txtBtnConfirm != null)
             txtBtnConfirm.text = textConfig?.EventBtnConfirm ?? "了解";
@@ -90,13 +98,13 @@ public class EventPopup : WindowBase
             sb.AppendLine($"产能: {eventConfig.ProductionModifier:+0.#%;-0.#%}");
 
         if (Mathf.Abs(eventConfig.AtkDemandModifier) > 0.001f)
-            sb.AppendLine($"ATK需求: {eventConfig.AtkDemandModifier:+0.#%;-0.#%}");
+            sb.AppendLine($"{OrderType.ATK.ToDisplayName()}需求: {eventConfig.AtkDemandModifier:+0.#%;-0.#%}");
 
         if (Mathf.Abs(eventConfig.DefDemandModifier) > 0.001f)
-            sb.AppendLine($"DEF需求: {eventConfig.DefDemandModifier:+0.#%;-0.#%}");
+            sb.AppendLine($"{OrderType.DEF.ToDisplayName()}需求: {eventConfig.DefDemandModifier:+0.#%;-0.#%}");
 
         if (Mathf.Abs(eventConfig.RetDemandModifier) > 0.001f)
-            sb.AppendLine($"RET需求: {eventConfig.RetDemandModifier:+0.#%;-0.#%}");
+            sb.AppendLine($"{OrderType.RET.ToDisplayName()}需求: {eventConfig.RetDemandModifier:+0.#%;-0.#%}");
 
         if (eventConfig.AllTroopChange != 0)
             sb.AppendLine($"全军兵力: {eventConfig.AllTroopChange:+#;-#}");
@@ -105,7 +113,7 @@ public class EventPopup : WindowBase
             sb.AppendLine($"随机将军信任: {eventConfig.RandomTrustChange:+#;-#}");
 
         if (eventConfig.Duration > 1)
-            sb.AppendLine($"持续: {eventConfig.Duration} 回合");
+            sb.AppendLine($"持续: {eventConfig.Duration} 星期");
 
         return sb.ToString();
     }

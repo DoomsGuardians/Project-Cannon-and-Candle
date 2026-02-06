@@ -100,7 +100,7 @@ public class CampaignEndPopup : WindowBase
             float netWorth = data.Player.CalculateNetWorth(data.Market);
             float profit = netWorth - data.Player.AuditValue;
 
-            string turnLabel = textConfig?.CampaignStatsTurn ?? "最终回合";
+            string turnLabel = textConfig?.CampaignStatsTurn ?? "最终星期";
             string cashLabel = textConfig?.CampaignStatsCash ?? "现金";
             string netWorthLabel = textConfig?.CampaignStatsNetWorth ?? "净资产";
 

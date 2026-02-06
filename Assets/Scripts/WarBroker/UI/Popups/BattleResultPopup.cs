@@ -17,6 +17,7 @@ public class BattleResultPopup : WindowBase
     private GameObject resultItemPrefab;
     private Button btnConfirm;
     private TMP_Text txtBtnConfirm;
+    private Image imgIllustration;
 
     private List<BattleResult> results;
     private List<GameObject> spawnedItems = new List<GameObject>();
@@ -44,6 +45,7 @@ public class BattleResultPopup : WindowBase
             resultItemPrefab = binder.resultItemPrefab;
             btnConfirm = binder.btnConfirm;
             txtBtnConfirm = binder.txtBtnConfirm;
+            imgIllustration = binder.imgIllustration;
         }
     }
 
@@ -78,6 +80,7 @@ public class BattleResultPopup : WindowBase
     public void SetBattleResults(List<BattleResult> battleResults)
     {
         results = battleResults;
+        UpdateIllustrationFromResults();
         RefreshUI();
     }
 
@@ -85,6 +88,51 @@ public class BattleResultPopup : WindowBase
     public void SetOnCloseCallback(System.Action callback)
     {
         onCloseCallback = callback;
+    }
+
+    /// <summary>设置插图（如果配置了插图则显示，否则保持默认）</summary>
+    public void SetIllustration(Sprite illustration)
+    {
+        if (imgIllustration != null && illustration != null)
+        {
+            imgIllustration.sprite = illustration;
+        }
+    }
+
+    /// <summary>根据战斗结果自动选择插图</summary>
+    private void UpdateIllustrationFromResults()
+    {
+        if (results == null || results.Count == 0 || textConfig == null || imgIllustration == null)
+            return;
+
+        // 选择最激烈的战斗（伤亡最大的）来显示插图
+        BattleResult selectedResult = null;
+        int maxCasualties = 0;
+
+        foreach (var result in results)
+        {
+            int casualties = Mathf.Abs(result.AllyTroopChange) + Mathf.Abs(result.EnemyTroopChange);
+            if (casualties > maxCasualties)
+            {
+                maxCasualties = casualties;
+                selectedResult = result;
+            }
+        }
+
+        // 如果没有伤亡，使用第一个战斗结果
+        if (selectedResult == null && results.Count > 0)
+        {
+            selectedResult = results[0];
+        }
+
+        if (selectedResult != null)
+        {
+            var sprite = textConfig.GetBattleImage(selectedResult.AllyOrder, selectedResult.EnemyOrder);
+            if (sprite != null)
+            {
+                imgIllustration.sprite = sprite;
+            }
+        }
     }
 
     private void RefreshUI()
@@ -244,13 +292,8 @@ public class BattleResultPopup : WindowBase
 
     private string GetPositionName(FrontlinePosition position)
     {
-        return position switch
-        {
-            FrontlinePosition.Left => "左翼",
-            FrontlinePosition.Center => "中军",
-            FrontlinePosition.Right => "右翼",
-            _ => position.ToString()
-        };
+        int laneCount = gameplayManager?.GetCampaignData()?.Battle?.Frontlines?.Count ?? 3;
+        return position.ToDisplayName(laneCount);
     }
 
     private void OnConfirm()

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 /// <summary>
@@ -24,6 +25,8 @@ public class MusicPlayerPanel : MonoBehaviour
 
     private MusicPlayerManager musicManager;
     private Image shuffleImage;
+    private TooltipPanel tooltipPanel;
+    private UITextConfig textConfig;
 
     private void Awake()
     {
@@ -45,8 +48,18 @@ public class MusicPlayerPanel : MonoBehaviour
             return;
         }
 
+        // 加载配置
+        if (GameRoot.Instance != null)
+        {
+            textConfig = GameRoot.Instance.resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
+            tooltipPanel = GameRoot.Instance.uIService.GetWindow<TooltipPanel>("TooltipPanel");
+        }
+
         // 绑定按钮事件
         BindButtons();
+
+        // 绑定悬停事件（Tooltip）
+        BindHoverEvents();
 
         // 订阅 Manager 事件
         musicManager.OnTrackChanged += OnTrackChanged;
@@ -80,6 +93,41 @@ public class MusicPlayerPanel : MonoBehaviour
 
         if (btnShuffle != null)
             btnShuffle.onClick.AddListener(OnShuffleClicked);
+    }
+
+    private void BindHoverEvents()
+    {
+        string prevTooltip = textConfig?.TooltipBtnPrevious ?? "上一首";
+        string playPauseTooltip = textConfig?.TooltipBtnPlayPause ?? "播放 / 暂停";
+        string nextTooltip = textConfig?.TooltipBtnNext ?? "下一首";
+        string shuffleTooltip = textConfig?.TooltipBtnShuffle ?? "随机播放";
+
+        AddButtonTooltip(btnPrevious, prevTooltip);
+        AddButtonTooltip(btnPlayPause, playPauseTooltip);
+        AddButtonTooltip(btnNext, nextTooltip);
+        AddButtonTooltip(btnShuffle, shuffleTooltip);
+    }
+
+    private void AddButtonTooltip(Button button, string title, string content = null)
+    {
+        if (button == null) return;
+
+        var trigger = button.gameObject.GetComponent<EventTrigger>();
+        if (trigger == null)
+            trigger = button.gameObject.AddComponent<EventTrigger>();
+
+        // 如果没有提供content，使用title作为content
+        string tooltipContent = content ?? title;
+
+        // 鼠标进入
+        var entryEnter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        entryEnter.callback.AddListener((data) => tooltipPanel?.Show(title, tooltipContent));
+        trigger.triggers.Add(entryEnter);
+
+        // 鼠标离开
+        var entryExit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+        entryExit.callback.AddListener((data) => tooltipPanel?.Hide());
+        trigger.triggers.Add(entryExit);
     }
 
     #region 按钮点击处理

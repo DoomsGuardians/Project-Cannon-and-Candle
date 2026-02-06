@@ -68,9 +68,9 @@ MonoBehaviour:
   ProductionFactorMin: 0.9
   ProductionFactorMax: 1.1
   Combat_ATK_ATK: {x: -2, y: -2}
-  Combat_ATK_DEF: {x: -3, y: -1}
+  Combat_ATK_DEF: {x: -4, y: -1}
   Combat_ATK_RET: {x: 0, y: 1}
-  Combat_DEF_ATK: {x: -1, y: -3}
+  Combat_DEF_ATK: {x: -1, y: -4}
   Combat_DEF_DEF: {x: 0, y: 0}
   Combat_DEF_RET: {x: 0, y: 1}
   Combat_RET_ATK: {x: 1, y: 0}

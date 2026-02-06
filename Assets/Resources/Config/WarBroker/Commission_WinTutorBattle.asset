@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
-  m_Name: Commission_WinTheBattle
+  m_Name: Commission_WinTutorBattle
   m_EditorClassIdentifier: 
-  CommissionId: winTheWar
+  CommissionId: WinTutorBattle
   DisplayName: "\u6218\u80DC\u5BF9\u624B"
-  Description: "\u5728\u4EFB\u610F\u4E00\u6761\u6218\u7EBF\uFF0C\u5360\u9886\u7B2C\u4E94\u9635\u5730"
+  Description: "\u5360\u9886\u5730\u65B9\u5927\u672C\u8425"
   CommissionerName: "\u6590\u8FEA\u5357\u4E8C\u4E16"
   CommissionerAvatar: {fileID: 21300000, guid: 94647991a64cb7846b609d5aed4b7cc4, type: 3}
   CommissionerQuote: "\u6715\u6388\u5C14\u5168\u6743\u7EDF\u5E05\u5E1D\u56FD\u5927\u519B\uFF0C\u52A1\u5FC5\u5F7B\u5E95\u7C89\u788E\u65B0\u6559\u53DB\u519B\uFF0C\u634D\u536B\u5929\u4E3B\u5723\u6559\uFF0C\u8FDD\u547D\u8005\u5FC5\u4E25\u60E9\u4E0D\u8D37\uFF01"
-  BonusAmount: 2500
+  BonusAmount: 1000
   Type: 0
   TargetValue: 5
   SecondaryTargetValue: 1

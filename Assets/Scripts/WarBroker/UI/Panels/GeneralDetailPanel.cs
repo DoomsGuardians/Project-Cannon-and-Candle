@@ -130,6 +130,9 @@ public class GeneralDetailPanel : WindowBase
         // 获取 TooltipPanel
         tooltipPanel = uIService.GetWindow<TooltipPanel>("TooltipPanel");
 
+        // 设置按钮 Tooltip
+        SetupButtonTooltips();
+
         // 监听意图变化事件
         eventService.AddEventListening((EventID)WarBrokerEventID.OnIntentChanged, OnIntentChanged);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTradeExecuted, OnDataChanged);
@@ -141,6 +144,58 @@ public class GeneralDetailPanel : WindowBase
     {
         eventService.RemoveEventListeningByTarget(this);
         tooltipPanel?.Hide();
+    }
+
+    private void SetupButtonTooltips()
+    {
+        // 从配置获取实际消耗值
+        int reinforceCost = intentSystem?.GetReinforceCost() ?? 1;
+        int overrideCost = intentSystem?.GetOverrideCost() ?? 2;
+
+        // 强化按钮 - 同时显示tooltip和预览
+        if (btnReinforce != null)
+        {
+            string reinforceTooltip = $"消耗{reinforceCost}单位对应指令，强化该将军的意图";
+            AddTooltipToButton(btnReinforce, "强化", reinforceTooltip);
+        }
+
+        // 篡改按钮
+        string overrideTooltip = $"消耗{overrideCost}单位指令，强制改变将军的行动意图";
+        if (btnOverrideATK != null)
+            AddTooltipToButton(btnOverrideATK, "篡改", overrideTooltip);
+        if (btnOverrideDEF != null)
+            AddTooltipToButton(btnOverrideDEF, "篡改", overrideTooltip);
+        if (btnOverrideRET != null)
+            AddTooltipToButton(btnOverrideRET, "篡改", overrideTooltip);
+
+        // 关闭按钮
+        if (btnClose != null)
+            AddTooltipToButton(btnClose, "", "关闭将军详情面板");
+    }
+
+    private void AddTooltipToButton(Button btn, string title, string content)
+    {
+        if (btn == null || tooltipPanel == null) return;
+
+        var trigger = btn.GetComponent<UnityEngine.EventSystems.EventTrigger>();
+        if (trigger == null)
+            trigger = btn.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+
+        // PointerEnter - 在已有的事件基础上添加tooltip显示
+        var enterEntry = new UnityEngine.EventSystems.EventTrigger.Entry
+        {
+            eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter
+        };
+        enterEntry.callback.AddListener((data) => tooltipPanel?.Show(title, content));
+        trigger.triggers.Add(enterEntry);
+
+        // PointerExit
+        var exitEntry = new UnityEngine.EventSystems.EventTrigger.Entry
+        {
+            eventID = UnityEngine.EventSystems.EventTriggerType.PointerExit
+        };
+        exitEntry.callback.AddListener((data) => tooltipPanel?.Hide());
+        trigger.triggers.Add(exitEntry);
     }
 
     /// <summary>设置当前显示的将军</summary>
@@ -372,7 +427,7 @@ public class GeneralDetailPanel : WindowBase
         if (txtIntent != null)
         {
             string intentIcon = intent.HasValue ? GetIntentIcon(intent.Value) : "?";
-            txtIntent.text = $"{intentIcon} {(intent.HasValue ? intent.Value.ToString() : "未知")}";
+            txtIntent.text = $"{intentIcon} {(intent.HasValue ? intent.Value.ToDisplayName() : "未知")}";
         }
     }
 
@@ -382,7 +437,7 @@ public class GeneralDetailPanel : WindowBase
         if (player == null) return;
 
         int reinforceCost = intentSystem?.GetReinforceCost() ?? 1;
-        int overrideCost = intentSystem?.GetOverrideCost() ?? 3;
+        int overrideCost = intentSystem?.GetOverrideCost() ?? 2;
 
         // 强化按钮
         if (btnReinforce != null)
@@ -497,9 +552,9 @@ public class GeneralDetailPanel : WindowBase
     {
         return type switch
         {
-            OrderType.ATK => "🔴",
-            OrderType.DEF => "🔵",
-            OrderType.RET => "🟡",
+            OrderType.ATK => "<color=#CC3333>[攻]</color>",
+            OrderType.DEF => "<color=#3366CC>[守]</color>",
+            OrderType.RET => "<color=#CCAA33>[撤]</color>",
             _ => "?"
         };
     }
@@ -517,13 +572,8 @@ public class GeneralDetailPanel : WindowBase
 
     private string GetPositionText(FrontlinePosition position)
     {
-        return position switch
-        {
-            FrontlinePosition.Left => "左翼",
-            FrontlinePosition.Center => "中军",
-            FrontlinePosition.Right => "右翼",
-            _ => position.ToString()
-        };
+        int laneCount = gameplayManager?.GetCampaignData()?.Battle?.Frontlines?.Count ?? 3;
+        return position.ToDisplayName(laneCount);
     }
 
     #region 按钮悬停事件 - 指令预览
@@ -564,7 +614,7 @@ public class GeneralDetailPanel : WindowBase
 
     private void OnOverrideHoverEnter(OrderType orderType)
     {
-        int cost = intentSystem?.GetOverrideCost() ?? 3;
+        int cost = intentSystem?.GetOverrideCost() ?? 2;
         eventService.SendMessage((EventID)WarBrokerEventID.OnInventoryPreview, orderType, -cost);
     }
 

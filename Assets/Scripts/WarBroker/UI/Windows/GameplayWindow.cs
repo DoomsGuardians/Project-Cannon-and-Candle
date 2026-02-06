@@ -120,7 +120,7 @@ public class GameplayWindow : WindowBase
     {
         // 回合图标 Tooltip
         if (imgTurnIcon != null)
-            AddTooltip(imgTurnIcon.gameObject, "回合", textConfig?.TooltipTurn ?? "当前回合 / 最大回合数");
+            AddTooltip(imgTurnIcon.gameObject, "星期", textConfig?.TooltipTurn ?? "当前星期 / 最大星期数");
 
         // 现金图标 Tooltip
         if (imgCashIcon != null)
@@ -160,9 +160,15 @@ public class GameplayWindow : WindowBase
         if (txtRET != null)
             AddTooltip(txtRET.gameObject, "撤退令", textConfig?.TooltipRET ?? "下达撤退指令，命令部队后撤进行休整补充");
 
+        // Tab按钮 Tooltip
+        if (btnMarket != null)
+            AddTooltip(btnMarket.gameObject, "市场", textConfig?.TooltipBtnMarket ?? "打开市场面板，进行现货/期货交易");
+        if (btnInfo != null)
+            AddTooltip(btnInfo.gameObject, "情报", textConfig?.TooltipBtnInfo ?? "打开情报面板，查看战场态势和K线图");
+
         // 结束回合按钮 Tooltip
         if (btnEndTurn != null)
-            AddTooltip(btnEndTurn.gameObject, "结束回合", GetEndTurnTooltipContent);
+            AddTooltip(btnEndTurn.gameObject, "结束本周", GetEndTurnTooltipContent);
     }
 
     private string GetCashTooltipContent()
@@ -180,7 +186,7 @@ public class GameplayWindow : WindowBase
         float totalCost = interest + storageCost;
 
         return $"当前: {data.Player.Cash:F0}\n" +
-               $"<color=#FF6666>下回合固定支出:</color>\n" +
+               $"<color=#FF6666>下星期固定支出:</color>\n" +
                $"  利息: -{interest:F0}\n" +
                $"  仓储费: -{storageCost:F0}\n" +
                $"  <color=#FFCC00>合计: -{totalCost:F0}</color>";
@@ -189,7 +195,7 @@ public class GameplayWindow : WindowBase
     private string GetEndTurnTooltipContent()
     {
         var data = gameplayManager?.GetCampaignData();
-        if (data == null) return "进入下一回合";
+        if (data == null) return "进入下一星期";
 
         float interest = data.Player.BankDebt * (balanceConfig?.BankInterestRate ?? 0.05f);
         int totalInventory = 0;
@@ -202,9 +208,9 @@ public class GameplayWindow : WindowBase
 
         if (totalCost > 0)
         {
-            return $"进入下一回合\n<color=#FF6666>将扣除: -{totalCost:F0}</color>";
+            return $"进入下一星期\n<color=#FF6666>将扣除: -{totalCost:F0}</color>";
         }
-        return "进入下一回合";
+        return "进入下一星期";
     }
 
     /// <summary>
@@ -319,7 +325,7 @@ public class GameplayWindow : WindowBase
         if (txtEventInfo != null)
         {
             txtEventInfo.text = data.ActiveEvent != null
-                ? $"事件: {data.ActiveEvent.EventName} ({data.EventRemainingTurns}回合)"
+                ? $"事件: {data.ActiveEvent.EventName} ({data.EventRemainingTurns}星期)"
                 : "";
         }
     }

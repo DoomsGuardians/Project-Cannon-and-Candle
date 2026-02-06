@@ -12,4 +12,5 @@ public class BattleResultPopupBinder : UIBinder
     public GameObject resultItemPrefab;
     public Button btnConfirm;
     public TMP_Text txtBtnConfirm;
+    public Image imgIllustration;
 }

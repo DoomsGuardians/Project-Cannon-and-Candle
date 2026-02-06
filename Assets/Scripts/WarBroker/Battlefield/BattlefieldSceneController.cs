@@ -240,11 +240,32 @@ public class BattlefieldSceneController : MonoBehaviour
         return unit;
     }
 
+    /// <summary>将 FrontlinePosition 映射到场景战线索引（支持动态战线数量）</summary>
+    private int GetSceneLaneIndex(FrontlinePosition position)
+    {
+        if (battlefieldRoot == null) return 0;
+
+        int laneCount = battlefieldRoot.LaneCount;
+        var positions = FrontlinePositionExtensions.GetPositionsForLaneCount(laneCount);
+
+        // 找到该 position 在当前配置中的索引
+        // 例如 3 条战线 [Left, Center, Right] 映射到 [0, 1, 2]
+        for (int i = 0; i < positions.Length; i++)
+        {
+            if (positions[i] == position)
+                return i;
+        }
+
+        // 回退：限制在有效范围内
+        Debug.LogWarning($"[BattleAnim] Position {position} not in current lane config (laneCount={laneCount})");
+        return Mathf.Clamp((int)position, 0, laneCount - 1);
+    }
+
     private void UpdateUnitPosition(GeneralUnit3D unit, GeneralData general, bool isAlly)
     {
         if (unit == null || battlefieldRoot == null) return;
 
-        int laneIndex = (int)general.Position;
+        int laneIndex = GetSceneLaneIndex(general.Position);
         // GridPosition 是 1-based，转换为 0-based 索引
         int gridIndex = general.GridPosition - 1;
         Vector3 gridPos = battlefieldRoot.GetGridPosition(laneIndex, gridIndex);
@@ -272,11 +293,7 @@ public class BattlefieldSceneController : MonoBehaviour
         }
 
         // 从单位数据获取战线索引
-        int laneIndex = 0;
-        if (unit.Data != null)
-        {
-            laneIndex = (int)unit.Data.Position;
-        }
+        int laneIndex = GetSceneLaneIndex(unit.Data?.Position ?? FrontlinePosition.Center);
 
         // GridPosition 是 1-based，转换为 0-based 索引
         // UnitsContainer 在原点，所以世界坐标 = 本地坐标
@@ -480,7 +497,8 @@ public class BattlefieldSceneController : MonoBehaviour
             battlefieldCamera.SmoothFollowBattle(allyTransform, enemyTransform);
         }
 
-        Debug.Log($"[BattleAnim] {result.Position}: {result.AllyOrder} vs {result.EnemyOrder}, Ally {result.AllyOldPosition}->{result.AllyNewPosition}, Enemy {result.EnemyOldPosition}->{result.EnemyNewPosition}");
+        int laneCount = battlefieldRoot?.LaneCount ?? 3;
+        Debug.Log($"[BattleAnim] {result.Position.ToDisplayName(laneCount)}: {result.AllyOrder.ToDisplayName()} vs {result.EnemyOrder.ToDisplayName()}, Ally {result.AllyOldPosition}->{result.AllyNewPosition}, Enemy {result.EnemyOldPosition}->{result.EnemyNewPosition}");
 
         // 等待 Cinemachine 过渡完成后再开始战斗动画
         float cameraDelay = battlefieldCamera != null ? battlefieldCamera.GetBlendDuration() : 0.5f;

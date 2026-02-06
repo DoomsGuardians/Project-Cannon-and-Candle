@@ -192,7 +192,7 @@ public class LetterDialogueConfig : ScriptableObject
         "北方的雄狮从不畏惧挑战。保重，将军。",
         "让我们看看，谁才是这场战争的主宰。",
         "历史会记住这一切。祝你好运，华伦斯坦。",
-        "无论胜负，都请保持一个军人的尊严。下星期见。"
+        "无论胜负，都请保持一个军人的尊严。战场上见。"
     };
 
     [Header("=== 华伦斯坦回应（确认按钮文本） ===")]
@@ -394,13 +394,7 @@ public class LetterDialogueConfig : ScriptableObject
 
     private string GetOrderTypeName(OrderType orderType)
     {
-        switch (orderType)
-        {
-            case OrderType.ATK: return "进攻";
-            case OrderType.DEF: return "防御";
-            case OrderType.RET: return "撤退";
-            default: return orderType.ToString();
-        }
+        return orderType.ToDisplayName();
     }
 }
 

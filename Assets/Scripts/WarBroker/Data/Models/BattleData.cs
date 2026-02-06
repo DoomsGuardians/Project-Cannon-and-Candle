@@ -116,7 +116,9 @@ public class BattleData
         EnemyReserves = campaignConfig.InitialReserves; // 敌方初始后备役与玩家相同
 
         Frontlines = new Dictionary<FrontlinePosition, FrontlineData>();
-        foreach (FrontlinePosition pos in Enum.GetValues(typeof(FrontlinePosition)))
+        // 根据战线数量创建对应的战线
+        var positions = FrontlinePositionExtensions.GetPositionsForLaneCount(campaignConfig.LaneCount);
+        foreach (var pos in positions)
         {
             var frontline = new FrontlineData { Position = pos };
             frontline.InitFromConfig(campaignConfig);

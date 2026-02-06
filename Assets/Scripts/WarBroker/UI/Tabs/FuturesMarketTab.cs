@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 /// <summary>
@@ -41,6 +42,8 @@ public class FuturesMarketTab : MonoBehaviour
     private GameplayManager gameplayManager;
     private GameBalanceConfig balanceConfig;
     private WindowBase parentWindow;
+    private UITextConfig textConfig;
+    private TooltipPanel tooltipPanel;
 
     private List<GameObject> spawnedItems = new List<GameObject>();
 
@@ -52,9 +55,12 @@ public class FuturesMarketTab : MonoBehaviour
         if (GameRoot.Instance != null)
         {
             balanceConfig = GameRoot.Instance.resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
+            textConfig = GameRoot.Instance.resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
+            tooltipPanel = GameRoot.Instance.uIService.GetWindow<TooltipPanel>("TooltipPanel");
         }
 
         BindButtons();
+        SetupTooltips();
         RefreshUI();
     }
 
@@ -73,6 +79,43 @@ public class FuturesMarketTab : MonoBehaviour
         // RET 行
         parentWindow.AddButtonListener(btnRetLong, () => OpenPosition(OrderType.RET, FuturesDirection.Long));
         parentWindow.AddButtonListener(btnRetShort, () => OpenPosition(OrderType.RET, FuturesDirection.Short));
+    }
+
+    private void SetupTooltips()
+    {
+        string longTooltip = textConfig?.TooltipBtnLong ?? "开多仓，预期价格上涨获利。3星期后结算";
+        string shortTooltip = textConfig?.TooltipBtnShort ?? "开空仓，预期价格下跌获利。3星期后结算";
+
+        // ATK 行
+        AddTooltip(btnAtkLong, "做多", longTooltip);
+        AddTooltip(btnAtkShort, "做空", shortTooltip);
+
+        // DEF 行
+        AddTooltip(btnDefLong, "做多", longTooltip);
+        AddTooltip(btnDefShort, "做空", shortTooltip);
+
+        // RET 行
+        AddTooltip(btnRetLong, "做多", longTooltip);
+        AddTooltip(btnRetShort, "做空", shortTooltip);
+    }
+
+    private void AddTooltip(Button button, string title, string content)
+    {
+        if (button == null) return;
+
+        var trigger = button.gameObject.GetComponent<EventTrigger>();
+        if (trigger == null)
+            trigger = button.gameObject.AddComponent<EventTrigger>();
+
+        // 鼠标进入
+        var entryEnter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        entryEnter.callback.AddListener((data) => tooltipPanel?.Show(title, content));
+        trigger.triggers.Add(entryEnter);
+
+        // 鼠标离开
+        var entryExit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+        entryExit.callback.AddListener((data) => tooltipPanel?.Hide());
+        trigger.triggers.Add(entryExit);
     }
 
     private void OpenPosition(OrderType type, FuturesDirection direction)
@@ -182,11 +225,11 @@ public class FuturesMarketTab : MonoBehaviour
         if (binder.txtCurrentPrice != null)
             binder.txtCurrentPrice.text = $"现价: {currentPrice:F1}";
 
-        // 到期回合
+        // 到期星期
         if (binder.txtExpiration != null)
         {
             int remaining = contract.ExpirationTurn - data.CurrentTurn;
-            binder.txtExpiration.text = $"剩余: {remaining} 回合";
+            binder.txtExpiration.text = $"剩余: {remaining} 星期";
         }
 
         // 保证金
@@ -205,6 +248,10 @@ public class FuturesMarketTab : MonoBehaviour
         {
             int contractId = contract.ContractId;
             parentWindow.AddButtonListener(binder.btnClose, () => OnClosePosition(contractId));
+
+            // 为平仓按钮添加 Tooltip
+            string closeTooltip = textConfig?.TooltipBtnClose ?? "提前平仓，按当前价格结算盈亏";
+            AddTooltip(binder.btnClose, "平仓", closeTooltip);
         }
     }
 

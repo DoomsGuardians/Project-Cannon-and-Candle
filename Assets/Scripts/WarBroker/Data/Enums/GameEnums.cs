@@ -27,9 +27,11 @@ public enum GeneralStatus
 /// <summary>战线位置</summary>
 public enum FrontlinePosition
 {
-    Left,   // 左翼
-    Center, // 中军
-    Right   // 右翼
+    Left,       // 左翼 / 第一战线
+    LeftCenter, // 左中 / 第二战线
+    Center,     // 中军 / 第三战线
+    RightCenter,// 右中 / 第四战线
+    Right       // 右翼 / 第五战线
 }
 
 /// <summary>期货方向</summary>

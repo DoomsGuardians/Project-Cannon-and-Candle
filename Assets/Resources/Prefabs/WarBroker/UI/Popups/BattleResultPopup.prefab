@@ -228,6 +228,7 @@ MonoBehaviour:
   resultItemPrefab: {fileID: 6691139977419062131, guid: 56f163c532cc6044990695af318fb926, type: 3}
   btnConfirm: {fileID: 162600393089374078}
   txtBtnConfirm: {fileID: 2732061791974177587}
+  imgIllustration: {fileID: 8779555305419627343}
 --- !u!1 &1141106509990073437
 GameObject:
   m_ObjectHideFlags: 0

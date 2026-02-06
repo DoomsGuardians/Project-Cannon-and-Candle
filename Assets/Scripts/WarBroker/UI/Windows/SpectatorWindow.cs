@@ -174,7 +174,7 @@ public class SpectatorWindow : WindowBase
 
         // 顶部信息
         if (txtTurn != null)
-            txtTurn.text = $"回合 {data.CurrentTurn} / {config?.MaxTurns ?? 30}";
+            txtTurn.text = $"星期 {data.CurrentTurn} / {config?.MaxTurns ?? 30}";
 
         if (txtStatus != null)
         {
@@ -231,7 +231,7 @@ public class SpectatorWindow : WindowBase
             foreach (var kv in allyLedger.Holdings)
             {
                 if (kv.Value > 0)
-                    sb.Append($"{kv.Key}:{kv.Value} ");
+                    sb.Append($"{kv.Key.ToDisplayName()}:{kv.Value} ");
             }
             txtAllyHoldings.text = sb.ToString();
         }
@@ -265,7 +265,7 @@ public class SpectatorWindow : WindowBase
             foreach (var kv in enemyLedger.Holdings)
             {
                 if (kv.Value > 0)
-                    sb.Append($"{kv.Key}:{kv.Value} ");
+                    sb.Append($"{kv.Key.ToDisplayName()}:{kv.Value} ");
             }
             txtEnemyHoldings.text = sb.ToString();
         }
@@ -275,12 +275,13 @@ public class SpectatorWindow : WindowBase
     {
         if (txtFrontlineInfo == null) return;
 
+        int laneCount = data.Battle.Frontlines.Count;
         sb.Clear();
         sb.AppendLine("战线状态:");
         foreach (var kv in data.Battle.Frontlines)
         {
             var fl = kv.Value;
-            sb.AppendLine($"  {kv.Key}: 位置 {fl.LinePosition:F1}");
+            sb.AppendLine($"  {kv.Key.ToDisplayName(laneCount)}: 位置 {fl.LinePosition:F1}");
         }
 
         // 将军状态
@@ -311,7 +312,7 @@ public class SpectatorWindow : WindowBase
         sb.AppendLine("当前价格:");
         foreach (var kv in data.Market.CurrentPrices)
         {
-            sb.AppendLine($"  {kv.Key}: {kv.Value:F1}");
+            sb.AppendLine($"  {kv.Key.ToDisplayName()}: {kv.Value:F1}");
         }
         txtPriceInfo.text = sb.ToString();
     }
@@ -365,7 +366,7 @@ public class SpectatorWindow : WindowBase
             sb.Clear();
             sb.AppendLine(stats.GetResultDescription());
             sb.AppendLine();
-            sb.AppendLine($"总回合数: {stats.TotalTurns}");
+            sb.AppendLine($"总星期数: {stats.TotalTurns}");
             sb.AppendLine();
             sb.AppendLine("=== 己方最终状态 ===");
             sb.AppendLine($"净资产: {stats.AllyStats.FinalNetWorth:F0}");

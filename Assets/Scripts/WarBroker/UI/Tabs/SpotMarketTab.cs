@@ -39,11 +39,20 @@ public class SpotMarketTab : MonoBehaviour
     private GameplayManager gameplayManager;
     private WindowBase parentWindow;
     private OrderType selectedOrderType = OrderType.ATK;
+    private UITextConfig textConfig;
+    private TooltipPanel tooltipPanel;
 
     public void Initialize(GameplayManager manager, WindowBase parent)
     {
         gameplayManager = manager;
         parentWindow = parent;
+
+        // 加载配置
+        if (GameRoot.Instance != null)
+        {
+            textConfig = GameRoot.Instance.resService.LoadResource<UITextConfig>(ConfigPaths.UI_TEXT);
+            tooltipPanel = GameRoot.Instance.uIService.GetWindow<TooltipPanel>("TooltipPanel");
+        }
 
         BindButtons();
         BindHoverEvents();
@@ -70,16 +79,25 @@ public class SpotMarketTab : MonoBehaviour
 
     private void BindHoverEvents()
     {
-        // 为买入/卖出按钮添加悬停事件
-        AddHoverEvent(btnAtkBuy, OrderType.ATK, 1);
-        AddHoverEvent(btnAtkSell, OrderType.ATK, -1);
-        AddHoverEvent(btnDefBuy, OrderType.DEF, 1);
-        AddHoverEvent(btnDefSell, OrderType.DEF, -1);
-        AddHoverEvent(btnRetBuy, OrderType.RET, 1);
-        AddHoverEvent(btnRetSell, OrderType.RET, -1);
+        // 为买入/卖出按钮添加悬停事件（预览+Tooltip）
+        string buyTooltip = textConfig?.TooltipBtnBuy ?? "买入1单位指令，价格随需求上涨";
+        string sellTooltip = textConfig?.TooltipBtnSell ?? "卖出1单位指令，价格随供给下跌";
+
+        AddHoverEvent(btnAtkBuy, OrderType.ATK, 1, "买入", buyTooltip);
+        AddHoverEvent(btnAtkSell, OrderType.ATK, -1, "卖出", sellTooltip);
+        AddHoverEvent(btnDefBuy, OrderType.DEF, 1, "买入", buyTooltip);
+        AddHoverEvent(btnDefSell, OrderType.DEF, -1, "卖出", sellTooltip);
+        AddHoverEvent(btnRetBuy, OrderType.RET, 1, "买入", buyTooltip);
+        AddHoverEvent(btnRetSell, OrderType.RET, -1, "卖出", sellTooltip);
+
+        // 为K线图按钮添加Tooltip
+        string chartTooltip = textConfig?.TooltipBtnChart ?? "切换显示该指令的K线图";
+        AddChartButtonTooltip(btnAtkChart, $"{OrderType.ATK.ToDisplayName()} K线", chartTooltip);
+        AddChartButtonTooltip(btnDefChart, $"{OrderType.DEF.ToDisplayName()} K线", chartTooltip);
+        AddChartButtonTooltip(btnRetChart, $"{OrderType.RET.ToDisplayName()} K线", chartTooltip);
     }
 
-    private void AddHoverEvent(Button button, OrderType orderType, int delta)
+    private void AddHoverEvent(Button button, OrderType orderType, int delta, string tooltipTitle, string tooltipContent)
     {
         if (button == null) return;
 
@@ -89,12 +107,39 @@ public class SpotMarketTab : MonoBehaviour
 
         // 鼠标进入
         var entryEnter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-        entryEnter.callback.AddListener((data) => SendPreviewEvent(orderType, delta));
+        entryEnter.callback.AddListener((data) =>
+        {
+            SendPreviewEvent(orderType, delta);
+            tooltipPanel?.Show(tooltipTitle, tooltipContent);
+        });
         trigger.triggers.Add(entryEnter);
 
         // 鼠标离开
         var entryExit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-        entryExit.callback.AddListener((data) => SendPreviewEvent(orderType, 0));
+        entryExit.callback.AddListener((data) =>
+        {
+            SendPreviewEvent(orderType, 0);
+            tooltipPanel?.Hide();
+        });
+        trigger.triggers.Add(entryExit);
+    }
+
+    private void AddChartButtonTooltip(Button button, string title, string content)
+    {
+        if (button == null) return;
+
+        var trigger = button.gameObject.GetComponent<EventTrigger>();
+        if (trigger == null)
+            trigger = button.gameObject.AddComponent<EventTrigger>();
+
+        // 鼠标进入
+        var entryEnter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        entryEnter.callback.AddListener((data) => tooltipPanel?.Show(title, content));
+        trigger.triggers.Add(entryEnter);
+
+        // 鼠标离开
+        var entryExit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+        entryExit.callback.AddListener((data) => tooltipPanel?.Hide());
         trigger.triggers.Add(entryExit);
     }
 
@@ -111,7 +156,7 @@ public class SpotMarketTab : MonoBehaviour
         {
             klineChart.Initialize();
             klineChart.SetOrderType(selectedOrderType);
-            klineChart.SetTitle(selectedOrderType.ToString());
+            klineChart.SetTitle(selectedOrderType.ToDisplayName());
             RefreshChart();  // 默认显示 ATK 的 K 线图
         }
     }
@@ -125,7 +170,7 @@ public class SpotMarketTab : MonoBehaviour
         if (klineChart != null)
         {
             klineChart.SetOrderType(type);
-            klineChart.SetTitle(type.ToString());
+            klineChart.SetTitle(type.ToDisplayName());
         }
         RefreshChart();
     }
@@ -187,20 +232,6 @@ public class SpotMarketTab : MonoBehaviour
         {
             int stock = marketInv[type];
             marketStockText.text = $"{stock}";
-
-            // 库存不足时变色提示
-            if (stock <= 0)
-            {
-                marketStockText.color = Color.red;
-            }
-            else if (stock < 50)
-            {
-                marketStockText.color = new Color(1f, 0.6f, 0f); // 橙色
-            }
-            else
-            {
-                marketStockText.color = Color.white;
-            }
         }
 
         // 持有量

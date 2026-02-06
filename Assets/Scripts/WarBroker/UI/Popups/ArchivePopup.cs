@@ -81,7 +81,7 @@ public class ArchivePopup : WindowBase
             var sb = new System.Text.StringBuilder();
             sb.AppendLine($"总战役数: {stats.TotalCampaignsPlayed}");
             sb.AppendLine($"胜/负/平: {stats.TotalVictories}/{stats.TotalDefeats}/{stats.TotalDraws}");
-            sb.AppendLine($"总回合数: {stats.TotalTurnsPlayed}");
+            sb.AppendLine($"总星期数: {stats.TotalTurnsPlayed}");
             sb.AppendLine($"总交易次数: {stats.TotalTradeCount}");
             sb.AppendLine($"游戏时长: {FormatPlayTime(stats.TotalPlayTimeSeconds)}");
             sb.AppendLine();
@@ -189,9 +189,9 @@ public class ArchivePopup : WindowBase
             }
         }
 
-        // 回合数
+        // 星期数
         if (binder.txtTurns != null)
-            binder.txtTurns.text = $"第{record.FinalTurn}回合";
+            binder.txtTurns.text = $"第{record.FinalTurn}星期";
     }
 
     private string FormatPlayTime(float seconds)

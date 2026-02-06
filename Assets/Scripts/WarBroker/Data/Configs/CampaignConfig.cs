@@ -107,6 +107,9 @@ public class RandomEventConfig
     [TextArea(2, 3)]
     public string Description;
 
+    [Tooltip("事件插图")]
+    public Sprite Illustration;
+
     [Header("效果")]
     [Tooltip("产能修正%")]
     public float ProductionModifier;
