@@ -182,11 +182,11 @@ public class CommissionSystem
     private int CalculateTotalCasualties()
     {
         int totalCasualties = 0;
-        int initialHP = 16; // 假设初始 HP 为 16
 
-        // 计算己方伤亡
+        // 计算己方伤亡（使用各将军配置的初始兵力）
         foreach (var general in campaignData.Battle.AllyGenerals)
         {
+            int initialHP = general.Config?.InitialTroops ?? 16;
             int casualties = Mathf.Max(0, initialHP - general.Troops);
             totalCasualties += casualties;
         }
@@ -194,12 +194,14 @@ public class CommissionSystem
         // 计算敌方伤亡
         foreach (var general in campaignData.Battle.EnemyGenerals)
         {
+            int initialHP = general.Config?.InitialTroops ?? 16;
             int casualties = Mathf.Max(0, initialHP - general.Troops);
             totalCasualties += casualties;
         }
 
-        // 加上后备役消耗（假设初始后备役为 60）
-        int reservesUsed = Mathf.Max(0, 60 - campaignData.Battle.CurrentReserves);
+        // 加上后备役消耗（使用战役配置的初始后备役）
+        int initialReserves = campaignData.Config?.InitialReserves ?? 60;
+        int reservesUsed = Mathf.Max(0, initialReserves - campaignData.Battle.CurrentReserves);
         totalCasualties += reservesUsed;
 
         return totalCasualties;

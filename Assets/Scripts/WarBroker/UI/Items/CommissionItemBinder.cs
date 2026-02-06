@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 /// <summary>
 /// 委托任务项 UI Binder
 /// 挂在 CommissionItem.prefab 上，持有 UI 元素引用
 /// </summary>
-public class CommissionItemBinder : UIBinder
+public class CommissionItemBinder : UIBinder, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("委托信息（静态）")]
     [Tooltip("委托名称，如 '斩首胜利'")]
@@ -27,4 +28,21 @@ public class CommissionItemBinder : UIBinder
     /// </summary>
     [HideInInspector]
     public CommissionConfig Config;
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (Config != null && !string.IsNullOrEmpty(Config.CommissionerQuote))
+        {
+            var uiService = GameRoot.Instance?.uIService;
+            var tooltip = uiService?.GetWindow<TooltipPanel>("TooltipPanel");
+            tooltip?.Show(Config.CommissionerName, Config.CommissionerQuote);
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        var uiService = GameRoot.Instance?.uIService;
+        var tooltip = uiService?.GetWindow<TooltipPanel>("TooltipPanel");
+        tooltip?.Hide();
+    }
 }
