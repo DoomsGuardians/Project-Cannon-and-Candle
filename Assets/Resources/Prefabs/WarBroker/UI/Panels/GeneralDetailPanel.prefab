@@ -1525,6 +1525,7 @@ GameObject:
   - component: {fileID: 5000894212334658208}
   - component: {fileID: 5406951424770416707}
   - component: {fileID: 2259632188248945769}
+  - component: {fileID: 8400296814760246503}
   m_Layer: 5
   m_Name: CloseBtn
   m_TagString: Untagged
@@ -1634,6 +1635,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8400296814760246503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3764752073776697775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &3992324294309033030
 GameObject:
   m_ObjectHideFlags: 0
@@ -1757,6 +1779,7 @@ GameObject:
   - component: {fileID: 9180187313697328443}
   - component: {fileID: 549782322523683843}
   - component: {fileID: 5683714644435223401}
+  - component: {fileID: 9121234447845029621}
   m_Layer: 5
   m_Name: DefBtn
   m_TagString: Untagged
@@ -1865,6 +1888,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &9121234447845029621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4491210259952565776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &4568752415191858618
 GameObject:
   m_ObjectHideFlags: 0
@@ -2370,6 +2414,7 @@ GameObject:
   - component: {fileID: 5982683283668017661}
   - component: {fileID: 8119780361099131420}
   - component: {fileID: 2915951192576424467}
+  - component: {fileID: 8761720364399731102}
   m_Layer: 5
   m_Name: RetBtn
   m_TagString: Untagged
@@ -2478,6 +2523,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8761720364399731102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6284384352022851851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &6670513169631674335
 GameObject:
   m_ObjectHideFlags: 0
@@ -3339,6 +3405,7 @@ GameObject:
   - component: {fileID: 4490914005984446544}
   - component: {fileID: 7463359889014339046}
   - component: {fileID: 7967169510756303615}
+  - component: {fileID: 6789718041281789214}
   m_Layer: 5
   m_Name: AtkBtn
   m_TagString: Untagged
@@ -3447,6 +3514,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6789718041281789214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7569211343123491173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &7911933326623317162
 GameObject:
   m_ObjectHideFlags: 0
@@ -3592,6 +3680,7 @@ GameObject:
   - component: {fileID: 1978301848817018635}
   - component: {fileID: 9189903661660735119}
   - component: {fileID: 1201450235805598078}
+  - component: {fileID: 294900349272497091}
   m_Layer: 5
   m_Name: ReinforceBtn
   m_TagString: Untagged
@@ -3700,6 +3789,27 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &294900349272497091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7973677994591018388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &8132189573812371160
 GameObject:
   m_ObjectHideFlags: 0

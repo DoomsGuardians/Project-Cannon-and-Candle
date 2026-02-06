@@ -1113,6 +1113,7 @@ GameObject:
   - component: {fileID: 6548095450552909510}
   - component: {fileID: 7374543670297838386}
   - component: {fileID: 5682684323864779995}
+  - component: {fileID: 7121910922899113359}
   m_Layer: 5
   m_Name: MarketBtn
   m_TagString: Untagged
@@ -1241,6 +1242,27 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &7121910922899113359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669110978970502644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &1902091706428394943
 GameObject:
   m_ObjectHideFlags: 0
@@ -2186,6 +2208,7 @@ GameObject:
   - component: {fileID: 3550100897034724431}
   - component: {fileID: 5253599994573412437}
   - component: {fileID: 3329191387833736952}
+  - component: {fileID: 4218678950390711184}
   m_Layer: 5
   m_Name: IntelBtn
   m_TagString: Untagged
@@ -2314,6 +2337,27 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &4218678950390711184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4000782416080746912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5ad08a7c507b574395c53fd70b35b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHover: 1
+  hoverScale: 1.05
+  hoverDuration: 0.05
+  hoverEase: 6
+  enableClick: 1
+  clickScale: 0.95
+  clickDuration: 0.1
+  clickEase: 6
+  animateWhenDisabled: 0
 --- !u!1 &4122224768928910054
 GameObject:
   m_ObjectHideFlags: 0
