@@ -69,7 +69,8 @@ public class InputService : ILogic
     {
         if (inputActions != null)
         {
-            inputActions.Disable();
+            inputActions.UI.Disable();
+            inputActions.Gameplay.Disable();
             inputActions.Dispose();
             inputActions = null;
         }

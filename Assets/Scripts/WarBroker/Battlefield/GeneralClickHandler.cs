@@ -79,6 +79,11 @@ public class GeneralClickHandler : MonoBehaviour, IPointerClickHandler
         }
 
         panel.SetGeneral(general);
+
+        // 通过 BattlefieldSceneController 播放选中音效
+        var controller = FindObjectOfType<BattlefieldSceneController>();
+        controller?.PlaySelectGeneralSound();
+
         Debug.Log($"[GeneralClickHandler] 打开将军详情: {general.Name}");
     }
 }

@@ -757,19 +757,31 @@ MonoBehaviour:
   - {fileID: 7742516759915961025, guid: 94ca8a641045c114c980b8c2ec350998, type: 3}
   - {fileID: 3571662678679236623, guid: 2ed66f245c08ee44288337b07276aca2, type: 3}
   - {fileID: 2726768995256360681, guid: 3a60252916b97164682e85d586e3a4ce, type: 3}
-  explosionSpawnRadius: 6
-  explosionCountMin: 6
-  explosionCountMax: 10
+  explosionSpawnRadius: 10
+  explosionCountMin: 4
+  explosionCountMax: 8
   explosionTimeSpread: 0.4
-  explosionScaleMin: 0.4
+  explosionScaleMin: 0.6
   explosionScaleMax: 1.4
-  explosionAvoidCenterRadius: 1
-  explosionSounds: []
-  collisionSound: {fileID: 0}
-  chargeSound: {fileID: 0}
-  landingSound: {fileID: 0}
-  gunfireSound: {fileID: 0}
-  battleAudioSource: {fileID: 0}
+  explosionAvoidCenterRadius: 1.5
+  explosionSounds:
+  - {fileID: 8300000, guid: f561d320ae4cc8346ad4240bd72379d8, type: 3}
+  - {fileID: 8300000, guid: f83877af7436c7f4aa5502c82b4cb3ce, type: 3}
+  - {fileID: 8300000, guid: 971f1a95af8aaf94c97865f5fd761c46, type: 3}
+  collisionSound: {fileID: 8300000, guid: d4454cc88fa24b744b67504d79fc6896, type: 3}
+  chargeSound: {fileID: 8300000, guid: 785853bd0e4f1f34d95176dbf7f14840, type: 3}
+  landingSound: {fileID: 8300000, guid: f0397038d8d215c4a862758b85424b49, type: 3}
+  gunfireSounds:
+  - {fileID: 8300000, guid: 112336715b4df2847b739a441700f82b, type: 3}
+  - {fileID: 8300000, guid: 16da494a766a21442b428680bf771bdd, type: 3}
+  - {fileID: 8300000, guid: c124f4d3f119db441b42c834b81b518a, type: 3}
+  cannonSound: {fileID: 8300000, guid: b780acd18ebf3f645b4edb26057b4ba9, type: 3}
+  soldierFallSound: {fileID: 8300000, guid: b75d9fd719117da42814c7e60e9e759a, type: 3}
+  soldierRiseSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  moveSound: {fileID: 8300000, guid: 6bd8d676925ff7a4590246c8a7587616, type: 3}
+  selectGeneralSound: {fileID: 8300000, guid: 6bd8d676925ff7a4590246c8a7587616, type: 3}
+  gunfireVolleyCount: 4
+  gunfireVolleySpread: 0.15
   battlefieldCamera: {fileID: 1474480991}
   battlefieldRoot: {fileID: 1975033477}
 --- !u!4 &1474480990

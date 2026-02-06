@@ -293,6 +293,10 @@ public class GameplayWindow : WindowBase
         // 禁用按钮，防止重复点击
         if (btnEndTurn != null)
         {
+            // 先播放点击音效（因为禁用后 UIButtonSound 不会播放）
+            var buttonSound = btnEndTurn.GetComponent<UIButtonSound>();
+            buttonSound?.PlayClickSound();
+
             btnEndTurn.interactable = false;
         }
 

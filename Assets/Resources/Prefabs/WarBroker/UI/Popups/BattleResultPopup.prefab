@@ -195,7 +195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
   m_OnCullStateChanged:
@@ -573,6 +573,7 @@ GameObject:
   - component: {fileID: 3384441306500180798}
   - component: {fileID: 162600393089374078}
   - component: {fileID: 8055575389477209854}
+  - component: {fileID: 8717118956858700931}
   m_Layer: 5
   m_Name: ConfirmBtn
   m_TagString: Untagged
@@ -703,6 +704,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &8717118956858700931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2968206423057927588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 58f1dfac25705814e8d8df429961a61e, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &3233728521118201263
 GameObject:
   m_ObjectHideFlags: 0

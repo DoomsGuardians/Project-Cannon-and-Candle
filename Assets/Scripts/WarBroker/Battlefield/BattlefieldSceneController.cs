@@ -26,20 +26,28 @@ public class BattlefieldSceneController : MonoBehaviour
     [Header("战斗爆炸特效")]
     [SerializeField] private GameObject[] battleExplosionPrefabs;  // 爆炸特效预制体数组
     [SerializeField] private float explosionSpawnRadius = 1.5f;    // 爆炸生成半径
-    [SerializeField] private int explosionCountMin = 3;            // 最少爆炸数量
-    [SerializeField] private int explosionCountMax = 6;            // 最多爆炸数量
-    [SerializeField] private float explosionTimeSpread = 0.4f;     // 爆炸时间分散范围
+    [SerializeField] private int explosionCountMin = 1;            // 最少爆炸数量
+    [SerializeField] private int explosionCountMax = 1;            // 最多爆炸数量
+    [SerializeField] private float explosionTimeSpread = 0.8f;     // 爆炸时间分散范围
     [SerializeField] private float explosionScaleMin = 0.15f;      // 爆炸最小缩放
     [SerializeField] private float explosionScaleMax = 0.35f;      // 爆炸最大缩放
     [SerializeField] private float explosionAvoidCenterRadius = 1f; // 避开中心的半径
 
-    [Header("音效接口")]
+    [Header("音效配置")]
     [SerializeField] private AudioClip[] explosionSounds;          // 爆炸音效数组
     [SerializeField] private AudioClip collisionSound;             // 碰撞音效
     [SerializeField] private AudioClip chargeSound;                // 冲锋音效
     [SerializeField] private AudioClip landingSound;               // 落地音效
-    [SerializeField] private AudioClip gunfireSound;               // 枪声音效
-    [SerializeField] private AudioSource battleAudioSource;        // 战斗音效播放器
+    [SerializeField] private AudioClip[] gunfireSounds;            // 枪声音效数组（齐射用）
+    [SerializeField] private AudioClip cannonSound;                // 开炮音效
+    [SerializeField] private AudioClip soldierFallSound;           // 锡兵倒下音效
+    [SerializeField] private AudioClip soldierRiseSound;           // 锡兵复活音效
+    [SerializeField] private AudioClip moveSound;                  // 部队移动音效
+    [SerializeField] private AudioClip selectGeneralSound;         // 选中将军音效
+
+    [Header("齐射音效设置")]
+    [SerializeField] private int gunfireVolleyCount = 4;           // 齐射次数
+    [SerializeField] private float gunfireVolleySpread = 0.15f;    // 齐射时间分散范围
 
     [Header("相机")]
     [SerializeField] private BattlefieldCameraController battlefieldCamera;
@@ -59,6 +67,7 @@ public class BattlefieldSceneController : MonoBehaviour
     private EventService eventService;
     private UIService uiService;
     private ResService resService;
+    private AudioService audioService;
     private GameBalanceConfig balanceConfig;
 
     // 动画队列
@@ -78,6 +87,7 @@ public class BattlefieldSceneController : MonoBehaviour
             eventService = GameRoot.Instance.eventService;
             uiService = GameRoot.Instance.uIService;
             resService = GameRoot.Instance.resService;
+            audioService = GameRoot.Instance.audioService;
             if (resService != null)
             {
                 balanceConfig = resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
@@ -362,6 +372,9 @@ public class BattlefieldSceneController : MonoBehaviour
             return;
         }
 
+        // 播放选中将军音效
+        PlaySelectGeneralSound();
+
         // 取消之前的选中
         if (selectedUnit != null)
         {
@@ -613,15 +626,22 @@ public class BattlefieldSceneController : MonoBehaviour
 
         // 锡兵倒下动画（战斗伤害）
         float fallDuration = 0f;
+        bool hasFallAnimation = false;
         if (allyUnit != null && allyBattleDamage < 0)
         {
             float duration = allyUnit.PlaySoldierFallAnimation(-allyBattleDamage, currentSequence, delay);
             fallDuration = Mathf.Max(fallDuration, duration);
+            hasFallAnimation = true;
         }
         if (enemyUnit != null && enemyBattleDamage < 0)
         {
             float duration = enemyUnit.PlaySoldierFallAnimation(-enemyBattleDamage, currentSequence, delay);
             fallDuration = Mathf.Max(fallDuration, duration);
+            hasFallAnimation = true;
+        }
+        if (hasFallAnimation)
+        {
+            currentSequence.InsertCallback(delay, () => PlaySoldierFallSound());
         }
         if (fallDuration > 0)
         {
@@ -630,17 +650,24 @@ public class BattlefieldSceneController : MonoBehaviour
 
         // 锡兵恢复动画（战斗回血，如 RET vs DEF）
         float riseDuration = 0f;
+        bool hasRiseAnimation = false;
         if (allyUnit != null && allyBattleDamage > 0)
         {
             float duration = allyUnit.PlaySoldierRiseAnimation(allyBattleDamage, currentSequence, delay);
             riseDuration = Mathf.Max(riseDuration, duration);
             currentSequence.InsertCallback(delay, () => allyUnit.TriggerHeal());
+            hasRiseAnimation = true;
         }
         if (enemyUnit != null && enemyBattleDamage > 0)
         {
             float duration = enemyUnit.PlaySoldierRiseAnimation(enemyBattleDamage, currentSequence, delay);
             riseDuration = Mathf.Max(riseDuration, duration);
             currentSequence.InsertCallback(delay, () => enemyUnit.TriggerHeal());
+            hasRiseAnimation = true;
+        }
+        if (hasRiseAnimation)
+        {
+            currentSequence.InsertCallback(delay, () => PlaySoldierRiseSound());
         }
         if (riseDuration > 0)
         {
@@ -649,17 +676,24 @@ public class BattlefieldSceneController : MonoBehaviour
 
         // 大本营恢复动画（单独播放）
         float baseRecoveryDuration = 0f;
+        bool hasBaseRecovery = false;
         if (allyUnit != null && result.AllyBaseRecovery > 0)
         {
             float duration = allyUnit.PlaySoldierRiseAnimation(result.AllyBaseRecovery, currentSequence, delay);
             baseRecoveryDuration = Mathf.Max(baseRecoveryDuration, duration);
             currentSequence.InsertCallback(delay, () => allyUnit.TriggerHeal());
+            hasBaseRecovery = true;
         }
         if (enemyUnit != null && result.EnemyBaseRecovery > 0)
         {
             float duration = enemyUnit.PlaySoldierRiseAnimation(result.EnemyBaseRecovery, currentSequence, delay);
             baseRecoveryDuration = Mathf.Max(baseRecoveryDuration, duration);
             currentSequence.InsertCallback(delay, () => enemyUnit.TriggerHeal());
+            hasBaseRecovery = true;
+        }
+        if (hasBaseRecovery)
+        {
+            currentSequence.InsertCallback(delay, () => PlaySoldierRiseSound());
         }
         if (baseRecoveryDuration > 0)
         {
@@ -710,6 +744,7 @@ public class BattlefieldSceneController : MonoBehaviour
             {
                 attacker.TriggerCannon();
                 attacker.TriggerExplosion();
+                PlayCannonSound();
             });
         }
 
@@ -778,6 +813,9 @@ public class BattlefieldSceneController : MonoBehaviour
     {
         if (battleExplosionPrefabs == null || battleExplosionPrefabs.Length == 0) return;
 
+        // 播放开炮音效
+        currentSequence.InsertCallback(startDelay, () => PlayCannonSound());
+
         int explosionCount = Random.Range(explosionCountMin, explosionCountMax + 1);
 
         // 计算中心点（两单位之间）
@@ -843,38 +881,93 @@ public class BattlefieldSceneController : MonoBehaviour
     private void PlayExplosionSound(Vector3 position)
     {
         if (explosionSounds == null || explosionSounds.Length == 0) return;
-        if (battleAudioSource == null) return;
 
         AudioClip clip = explosionSounds[Random.Range(0, explosionSounds.Length)];
-        battleAudioSource.PlayOneShot(clip, Random.Range(0.8f, 1f));
+        audioService?.PlaySFX(clip, Random.Range(0.2f, 0.25f));
     }
 
     /// <summary>播放碰撞音效</summary>
     private void PlayCollisionSound()
     {
-        if (collisionSound == null || battleAudioSource == null) return;
-        battleAudioSource.PlayOneShot(collisionSound);
+        if (collisionSound == null) return;
+        audioService?.PlaySFX(collisionSound);
     }
 
     /// <summary>播放冲锋音效</summary>
     private void PlayChargeSound()
     {
-        if (chargeSound == null || battleAudioSource == null) return;
-        battleAudioSource.PlayOneShot(chargeSound, 0.7f);
+        if (chargeSound == null) return;
+        if (audioService == null) audioService = GameRoot.Instance?.audioService;
+        audioService?.PlaySFX(chargeSound, 0.7f);
     }
 
     /// <summary>播放落地音效</summary>
     private void PlayLandingSound()
     {
-        if (landingSound == null || battleAudioSource == null) return;
-        battleAudioSource.PlayOneShot(landingSound);
+        if (landingSound == null) return;
+        if (audioService == null) audioService = GameRoot.Instance?.audioService;
+        audioService?.PlaySFX(landingSound);
     }
 
-    /// <summary>播放枪声音效</summary>
+    /// <summary>播放枪声齐射音效</summary>
     private void PlayGunfireSound()
     {
-        if (gunfireSound == null || battleAudioSource == null) return;
-        battleAudioSource.PlayOneShot(gunfireSound, 0.6f);
+        if (gunfireSounds == null || gunfireSounds.Length == 0) return;
+
+        // 播放多次枪声，模拟齐射效果
+        for (int i = 0; i < gunfireVolleyCount; i++)
+        {
+            float delay = Random.Range(0f, gunfireVolleySpread);
+            AudioClip clip = gunfireSounds[Random.Range(0, gunfireSounds.Length)];
+            float volume = Random.Range(0.12f, 0.18f);
+
+            // 使用协程延迟播放
+            StartCoroutine(PlaySoundDelayed(clip, delay, volume));
+        }
+    }
+
+    /// <summary>延迟播放音效</summary>
+    private System.Collections.IEnumerator PlaySoundDelayed(AudioClip clip, float delay, float volume)
+    {
+        if (delay > 0)
+            yield return new WaitForSeconds(delay);
+
+        audioService?.PlaySFX(clip, volume);
+    }
+
+    /// <summary>播放开炮音效</summary>
+    private void PlayCannonSound()
+    {
+        if (cannonSound == null) return;
+        audioService?.PlaySFX(cannonSound, 0.4f);
+    }
+
+    /// <summary>播放锡兵倒下音效</summary>
+    private void PlaySoldierFallSound()
+    {
+        if (soldierFallSound == null) return;
+        audioService?.PlaySFX(soldierFallSound, 0.7f);
+    }
+
+    /// <summary>播放锡兵复活音效</summary>
+    private void PlaySoldierRiseSound()
+    {
+        if (soldierRiseSound == null) return;
+        audioService?.PlaySFX(soldierRiseSound, 0.7f);
+    }
+
+    /// <summary>播放部队移动音效</summary>
+    private void PlayMoveSound()
+    {
+        if (moveSound == null) return;
+        audioService?.PlaySFX(moveSound, 0.6f);
+    }
+
+    /// <summary>播放选中将军音效</summary>
+    public void PlaySelectGeneralSound()
+    {
+        if (selectGeneralSound == null) return;
+        audioService?.PlaySFX(selectGeneralSound, 0.8f);
     }
 
     /// <summary>检查溃败并播放溃败动画</summary>
@@ -884,6 +977,9 @@ public class BattlefieldSceneController : MonoBehaviour
 
         if (unit.Data.GetStatus(balanceConfig) == GeneralStatus.Routed)
         {
+            // 播放逃跑移动音效
+            PlayMoveSound();
+
             Vector3 exitDir = isAlly ? Vector3.back : Vector3.forward;
             var seq = unit.PlayRoutAnimation(exitDir);
             seq.OnComplete(() => unit.Hide());
@@ -1143,6 +1239,9 @@ public class BattlefieldSceneController : MonoBehaviour
         currentSequence.Insert(delay, enemyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.15f).SetEase(Ease.OutQuad));
         delay += 0.15f;
 
+        // 播放移动音效
+        currentSequence.InsertCallback(delay, () => PlayMoveSound());
+
         // 2. 追击：ATK追击，RET逃跑
         float moveDuration = allyUnit.InsertEnhancedMoveAnimation(currentSequence, delay, allyTarget, true, false, 0.1f);
         currentSequence.Insert(delay, enemyUnit.transform.DOLocalMove(enemyTarget, 0.45f).SetEase(Ease.InQuad));
@@ -1152,10 +1251,11 @@ public class BattlefieldSceneController : MonoBehaviour
         // 3. 撤退方转回
         currentSequence.Insert(delay, enemyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.15f).SetEase(Ease.OutQuad));
 
-        // 4. ATK胜利姿态：轻微跳跃
+        // 4. ATK胜利姿态：轻微跳跃 + 落地音效
         currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveY(0.3f, 0.12f).SetEase(Ease.OutQuad));
         delay += 0.12f;
         currentSequence.Insert(delay, allyUnit.transform.DOLocalMoveY(0f, 0.12f).SetEase(Ease.InQuad));
+        currentSequence.InsertCallback(delay + 0.12f, () => PlayLandingSound());
         delay += 0.22f;
 
         return delay;
@@ -1308,6 +1408,9 @@ public class BattlefieldSceneController : MonoBehaviour
         currentSequence.Insert(delay, allyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.1f).SetEase(Ease.OutQuad));
         delay += 0.1f;
 
+        // 播放移动音效
+        currentSequence.InsertCallback(delay, () => PlayMoveSound());
+
         // 2. 敌方追击，己方狼狈逃跑
         float moveDuration = enemyUnit.InsertEnhancedMoveAnimation(currentSequence, delay, enemyTarget, true, false, 0.1f);
         currentSequence.InsertCallback(delay + 0.1f, () => enemyUnit.TriggerCharge());
@@ -1320,10 +1423,11 @@ public class BattlefieldSceneController : MonoBehaviour
         // 3. 己方转回
         currentSequence.Insert(delay, allyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.15f).SetEase(Ease.OutQuad));
 
-        // 4. 敌方胜利姿态
+        // 4. 敌方胜利姿态 + 落地音效
         currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveY(0.3f, 0.12f).SetEase(Ease.OutQuad));
         delay += 0.12f;
         currentSequence.Insert(delay, enemyUnit.transform.DOLocalMoveY(0f, 0.12f).SetEase(Ease.InQuad));
+        currentSequence.InsertCallback(delay + 0.12f, () => PlayLandingSound());
         delay += 0.22f;
 
         return delay;
@@ -1335,6 +1439,9 @@ public class BattlefieldSceneController : MonoBehaviour
         if (allyUnit == null) return delay;
 
         Vector3 enemyStart = enemyUnit?.transform.localPosition ?? Vector3.zero;
+
+        // 播放移动音效
+        currentSequence.InsertCallback(delay, () => PlayMoveSound());
 
         // 1. 己方转身撤退
         currentSequence.Insert(delay, allyUnit.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.12f).SetEase(Ease.OutQuad));
@@ -1364,6 +1471,9 @@ public class BattlefieldSceneController : MonoBehaviour
         if (enemyUnit != null)
             currentSequence.Insert(delay, enemyUnit.transform.DOLocalRotate(new Vector3(0, 0, 0), 0.12f).SetEase(Ease.OutQuad));
         delay += 0.12f;
+
+        // 播放移动音效
+        currentSequence.InsertCallback(delay, () => PlayMoveSound());
 
         // 2. 双方同时后撤
         if (allyUnit != null)
@@ -1397,6 +1507,9 @@ public class BattlefieldSceneController : MonoBehaviour
 
         if (allyMoved || enemyMoved)
         {
+            // 播放移动音效（只播放一次）
+            currentSequence.InsertCallback(delay, () => PlayMoveSound());
+
             float maxDuration = 0f;
             if (allyUnit != null && allyMoved)
             {
@@ -1408,6 +1521,11 @@ public class BattlefieldSceneController : MonoBehaviour
                 float duration = enemyUnit.InsertEnhancedMoveAnimation(currentSequence, delay, enemyTarget, true, true);
                 maxDuration = Mathf.Max(maxDuration, duration);
             }
+
+            // 在落地时播放落地音效（落地时间约为动画结束前0.15秒）
+            float landingTime = delay + Mathf.Max(0, maxDuration - 0.15f);
+            currentSequence.InsertCallback(landingTime, () => PlayLandingSound());
+
             delay += maxDuration > 0 ? maxDuration : 0.8f;
         }
 

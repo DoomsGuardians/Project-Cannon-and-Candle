@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 5665706765247256765}
   - component: {fileID: 6471116135487609298}
   - component: {fileID: 3977075944626739098}
+  - component: {fileID: 8587299920515235363}
   m_Layer: 5
   m_Name: RetShortBtn
   m_TagString: Untagged
@@ -219,6 +220,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &8587299920515235363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 67474786400900441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 4f3c002f46180904baff896d8fc5a6f0, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &72900975805892348
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,7 +349,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1562945599511081975
 CanvasRenderer:
@@ -746,7 +766,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1249052489570970026
 CanvasRenderer:
@@ -1088,7 +1108,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -935, y: 0}
+  m_AnchoredPosition: {x: 20, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &4527054435406785519
@@ -1239,7 +1259,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9003693144234095548
 CanvasRenderer:
@@ -1282,6 +1302,7 @@ GameObject:
   - component: {fileID: 1346628922943027815}
   - component: {fileID: 2440733089320648938}
   - component: {fileID: 1782835556958128093}
+  - component: {fileID: 1254060048858167222}
   m_Layer: 5
   m_Name: 500Btn
   m_TagString: Untagged
@@ -1304,9 +1325,9 @@ RectTransform:
   - {fileID: 5358423526295867647}
   m_Father: {fileID: 2366992141432456201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 832.5, y: -40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4877640780563339345
@@ -1412,6 +1433,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &1254060048858167222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683195803345507254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &689060147147857369
 GameObject:
   m_ObjectHideFlags: 0
@@ -1949,6 +1989,7 @@ GameObject:
   - component: {fileID: 8615783083589449089}
   - component: {fileID: 7343249951808883745}
   - component: {fileID: 3120067584611644664}
+  - component: {fileID: 5557100983215749977}
   m_Layer: 5
   m_Name: AtkShortBtn
   m_TagString: Untagged
@@ -2078,6 +2119,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &5557100983215749977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1026842341405011934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 4f3c002f46180904baff896d8fc5a6f0, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &1081954892317687787
 GameObject:
   m_ObjectHideFlags: 0
@@ -2801,6 +2861,7 @@ GameObject:
   - component: {fileID: 2767829980424706294}
   - component: {fileID: 3265482151940203954}
   - component: {fileID: 6066764448662967414}
+  - component: {fileID: 9118701740512612349}
   m_Layer: 5
   m_Name: DefChartBtn
   m_TagString: Untagged
@@ -2930,6 +2991,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &9118701740512612349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297650261039041744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &1384900831758479860
 GameObject:
   m_ObjectHideFlags: 0
@@ -3094,9 +3174,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2366992141432456201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 747.5, y: -40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1501272679697778654
@@ -3137,7 +3217,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 935, y: -190}
+  m_AnchoredPosition: {x: -20, y: -190}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &4453217661577670094
@@ -3232,6 +3312,7 @@ GameObject:
   - component: {fileID: 1685376533367635740}
   - component: {fileID: 8187512102860656621}
   - component: {fileID: 6297201963588525191}
+  - component: {fileID: 2442573513735942864}
   m_Layer: 5
   m_Name: RepayBtn
   m_TagString: Untagged
@@ -3362,6 +3443,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &2442573513735942864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615314186149392780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &1736279053361051199
 GameObject:
   m_ObjectHideFlags: 0
@@ -3878,7 +3978,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3342458308223010086
 CanvasRenderer:
@@ -3996,6 +4096,7 @@ GameObject:
   - component: {fileID: 4584823510537112037}
   - component: {fileID: 9164593277492276674}
   - component: {fileID: 7391929841851771679}
+  - component: {fileID: 8170243948772024030}
   m_Layer: 5
   m_Name: AtkSellBtn
   m_TagString: Untagged
@@ -4125,6 +4226,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &8170243948772024030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069052353393725308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 4f3c002f46180904baff896d8fc5a6f0, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &2144565559273675111
 GameObject:
   m_ObjectHideFlags: 0
@@ -4160,7 +4280,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2633818029050402333
 CanvasRenderer:
@@ -4226,7 +4346,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -314.16003, y: -169}
+  m_AnchoredPosition: {x: 6.720001, y: -169}
   m_SizeDelta: {x: 23, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8196500324228788318
@@ -4837,6 +4957,7 @@ GameObject:
   - component: {fileID: 5950672914059001456}
   - component: {fileID: 4840419625584350848}
   - component: {fileID: 9064068831708169407}
+  - component: {fileID: 2436418571830953067}
   m_Layer: 5
   m_Name: DefSellBtn
   m_TagString: Untagged
@@ -4966,6 +5087,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &2436418571830953067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2402378060771615170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 4f3c002f46180904baff896d8fc5a6f0, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &2405470628278363877
 GameObject:
   m_ObjectHideFlags: 0
@@ -4979,6 +5119,7 @@ GameObject:
   - component: {fileID: 1934247425503342576}
   - component: {fileID: 9113503165070912160}
   - component: {fileID: 4005634629954727239}
+  - component: {fileID: 7077002979018740608}
   m_Layer: 5
   m_Name: DefBuyBtn
   m_TagString: Untagged
@@ -5108,6 +5249,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &7077002979018740608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2405470628278363877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 6da6c57cea40b904da6ff2b6e4e4dabf, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &2433258323588318307
 GameObject:
   m_ObjectHideFlags: 0
@@ -5273,6 +5433,7 @@ GameObject:
   - component: {fileID: 4821026401288093529}
   - component: {fileID: 614997456832937053}
   - component: {fileID: 5431390288995502126}
+  - component: {fileID: 4463508323861110692}
   m_Layer: 5
   m_Name: BorrowBtn
   m_TagString: Untagged
@@ -5403,6 +5564,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &4463508323861110692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2507620032301299710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &2647359163161299241
 GameObject:
   m_ObjectHideFlags: 0
@@ -5647,7 +5827,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8416883228856127163
 CanvasRenderer:
@@ -7478,7 +7658,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 37.400024, y: -169}
+  m_AnchoredPosition: {x: -0.79999924, y: -169}
   m_SizeDelta: {x: 23, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6910549967147237416
@@ -7741,6 +7921,7 @@ GameObject:
   - component: {fileID: 2389647423429937300}
   - component: {fileID: 4535253079499531566}
   - component: {fileID: 3817009040115226293}
+  - component: {fileID: 3912674796977949580}
   m_Layer: 5
   m_Name: AtkChartBtn
   m_TagString: Untagged
@@ -7870,6 +8051,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &3912674796977949580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3137431992523875322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &3171203937588532698
 GameObject:
   m_ObjectHideFlags: 0
@@ -7962,6 +8162,7 @@ GameObject:
   - component: {fileID: 5935797297329757574}
   - component: {fileID: 3177019197092694289}
   - component: {fileID: 8795513020846870871}
+  - component: {fileID: 6774596940691098045}
   m_Layer: 5
   m_Name: RetSellBtn
   m_TagString: Untagged
@@ -8091,6 +8292,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &6774596940691098045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3290645069120923186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 4f3c002f46180904baff896d8fc5a6f0, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &3311593229319288723
 GameObject:
   m_ObjectHideFlags: 0
@@ -9251,6 +9471,7 @@ GameObject:
   - component: {fileID: 8788014351741969684}
   - component: {fileID: 8232498286728288278}
   - component: {fileID: 5769836750001332136}
+  - component: {fileID: 1837074776370157946}
   m_Layer: 5
   m_Name: RetLongBtn
   m_TagString: Untagged
@@ -9380,6 +9601,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &1837074776370157946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3830790801234954477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 0253ca25ce59e1545910a21afbf54be7, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &3853102407464486721
 GameObject:
   m_ObjectHideFlags: 0
@@ -9696,7 +9936,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -1784.5, y: 50.66667}
+  m_AnchoredPosition: {x: 30, y: 50.66667}
   m_SizeDelta: {x: 34, y: 21}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &477721972411788986
@@ -9913,6 +10153,7 @@ GameObject:
   - component: {fileID: 5751623076113469593}
   - component: {fileID: 5589593948881696503}
   - component: {fileID: 5220772416481739235}
+  - component: {fileID: 6039873066616895428}
   m_Layer: 5
   m_Name: DecreaseBtn
   m_TagString: Untagged
@@ -9935,9 +10176,9 @@ RectTransform:
   - {fileID: 6286637401423833334}
   m_Father: {fileID: 2366992141432456201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 512.5, y: -40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3100575947544825774
@@ -10043,6 +10284,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &6039873066616895428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4070193991643868415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &4072541933096063126
 GameObject:
   m_ObjectHideFlags: 0
@@ -10078,7 +10338,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5615110613370609169
 CanvasRenderer:
@@ -10563,7 +10823,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4919425932033975865
 CanvasRenderer:
@@ -11014,7 +11274,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7871259756554735522
 CanvasRenderer:
@@ -11664,7 +11924,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -11.399994}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &5131030636458147117
 GameObject:
@@ -11881,7 +12141,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6885622943652364303
 CanvasRenderer:
@@ -12151,6 +12411,7 @@ GameObject:
   - component: {fileID: 8585800823967021914}
   - component: {fileID: 5465308668055996503}
   - component: {fileID: 5628610264158254402}
+  - component: {fileID: 8810760974169898924}
   m_Layer: 5
   m_Name: AtkLongBtn
   m_TagString: Untagged
@@ -12280,6 +12541,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &8810760974169898924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5279216525009056783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 0253ca25ce59e1545910a21afbf54be7, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &5286786176431166367
 GameObject:
   m_ObjectHideFlags: 0
@@ -12427,6 +12707,7 @@ GameObject:
   - component: {fileID: 5980504111492447693}
   - component: {fileID: 4947006377767460118}
   - component: {fileID: 2687617891101328271}
+  - component: {fileID: 2783994264353682201}
   m_Layer: 5
   m_Name: IncreaseBtn
   m_TagString: Untagged
@@ -12449,9 +12730,9 @@ RectTransform:
   - {fileID: 4757128340740063550}
   m_Father: {fileID: 2366992141432456201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 712.5, y: -40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6424196672034240780
@@ -12557,6 +12838,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &2783994264353682201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5306021625578271717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &5341555192777687572
 GameObject:
   m_ObjectHideFlags: 0
@@ -12570,6 +12870,7 @@ GameObject:
   - component: {fileID: 3030314977372553476}
   - component: {fileID: 8736193225284420362}
   - component: {fileID: 6885028317491210827}
+  - component: {fileID: 246481632255206276}
   m_Layer: 5
   m_Name: MaxBtn
   m_TagString: Untagged
@@ -12592,9 +12893,9 @@ RectTransform:
   - {fileID: 8889832615200785179}
   m_Father: {fileID: 2366992141432456201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 882.5, y: -40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &269004165049805661
@@ -12700,6 +13001,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &246481632255206276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5341555192777687572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &5588925984797745717
 GameObject:
   m_ObjectHideFlags: 0
@@ -12811,7 +13131,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 740.52, y: -169}
+  m_AnchoredPosition: {x: -15.839996, y: -169}
   m_SizeDelta: {x: 23, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2206998723720160647
@@ -12935,7 +13255,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7207171268637832228
 CanvasRenderer:
@@ -13583,7 +13903,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -1784.5, y: -152}
+  m_AnchoredPosition: {x: 30, y: -152}
   m_SizeDelta: {x: 14, y: 21}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &1429069764994288178
@@ -13659,7 +13979,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3296101260765269570
 CanvasRenderer:
@@ -13934,7 +14254,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -1784.5, y: 152}
+  m_AnchoredPosition: {x: 30, y: 152}
   m_SizeDelta: {x: 34, y: 21}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &2888057606580175348
@@ -14433,7 +14753,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -665.72, y: -169}
+  m_AnchoredPosition: {x: 14.24, y: -169}
   m_SizeDelta: {x: 23, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8819987299746826478
@@ -14830,6 +15150,7 @@ GameObject:
   - component: {fileID: 59164391827164520}
   - component: {fileID: 8725802028407941165}
   - component: {fileID: 3804337057217967598}
+  - component: {fileID: 2036645975970466210}
   m_Layer: 5
   m_Name: RetChartBtn
   m_TagString: Untagged
@@ -14959,6 +15280,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &2036645975970466210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6960445218344679384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &6966941275762128588
 GameObject:
   m_ObjectHideFlags: 0
@@ -16100,7 +16440,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 388.95996, y: -169}
+  m_AnchoredPosition: {x: -8.319998, y: -169}
   m_SizeDelta: {x: 23, y: 21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7217741495524234084
@@ -16176,7 +16516,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1870, y: 380}
+  m_SizeDelta: {x: -40, y: 380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3239705825770523940
 CanvasRenderer:
@@ -16242,7 +16582,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -1784.5, y: -50.666664}
+  m_AnchoredPosition: {x: 30, y: -50.666664}
   m_SizeDelta: {x: 24, y: 21}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &8170862806824909186
@@ -16316,9 +16656,9 @@ RectTransform:
   - {fileID: 5796243579453772249}
   m_Father: {fileID: 2366992141432456201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 612.5, y: -40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 150, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3724416400679924369
@@ -17275,6 +17615,7 @@ GameObject:
   - component: {fileID: 3060963775461326119}
   - component: {fileID: 5636224538637591774}
   - component: {fileID: 1794639897989905125}
+  - component: {fileID: 2615890519434387247}
   m_Layer: 5
   m_Name: RetBuyBtn
   m_TagString: Untagged
@@ -17404,6 +17745,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &2615890519434387247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8142772592664346711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 6da6c57cea40b904da6ff2b6e4e4dabf, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &8200783008999654791
 GameObject:
   m_ObjectHideFlags: 0
@@ -17507,6 +17867,7 @@ GameObject:
   - component: {fileID: 3170223406287949070}
   - component: {fileID: 1014332337951689136}
   - component: {fileID: 3203819719203725115}
+  - component: {fileID: 2562392042870602334}
   m_Layer: 5
   m_Name: 100Btn
   m_TagString: Untagged
@@ -17529,9 +17890,9 @@ RectTransform:
   - {fileID: 439536419462759857}
   m_Father: {fileID: 2366992141432456201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 782.5, y: -40}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5831322922483879463
@@ -17637,6 +17998,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &2562392042870602334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8227832682686117760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &8239870044164802255
 GameObject:
   m_ObjectHideFlags: 0
@@ -17650,6 +18030,7 @@ GameObject:
   - component: {fileID: 6522999213012442924}
   - component: {fileID: 5351598014261863062}
   - component: {fileID: 3508606402806889922}
+  - component: {fileID: 5933865641384301181}
   m_Layer: 5
   m_Name: AtkBuyBtn
   m_TagString: Untagged
@@ -17779,6 +18160,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &5933865641384301181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8239870044164802255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 6da6c57cea40b904da6ff2b6e4e4dabf, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &8385982584857265918
 GameObject:
   m_ObjectHideFlags: 0
@@ -18132,6 +18532,7 @@ GameObject:
   - component: {fileID: 2538143663105728629}
   - component: {fileID: 4344899733494506264}
   - component: {fileID: 6913351256456686031}
+  - component: {fileID: 1108935507951357095}
   m_Layer: 5
   m_Name: DefLongBtn
   m_TagString: Untagged
@@ -18261,6 +18662,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &1108935507951357095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8579252716189195905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 0253ca25ce59e1545910a21afbf54be7, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &8606426224091450792
 GameObject:
   m_ObjectHideFlags: 0
@@ -18976,6 +19396,7 @@ GameObject:
   - component: {fileID: 6552393665316606839}
   - component: {fileID: 5258494490557513012}
   - component: {fileID: 1602390860886419700}
+  - component: {fileID: 3290062527951033903}
   m_Layer: 5
   m_Name: DefShortBtn
   m_TagString: Untagged
@@ -19105,6 +19526,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &3290062527951033903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9057791858962533366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 4f3c002f46180904baff896d8fc5a6f0, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &9087679027007309489
 GameObject:
   m_ObjectHideFlags: 0

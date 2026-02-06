@@ -634,6 +634,7 @@ GameObject:
   - component: {fileID: 7589829118441326726}
   - component: {fileID: 2367951230995787670}
   - component: {fileID: 5871907268527638141}
+  - component: {fileID: 6049847370134615039}
   m_Layer: 5
   m_Name: CloseBtn
   m_TagString: Untagged
@@ -784,6 +785,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &6049847370134615039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5609303082676237711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: 4f3c002f46180904baff896d8fc5a6f0, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &7238906872881965051
 GameObject:
   m_ObjectHideFlags: 0

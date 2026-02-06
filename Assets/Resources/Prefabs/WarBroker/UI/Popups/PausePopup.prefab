@@ -408,7 +408,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.7490196}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
   m_OnCullStateChanged:
@@ -829,6 +829,7 @@ GameObject:
   - component: {fileID: 328454470492564315}
   - component: {fileID: 8169038448991448170}
   - component: {fileID: 3429035872024181135}
+  - component: {fileID: 8914706040085193940}
   m_Layer: 5
   m_Name: MainMenuBtn
   m_TagString: Untagged
@@ -959,6 +960,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &8914706040085193940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3630719013531832642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &3814824400243356682
 GameObject:
   m_ObjectHideFlags: 0
@@ -1181,6 +1201,7 @@ GameObject:
   - component: {fileID: 8576526517391858499}
   - component: {fileID: 9161884060350239231}
   - component: {fileID: 4802961500125052105}
+  - component: {fileID: 4960476495130679520}
   m_Layer: 5
   m_Name: SettingBtn
   m_TagString: Untagged
@@ -1311,6 +1332,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &4960476495130679520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7676870878360623065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &8062905996456566556
 GameObject:
   m_ObjectHideFlags: 0
@@ -1458,6 +1498,7 @@ GameObject:
   - component: {fileID: 3718517239303119476}
   - component: {fileID: 6230350684088959906}
   - component: {fileID: 5488687283046998968}
+  - component: {fileID: 6056096104312826953}
   m_Layer: 5
   m_Name: QuitBtn
   m_TagString: Untagged
@@ -1588,6 +1629,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &6056096104312826953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8474231283091876008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &8765250677058473746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1601,6 +1661,7 @@ GameObject:
   - component: {fileID: 1557807485401504976}
   - component: {fileID: 8749549214902314015}
   - component: {fileID: 7406648984023544924}
+  - component: {fileID: 8081968166889687535}
   m_Layer: 5
   m_Name: ResumeBtn
   m_TagString: Untagged
@@ -1731,3 +1792,22 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &8081968166889687535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8765250677058473746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0

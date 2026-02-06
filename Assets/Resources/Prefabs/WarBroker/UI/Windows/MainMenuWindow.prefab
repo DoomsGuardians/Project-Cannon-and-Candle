@@ -142,6 +142,7 @@ GameObject:
   - component: {fileID: 1461487111481516102}
   - component: {fileID: 8085027582263791389}
   - component: {fileID: 6378827171984116326}
+  - component: {fileID: 8791162170809840480}
   m_Layer: 5
   m_Name: QuitBtn
   m_TagString: Untagged
@@ -272,6 +273,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &8791162170809840480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1039595962395368295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &1601349922112345736
 GameObject:
   m_ObjectHideFlags: 0
@@ -1030,6 +1050,7 @@ GameObject:
   - component: {fileID: 6486669241926133966}
   - component: {fileID: 7133643656405946934}
   - component: {fileID: 6677099564390803502}
+  - component: {fileID: 896788260777855286}
   m_Layer: 5
   m_Name: SettingsBtn
   m_TagString: Untagged
@@ -1160,6 +1181,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &896788260777855286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4788338223239234892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &5961612681262974706
 GameObject:
   m_ObjectHideFlags: 0
@@ -1173,6 +1213,7 @@ GameObject:
   - component: {fileID: 5078284164312352042}
   - component: {fileID: 3599907888347137529}
   - component: {fileID: 8092746026917975684}
+  - component: {fileID: 8555022913647998656}
   m_Layer: 5
   m_Name: PlayerBtn
   m_TagString: Untagged
@@ -1303,6 +1344,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &8555022913647998656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5961612681262974706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &7963658844182048576
 GameObject:
   m_ObjectHideFlags: 0
@@ -1584,6 +1644,7 @@ GameObject:
   - component: {fileID: 1217254859071287532}
   - component: {fileID: 7881676856601153448}
   - component: {fileID: 2365642244642212078}
+  - component: {fileID: 2034351271491587722}
   m_Layer: 5
   m_Name: StartBtn
   m_TagString: Untagged
@@ -1714,3 +1775,22 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &2034351271491587722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8301456755538101526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: fe1a4c842789e2b4eafef3a17e2267c3, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0

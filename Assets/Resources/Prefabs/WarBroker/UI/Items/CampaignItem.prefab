@@ -334,6 +334,7 @@ GameObject:
   - component: {fileID: 7670155723649293632}
   - component: {fileID: 1967547669093875470}
   - component: {fileID: 6199264232721024721}
+  - component: {fileID: 2135142793243816338}
   m_Layer: 5
   m_Name: CampaignItem
   m_TagString: Untagged
@@ -483,6 +484,25 @@ MonoBehaviour:
   clickDuration: 0.1
   clickEase: 6
   animateWhenDisabled: 0
+--- !u!114 &2135142793243816338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5511484566516584326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c718f2c58352844a7d42b28abcbf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHoverSound: 1
+  hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
+  hoverVolume: 1
+  enableClickSound: 1
+  clickSound: {fileID: 8300000, guid: d0903d91834e96449be505db94e1205f, type: 3}
+  clickVolume: 1
+  playSoundWhenDisabled: 0
 --- !u!1 &6261421789173782773
 GameObject:
   m_ObjectHideFlags: 0
