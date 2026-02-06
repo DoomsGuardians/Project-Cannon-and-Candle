@@ -33,7 +33,7 @@ MonoBehaviour:
   settings:
     shader: {fileID: 4800000, guid: c6234abe79462414fafabe558334bb2a, type: 3}
     renderPassEvent: 550
-    enableInSceneView: 0
+    enableInSceneView: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
