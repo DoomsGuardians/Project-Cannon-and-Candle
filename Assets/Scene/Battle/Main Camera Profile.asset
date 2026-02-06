@@ -43,7 +43,7 @@ MonoBehaviour:
   active: 1
   focusDistance:
     m_OverrideState: 1
-    m_Value: 10
+    m_Value: 4.5
   focusRange:
     m_OverrideState: 1
     m_Value: 40

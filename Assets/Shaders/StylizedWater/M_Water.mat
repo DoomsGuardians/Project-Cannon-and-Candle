@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_Water
+  m_Shader: {fileID: 4800000, guid: d3b43d8abcc523b4d80ff1f180547fc8, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _FoamNoiseTexture:
+        m_Texture: {fileID: 2800000, guid: 6d5fac9be7916ca4099badef2094b574, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FoamTexture:
+        m_Texture: {fileID: 2800000, guid: 30b0a4fe1d23ff64a9628c84262641c7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ReflectionCubemap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _WaveNormalMap:
+        m_Texture: {fileID: 2800000, guid: 078de88bef9c4604c937cce9bbe702be, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _DepthDensity: 0.5
+    - _DistanceDensity: 0.1
+    - _EdgeFoamDepth: 1
+    - _EdgeFoamStrength: 0.5
+    - _FoamContribution: 0.5
+    - _FoamNoiseScale: 20
+    - _FoamScale: 10
+    - _FoamSpeed: 0.1
+    - _ReflectionContribution: 0.5
+    - _ReflectionDistortion: 0.1
+    - _RefractionStrength: 0.1
+    - _SSSPower: 4
+    - _SSSStrength: 0.3
+    - _SparkleContribution: 0.3
+    - _SparkleExponent: 128
+    - _SparkleScale: 50
+    - _SparkleSpeed: 0.2
+    - _SunSpecularExponent: 256
+    - _Wave1Amplitude: 0.1
+    - _Wave1Speed: 1
+    - _Wave1Wavelength: 5
+    - _Wave2Amplitude: 0.05
+    - _Wave2Speed: 1.5
+    - _Wave2Wavelength: 3
+    - _WaveNormalScale: 1
+    - _WaveNormalSpeed: 0.1
+    m_Colors:
+    - _DeepColor: {r: 0.1, g: 0.3, b: 0.5, a: 1}
+    - _FarColor: {r: 0.05, g: 0.2, b: 0.4, a: 1}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SSSColor: {r: 0.2, g: 0.8, b: 0.4, a: 1}
+    - _ShallowColor: {r: 0.3, g: 0.8, b: 0.9, a: 1}
+    - _SunSpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Wave1Direction: {r: 1, g: 0, b: 0, a: 0}
+    - _Wave2Direction: {r: 0, g: 0, b: 1, a: 0}
+  m_BuildTextureStacks: []
