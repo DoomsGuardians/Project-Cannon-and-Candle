@@ -58,4 +58,8 @@ public enum WarBrokerEventID
 
     // 结算通知事件
     OnTurnSettlement = 1300,          // 回合结算通知（param1=TurnSettlementInfo）
+
+    // 教程事件
+    OnTutorialComplete = 1400,        // 教程完成（param1=bool是否完整完成）
+    OnTutorialWelcomeComplete,        // 教程开场白对话完成，可以开始回合
 }

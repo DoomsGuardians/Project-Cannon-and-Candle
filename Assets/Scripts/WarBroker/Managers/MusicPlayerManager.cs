@@ -253,7 +253,8 @@ public class MusicPlayerManager : ManagerBase
             return;
         }
 
-        currentTrackIndex = 0;
+        // 使用智能权重选择初始曲目，而不是总是从第一首开始
+        currentTrackIndex = SelectNextTrackByGameState();
         shuffleHistory.Clear();
         shuffleHistory.Add(currentTrackIndex);
     }

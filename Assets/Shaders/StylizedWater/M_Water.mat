@@ -41,8 +41,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DepthDensity: 0.5
-    - _DistanceDensity: 0.1
+    - _DepthDensity: 0.1
+    - _DistanceDensity: 0.8
     - _EdgeFoamDepth: 1
     - _EdgeFoamStrength: 0.5
     - _FoamContribution: 0.5

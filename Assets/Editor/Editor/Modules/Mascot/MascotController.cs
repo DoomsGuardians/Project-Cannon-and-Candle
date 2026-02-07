@@ -22,7 +22,9 @@ public class MascotController : MonoBehaviour
 
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+#pragma warning disable CS0414 // 该字段在协程中被赋值，用于追踪当前行为状态
     private MascotLogic.BehaviorType currentBehavior;
+#pragma warning restore CS0414
     private Coroutine behaviorCoroutine;
     private bool isMoving = false;
     private float idleTimer = 0f;

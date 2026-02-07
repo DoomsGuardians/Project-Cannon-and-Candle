@@ -22,6 +22,16 @@ public class CampaignConfig : ScriptableObject
     [Range(0, 10000)]
     public float TicketPrice = 100f;
 
+    [Tooltip("是否为教程关卡")]
+    public bool IsTutorial = false;
+
+    [Header("===== 开场白设置 =====")]
+    [Tooltip("开场白 Naninovel 脚本名称（留空则无开场白）")]
+    public string IntroScriptName;
+
+    [Tooltip("开场白脚本起始标签（留空则从头播放）")]
+    public string IntroScriptLabel;
+
     [Header("===== 回合设置 =====")]
     [Tooltip("最大回合数")]
     [Range(6, 60)]

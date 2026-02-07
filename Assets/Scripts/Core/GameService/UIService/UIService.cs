@@ -524,5 +524,10 @@ public class UIService : ILogic
     /// </summary>
     public bool HasQueuedPopupShowing => currentQueuedPopup != null && currentQueuedPopup.isVisible;
 
+    /// <summary>
+    /// 是否有弹窗正在显示或在队列中等待
+    /// </summary>
+    public bool HasQueuedPopups() => popupQueue.Count > 0 || HasQueuedPopupShowing;
+
     #endregion
 }

@@ -181,7 +181,7 @@ public class GeneralUnit3D : MonoBehaviour
         }
     }
 
-    /// <summary>设置气泡点击事件</summary>
+    /// <summary>设置气泡点击和悬停事件</summary>
     private void SetupBubbleClick()
     {
         if (intentBubbleImage == null) return;
@@ -197,9 +197,9 @@ public class GeneralUnit3D : MonoBehaviour
         trigger.triggers.Clear();
 
         // 添加点击事件 - 通过 BattlefieldSceneController 处理
-        var entry = new EventTrigger.Entry();
-        entry.eventID = EventTriggerType.PointerClick;
-        entry.callback.AddListener((data) =>
+        var clickEntry = new EventTrigger.Entry();
+        clickEntry.eventID = EventTriggerType.PointerClick;
+        clickEntry.callback.AddListener((data) =>
         {
             // 检查是否可以进行游戏输入
             var inputService = GameRoot.Instance?.inputService;
@@ -209,7 +209,68 @@ public class GeneralUnit3D : MonoBehaviour
             var controller = FindObjectOfType<BattlefieldSceneController>();
             controller?.OnGeneralClicked(this);
         });
-        trigger.triggers.Add(entry);
+        trigger.triggers.Add(clickEntry);
+
+        // 添加悬停事件 - 显示意图效果 tooltip
+        var enterEntry = new EventTrigger.Entry();
+        enterEntry.eventID = EventTriggerType.PointerEnter;
+        enterEntry.callback.AddListener((data) => ShowIntentTooltip());
+        trigger.triggers.Add(enterEntry);
+
+        var exitEntry = new EventTrigger.Entry();
+        exitEntry.eventID = EventTriggerType.PointerExit;
+        exitEntry.callback.AddListener((data) => HideIntentTooltip());
+        trigger.triggers.Add(exitEntry);
+    }
+
+    /// <summary>显示意图效果 tooltip</summary>
+    private void ShowIntentTooltip()
+    {
+        if (Data == null) return;
+
+        var intent = Data.FinalIntent ?? Data.DefaultIntent;
+        if (!intent.HasValue) return;
+
+        var tooltipPanel = GameRoot.Instance?.uIService?.GetWindow<TooltipPanel>("TooltipPanel");
+        if (tooltipPanel == null) return;
+
+        string title = intent.Value.ToDisplayName();
+        string content = GetIntentEffectDescription(intent.Value, Data.IntentSource);
+
+        tooltipPanel.Show(title, content);
+    }
+
+    /// <summary>隐藏意图效果 tooltip</summary>
+    private void HideIntentTooltip()
+    {
+        var tooltipPanel = GameRoot.Instance?.uIService?.GetWindow<TooltipPanel>("TooltipPanel");
+        tooltipPanel?.Hide();
+    }
+
+    /// <summary>获取意图效果描述</summary>
+    private string GetIntentEffectDescription(OrderType orderType, IntentSource source)
+    {
+        string effect = orderType switch
+        {
+            OrderType.ATK => "向前推进，攻击敌军",
+            OrderType.DEF => "原地驻守，抵御攻击",
+            OrderType.RET => "后撤休整，恢复兵力",
+            _ => ""
+        };
+
+        if (source == IntentSource.Reinforced)
+        {
+            string bonus = orderType switch
+            {
+                OrderType.ATK => "造成伤害 +2",
+                OrderType.DEF => "受伤减免 2 点",
+                OrderType.RET => "额外回复 +2",
+                _ => ""
+            };
+            effect += $"\n<color=#FFD700>强化: {bonus}</color>";
+        }
+
+        return effect;
     }
 
     /// <summary>更新显示</summary>
@@ -655,8 +716,11 @@ public class GeneralUnit3D : MonoBehaviour
         float riseTime = mainMoveDuration * 0.6f;
         float slamTime = mainMoveDuration * 0.4f;
 
-        float baseY = targetLocalPosition.y;
-        float peakY = baseY + arcHeight;
+        // 计算高度：抛物线顶点基于起始和目标中较高的那个 + arcHeight
+        float startY = startPos.y;
+        float targetY = targetLocalPosition.y;
+        float maxBaseY = Mathf.Max(startY, targetY);
+        float peakY = maxBaseY + arcHeight;
 
         float t = startTime;
 
@@ -669,7 +733,7 @@ public class GeneralUnit3D : MonoBehaviour
             t += anticipationDuration;
         }
 
-        // 2. 上升阶段
+        // 2. 上升阶段：XZ 移动到目标位置，Y 升到抛物线顶点
         Vector3 peakPos = new Vector3(targetLocalPosition.x, peakY, targetLocalPosition.z);
         sequence.Insert(t, transform.DOLocalMove(peakPos, riseTime).SetEase(Ease.OutQuad));
         if (withAnticipation)
@@ -678,8 +742,8 @@ public class GeneralUnit3D : MonoBehaviour
         }
         t += riseTime;
 
-        // 3. 下砸阶段
-        sequence.Insert(t, transform.DOLocalMoveY(baseY, slamTime).SetEase(Ease.InQuart));
+        // 3. 下砸阶段：从顶点精确落到目标位置的 Y
+        sequence.Insert(t, transform.DOLocalMoveY(targetY, slamTime).SetEase(Ease.InQuart));
         t += slamTime;
 
         // 4. 落地冲击
@@ -695,6 +759,12 @@ public class GeneralUnit3D : MonoBehaviour
             sequence.Insert(t + landingSquashDuration * 0.3f, transform.DOScaleY(1f, landingSquashDuration * 0.7f).SetEase(Ease.OutBounce));
             t += landingSquashDuration;
         }
+
+        // 5. 确保最终位置精确（防止浮点误差）
+        sequence.InsertCallback(t, () =>
+        {
+            transform.localPosition = targetLocalPosition;
+        });
 
         return t - startTime;
     }

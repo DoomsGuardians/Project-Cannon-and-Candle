@@ -121,17 +121,8 @@ public class GeneralDetailPanel : WindowBase
         AddButtonListener(btnOverrideRET, () => OnOverride(OrderType.RET));
         AddButtonListener(btnClose, OnClose);
 
-        // 添加按钮悬停事件（显示指令预览变化）
-        AddButtonHoverEvents(btnReinforce, OnReinforceHoverEnter, OnHoverExit);
-        AddButtonHoverEvents(btnOverrideATK, () => OnOverrideHoverEnter(OrderType.ATK), OnHoverExit);
-        AddButtonHoverEvents(btnOverrideDEF, () => OnOverrideHoverEnter(OrderType.DEF), OnHoverExit);
-        AddButtonHoverEvents(btnOverrideRET, () => OnOverrideHoverEnter(OrderType.RET), OnHoverExit);
-
         // 获取 TooltipPanel
         tooltipPanel = uIService.GetWindow<TooltipPanel>("TooltipPanel");
-
-        // 设置按钮 Tooltip
-        SetupButtonTooltips();
 
         // 监听意图变化事件
         eventService.AddEventListening((EventID)WarBrokerEventID.OnIntentChanged, OnIntentChanged);
@@ -152,49 +143,87 @@ public class GeneralDetailPanel : WindowBase
         int reinforceCost = intentSystem?.GetReinforceCost() ?? 1;
         int overrideCost = intentSystem?.GetOverrideCost() ?? 2;
 
-        // 强化按钮 - 同时显示tooltip和预览
-        if (btnReinforce != null)
+        // 强化按钮 - 只显示强化特有效果
+        if (btnReinforce != null && currentGeneral?.DefaultIntent != null)
         {
-            string reinforceTooltip = $"消耗{reinforceCost}单位对应指令，强化该将军的意图";
-            AddTooltipToButton(btnReinforce, "强化", reinforceTooltip);
+            var intentType = currentGeneral.DefaultIntent.Value;
+            string bonus = GetReinforceBonusText(intentType);
+            string tooltip = $"消耗 {reinforceCost} 单位 {intentType.ToDisplayName()}\n强化效果: {bonus}";
+            AddTooltipToButton(btnReinforce, "强化意图", tooltip,
+                OnReinforceHoverEnter, OnHoverExit);
         }
 
-        // 篡改按钮
-        string overrideTooltip = $"消耗{overrideCost}单位指令，强制改变将军的行动意图";
+        // 篡改按钮 - 简单描述
         if (btnOverrideATK != null)
-            AddTooltipToButton(btnOverrideATK, "篡改", overrideTooltip);
+        {
+            string tooltip = $"消耗 {overrideCost} 单位 ATK\n向前推进，攻击敌军";
+            AddTooltipToButton(btnOverrideATK, "篡改为 ATK", tooltip,
+                () => OnOverrideHoverEnter(OrderType.ATK), OnHoverExit);
+        }
         if (btnOverrideDEF != null)
-            AddTooltipToButton(btnOverrideDEF, "篡改", overrideTooltip);
+        {
+            string tooltip = $"消耗 {overrideCost} 单位 DEF\n原地驻守，抵御攻击";
+            AddTooltipToButton(btnOverrideDEF, "篡改为 DEF", tooltip,
+                () => OnOverrideHoverEnter(OrderType.DEF), OnHoverExit);
+        }
         if (btnOverrideRET != null)
-            AddTooltipToButton(btnOverrideRET, "篡改", overrideTooltip);
+        {
+            string tooltip = $"消耗 {overrideCost} 单位 RET\n后撤休整，恢复兵力";
+            AddTooltipToButton(btnOverrideRET, "篡改为 RET", tooltip,
+                () => OnOverrideHoverEnter(OrderType.RET), OnHoverExit);
+        }
 
         // 关闭按钮
         if (btnClose != null)
             AddTooltipToButton(btnClose, "", "关闭将军详情面板");
     }
 
-    private void AddTooltipToButton(Button btn, string title, string content)
+    /// <summary>获取强化加成文本</summary>
+    private string GetReinforceBonusText(OrderType orderType)
     {
-        if (btn == null || tooltipPanel == null) return;
+        return orderType switch
+        {
+            OrderType.ATK => "造成伤害 +2",
+            OrderType.DEF => "受伤时减免 2 点",
+            OrderType.RET => "额外回复 +2",
+            _ => ""
+        };
+    }
+
+    private void AddTooltipToButton(Button btn, string title, string content,
+        System.Action onEnterPreview = null, System.Action onExitPreview = null)
+    {
+        if (btn == null) return;
 
         var trigger = btn.GetComponent<UnityEngine.EventSystems.EventTrigger>();
         if (trigger == null)
             trigger = btn.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
 
-        // PointerEnter - 在已有的事件基础上添加tooltip显示
+        // 清除旧事件
+        trigger.triggers.Clear();
+
+        // PointerEnter - 显示 tooltip + 预览
         var enterEntry = new UnityEngine.EventSystems.EventTrigger.Entry
         {
             eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter
         };
-        enterEntry.callback.AddListener((data) => tooltipPanel?.Show(title, content));
+        enterEntry.callback.AddListener((data) =>
+        {
+            tooltipPanel?.Show(title, content);
+            onEnterPreview?.Invoke();
+        });
         trigger.triggers.Add(enterEntry);
 
-        // PointerExit
+        // PointerExit - 隐藏 tooltip + 清除预览
         var exitEntry = new UnityEngine.EventSystems.EventTrigger.Entry
         {
             eventID = UnityEngine.EventSystems.EventTriggerType.PointerExit
         };
-        exitEntry.callback.AddListener((data) => tooltipPanel?.Hide());
+        exitEntry.callback.AddListener((data) =>
+        {
+            tooltipPanel?.Hide();
+            onExitPreview?.Invoke();
+        });
         trigger.triggers.Add(exitEntry);
     }
 
@@ -262,6 +291,7 @@ public class GeneralDetailPanel : WindowBase
             // 完整模式（己方将军）：显示所有信息
             RefreshIntent();
             RefreshButtons();
+            SetupButtonTooltips();  // 更新按钮 tooltip（包含效果描述）
 
             // 显示所有区域
             SetActiveIfNotNull(trustArea, true);

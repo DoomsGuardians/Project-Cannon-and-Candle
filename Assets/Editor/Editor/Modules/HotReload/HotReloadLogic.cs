@@ -36,7 +36,6 @@ public static class HotReloadLogic
         CompilationFailed
     }
 
-    private static CompilationStatus _lastStatus = CompilationStatus.Idle;
     private static DateTime _lastCompileTime = DateTime.MinValue;
     private static int _lastCompileErrorCount = 0;
     private static int _lastCompileWarningCount = 0;

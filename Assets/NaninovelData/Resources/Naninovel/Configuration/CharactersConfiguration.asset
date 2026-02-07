@@ -66,7 +66,7 @@ MonoBehaviour:
     Poses: []
   Metadata:
     ids:
-    - Victor
+    - Narrator
     metas:
     - Implementation: Naninovel.SpriteCharacter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null

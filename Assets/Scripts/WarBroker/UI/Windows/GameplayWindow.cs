@@ -303,6 +303,9 @@ public class GameplayWindow : WindowBase
         var panel = uIService.GetWindow<WindowBase>(panelName);
         AttachPanelToContentArea(panel);
         currentPanel = panelName;
+
+        // 通知教程系统面板已打开
+        TutorialManager.Instance?.OnPanelOpened(panelName);
     }
 
     private void OnEndTurnClicked()
@@ -617,4 +620,46 @@ public class GameplayWindow : WindowBase
         panel.offsetMin = Vector2.zero;
         panel.offsetMax = Vector2.zero;
     }
+
+    #region 教程按钮控制
+
+    /// <summary>
+    /// 设置按钮的 interactable 状态（供教程系统使用）
+    /// </summary>
+    /// <param name="buttonId">按钮标识：Market, Intel, EndTurn</param>
+    /// <param name="interactable">是否可交互</param>
+    public void SetButtonInteractable(string buttonId, bool interactable)
+    {
+        switch (buttonId)
+        {
+            case "Market":
+                if (btnMarket != null) btnMarket.interactable = interactable;
+                break;
+            case "Intel":
+                if (btnInfo != null) btnInfo.interactable = interactable;
+                break;
+            case "EndTurn":
+                if (btnEndTurn != null) btnEndTurn.interactable = interactable;
+                break;
+            default:
+                Debug.LogWarning($"[GameplayWindow] Unknown button ID: {buttonId}");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 获取按钮的 interactable 状态
+    /// </summary>
+    public bool GetButtonInteractable(string buttonId)
+    {
+        return buttonId switch
+        {
+            "Market" => btnMarket != null && btnMarket.interactable,
+            "Intel" => btnInfo != null && btnInfo.interactable,
+            "EndTurn" => btnEndTurn != null && btnEndTurn.interactable,
+            _ => false
+        };
+    }
+
+    #endregion
 }

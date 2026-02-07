@@ -2,7 +2,12 @@ fileFormatVersion: 2
 guid: e02d9d3f4e661a04fa776611d93d4a6b
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: grass_3
+    second: {fileID: 2100000, guid: d30a8fcd394d6934bbb7c253bf518fa4, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -47,10 +52,10 @@ ScriptedImporter:
 '
   optimizeGameObjects: 0
   materials:
-  - {instanceID: 0}
+  - {fileID: 3010116014333153850, guid: e02d9d3f4e661a04fa776611d93d4a6b, type: 3}
   textures:
-  - {instanceID: 0}
-  - {instanceID: 0}
+  - {fileID: 6983701643236107813, guid: e02d9d3f4e661a04fa776611d93d4a6b, type: 3}
+  - {fileID: 8022499087761476943, guid: e02d9d3f4e661a04fa776611d93d4a6b, type: 3}
   hasSceneData: 1
   hasAnimationData: 0
   hasMaterialData: 1
@@ -58,10 +63,10 @@ ScriptedImporter:
   animations: []
   _extensions: []
   _textures:
-  - texture: {instanceID: 0}
+  - texture: {fileID: 6983701643236107813, guid: e02d9d3f4e661a04fa776611d93d4a6b, type: 3}
     shouldBeLinear: 0
     shouldBeNormalMap: 0
-  - texture: {instanceID: 0}
+  - texture: {fileID: 8022499087761476943, guid: e02d9d3f4e661a04fa776611d93d4a6b, type: 3}
     shouldBeLinear: 1
     shouldBeNormalMap: 1
   _mainAssetIdentifier: scenes/Sketchfab_Scene

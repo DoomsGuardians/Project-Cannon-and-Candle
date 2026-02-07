@@ -1,0 +1,133 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef6e08c724aae2e4e8565ffca7913c4c, type: 3}
+  m_Name: TutorialConfig
+  m_EditorClassIdentifier:
+  Steps:
+  - StepId: welcome
+    Description: "\u6B22\u8FCE\u8BED"
+    ScriptName: Tutorial
+    StartLabel: welcome
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    - Market
+    - Intel
+    AllowedButtonsOnly: []
+  - StepId: intro_ui
+    Description: "\u754C\u9762\u4ECB\u7ECD\uFF0C\u5F15\u5BFC\u70B9\u51FB\u5E02\u573A"
+    ScriptName: Tutorial
+    StartLabel: intro_ui
+    Trigger: 8
+    TriggerParameter: MarketPanel
+    HighlightTarget: MarketBtn
+    DisabledButtons:
+    - EndTurn
+    - Intel
+    AllowedButtonsOnly: []
+  - StepId: intro_market
+    Description: "\u5E02\u573A\u9762\u677F\u4ECB\u7ECD"
+    ScriptName: Tutorial
+    StartLabel: intro_market
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: teach_buy
+    Description: "\u6559\u4E70\u5165ATK"
+    ScriptName: Tutorial
+    StartLabel: teach_buy
+    Trigger: 1
+    TriggerParameter: ATK
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: buy_success
+    Description: "\u4E70\u5165\u6210\u529F\u53CD\u9988"
+    ScriptName: Tutorial
+    StartLabel: buy_success
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: intro_generals
+    Description: "\u5F15\u5BFC\u70B9\u51FB\u5C06\u519B"
+    ScriptName: Tutorial
+    StartLabel: intro_generals
+    Trigger: 8
+    TriggerParameter: GeneralDetailPanel
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: teach_assign
+    Description: "\u6559\u5206\u914D\u6307\u4EE4"
+    ScriptName: Tutorial
+    StartLabel: teach_assign
+    Trigger: 3
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: assign_success
+    Description: "\u5206\u914D\u6210\u529F\u53CD\u9988"
+    ScriptName: Tutorial
+    StartLabel: assign_success
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons: []
+    AllowedButtonsOnly: []
+  - StepId: teach_endturn
+    Description: "\u6559\u7ED3\u675F\u56DE\u5408"
+    ScriptName: Tutorial
+    StartLabel: teach_endturn
+    Trigger: 4
+    TriggerParameter:
+    HighlightTarget: EndTurnBtnContainer
+    DisabledButtons: []
+    AllowedButtonsOnly: []
+  - StepId: battle_intro
+    Description: "\u6218\u6597\u9636\u6BB5\u8BF4\u660E"
+    ScriptName: Tutorial
+    StartLabel: battle_intro
+    Trigger: 7
+    TriggerParameter: MarketPhase
+    HighlightTarget:
+    DisabledButtons: []
+    AllowedButtonsOnly: []
+  - StepId: goal
+    Description: "\u6E38\u620F\u76EE\u6807\u8BF4\u660E"
+    ScriptName: Tutorial
+    StartLabel: goal
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons: []
+    AllowedButtonsOnly: []
+  - StepId: complete
+    Description: "\u6559\u7A0B\u7ED3\u675F"
+    ScriptName: Tutorial
+    StartLabel: complete
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons: []
+    AllowedButtonsOnly: []

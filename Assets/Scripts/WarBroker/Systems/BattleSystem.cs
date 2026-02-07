@@ -295,6 +295,10 @@ public class BattleSystem : ILogic
         (int allyHPChange, int enemyHPChange) = GetCombatOutcome(allyOrder, enemyOrder);
 
         // GDD v7.0: 确定性强化效果
+        // 记录强化加成，稍后根据实际伤害情况应用
+        int allyReinforcedBonus = 0;
+        int enemyReinforcedBonus = 0;
+
         // 己方强化效果
         if (ally.IntentSource == IntentSource.Reinforced)
         {
@@ -304,7 +308,7 @@ public class BattleSystem : ILogic
                     enemyHPChange -= 2; // 造成伤害 +2（敌方多扣2血）
                     break;
                 case OrderType.DEF:
-                    allyHPChange += 2; // 受到伤害 -2（己方少扣2血）
+                    allyReinforcedBonus = 2; // 记录防御加成，稍后应用
                     break;
                 case OrderType.RET:
                     allyHPChange += 2; // 额外回血 +2
@@ -321,7 +325,7 @@ public class BattleSystem : ILogic
                     allyHPChange -= 2; // 敌方造成伤害 +2
                     break;
                 case OrderType.DEF:
-                    enemyHPChange += 2; // 敌方受到伤害 -2
+                    enemyReinforcedBonus = 2; // 记录防御加成，稍后应用
                     break;
                 case OrderType.RET:
                     enemyHPChange += 2; // 敌方额外回血 +2
@@ -346,14 +350,14 @@ public class BattleSystem : ILogic
         {
             allyHPChange -= enemyMoraleDamageBonus;
         }
-        // 防御修正（只有受伤时才应用）
+        // 防御修正 + 强化DEF加成（只有受伤时才应用）
         if (allyHPChange < 0)
         {
-            allyHPChange += allyMoraleDefenseBonus;
+            allyHPChange += allyMoraleDefenseBonus + allyReinforcedBonus;
         }
         if (enemyHPChange < 0)
         {
-            enemyHPChange += enemyMoraleDefenseBonus;
+            enemyHPChange += enemyMoraleDefenseBonus + enemyReinforcedBonus;
         }
 
         // 应用随机修正（仅对伤害部分）

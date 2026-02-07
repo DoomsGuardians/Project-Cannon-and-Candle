@@ -97,7 +97,6 @@ public static class EditorTimeTrackerLogic
     // 烘焙状态
     private static Dictionary<string, DateTime> _bakeStartTimes = new Dictionary<string, DateTime>();
     private static bool _isLightmapBaking = false;
-    private static bool _isNavMeshBaking = false;
 
     // 慢操作阈值（毫秒）
     private const double SLOW_OPERATION_THRESHOLD_MS = 1000; // 1秒

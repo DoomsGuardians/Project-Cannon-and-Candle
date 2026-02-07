@@ -2,7 +2,12 @@ fileFormatVersion: 2
 guid: 9f9a1d6f4ccd19a4e87589f2f271bfa4
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Campfire_uenpfeifa_Low
+    second: {fileID: 2100000, guid: 514b3f0c512105e4292ce01b78b73141, type: 2}
   serializedVersion: 2
   userData: 
   assetBundleName: 
@@ -47,11 +52,11 @@ ScriptedImporter:
 '
   optimizeGameObjects: 0
   materials:
-  - {instanceID: 0}
+  - {fileID: -279949075784224204, guid: 9f9a1d6f4ccd19a4e87589f2f271bfa4, type: 3}
   textures:
-  - {instanceID: 0}
-  - {instanceID: 0}
-  - {instanceID: 0}
+  - {fileID: 6983701643236107813, guid: 9f9a1d6f4ccd19a4e87589f2f271bfa4, type: 3}
+  - {fileID: 8022499087761476943, guid: 9f9a1d6f4ccd19a4e87589f2f271bfa4, type: 3}
+  - {fileID: 5230624929818990856, guid: 9f9a1d6f4ccd19a4e87589f2f271bfa4, type: 3}
   hasSceneData: 1
   hasAnimationData: 0
   hasMaterialData: 1
@@ -59,13 +64,13 @@ ScriptedImporter:
   animations: []
   _extensions: []
   _textures:
-  - texture: {instanceID: 0}
+  - texture: {fileID: 6983701643236107813, guid: 9f9a1d6f4ccd19a4e87589f2f271bfa4, type: 3}
     shouldBeLinear: 0
     shouldBeNormalMap: 0
-  - texture: {instanceID: 0}
+  - texture: {fileID: 8022499087761476943, guid: 9f9a1d6f4ccd19a4e87589f2f271bfa4, type: 3}
     shouldBeLinear: 1
     shouldBeNormalMap: 0
-  - texture: {instanceID: 0}
+  - texture: {fileID: 5230624929818990856, guid: 9f9a1d6f4ccd19a4e87589f2f271bfa4, type: 3}
     shouldBeLinear: 1
     shouldBeNormalMap: 1
   _mainAssetIdentifier: scenes/Sketchfab_Scene

@@ -31,13 +31,22 @@ public class AlignToGroundModule : ToolModule
     {
         if (!context.HasSelectedTransforms)
         {
-            EditorGUILayout.HelpBox("请在 Hierarchy 窗口中选择要对齐的物体。", MessageType.Info);
+            EditorGUILayout.HelpBox("请在 Hierarchy 窗口中选择要对齐的物体。\n注意：目标表面需要有 Collider 组件。", MessageType.Info);
             return;
         }
 
-        _settings.GroundLayerMask = SceneUtil.LayerMaskField("地面层级", _settings.GroundLayerMask);
+        EditorGUILayout.LabelField("吸附设置", EditorStyles.boldLabel);
+        _settings.GroundLayerMask = SceneUtil.LayerMaskField("目标层级", _settings.GroundLayerMask);
+        _settings.AlignToNormal = EditorGUILayout.Toggle("对齐表面法线", _settings.AlignToNormal);
 
-        if (DrawIconButton("⬇️ 一键对齐地面", IconName, HeaderColor, 30))
+        if (_settings.AlignToNormal)
+        {
+            EditorGUILayout.HelpBox("启用后，物体的 Up 方向将对齐到表面法线方向。", MessageType.None);
+        }
+
+        EditorGUILayout.Space(5);
+
+        if (DrawIconButton("⬇️ 吸附到表面", IconName, HeaderColor, 30))
         {
             AlignToGroundLogic.SnapToGround(context.SelectedTransforms, _settings);
             SaveSettings();
@@ -63,11 +72,13 @@ public class AlignToGroundModule : ToolModule
     private void LoadSettings()
     {
         _settings.GroundLayerMask = ToolboxSettings.GetInt(SETTINGS_KEY_PREFIX + "GroundLayerMask", -1);
+        _settings.AlignToNormal = ToolboxSettings.GetBool(SETTINGS_KEY_PREFIX + "AlignToNormal", false);
     }
 
     private void SaveSettings()
     {
         ToolboxSettings.SetInt(SETTINGS_KEY_PREFIX + "GroundLayerMask", _settings.GroundLayerMask);
+        ToolboxSettings.SetBool(SETTINGS_KEY_PREFIX + "AlignToNormal", _settings.AlignToNormal);
     }
 }
 

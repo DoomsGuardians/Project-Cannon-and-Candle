@@ -18,7 +18,7 @@ MonoBehaviour:
   InitialPosition: {x: 0, y: 0, z: -10}
   CustomCameraPrefab: {fileID: 0}
   UseUICamera: 0
-  CustomUICameraPrefab: {fileID: 0}
+  CustomUICameraPrefab: {fileID: 8689437527637811145, guid: a08b54c0cadb43c4ab752c755ae26612, type: 3}
   DefaultDuration: 0.35
   DefaultEasing: 0
   ThumbnailResolution: {x: 240, y: 140}

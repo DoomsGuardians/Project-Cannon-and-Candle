@@ -18,6 +18,13 @@ public class GameplayManager : ManagerBase
     // 收集本回合的战斗结果
     private List<BattleResult> pendingBattleResults = new List<BattleResult>();
 
+    // 等待开场白/教程完成后才开始回合
+    private bool waitingForIntroComplete = false;
+
+#if NANINOVEL
+    private NaninovelService naninovelService;
+#endif
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -26,6 +33,10 @@ public class GameplayManager : ManagerBase
         battleSystem = GameRoot.Instance.battleSystem;
         campaignSystem = GameRoot.Instance.campaignSystem;
         saveSystem = GameRoot.Instance.saveSystem;
+
+#if NANINOVEL
+        naninovelService = GameRoot.Instance.naninovelService;
+#endif
 
         balanceConfig = resService.LoadResource<GameBalanceConfig>(ConfigPaths.GAME_BALANCE);
     }
@@ -50,6 +61,7 @@ public class GameplayManager : ManagerBase
         eventService.AddEventListening((EventID)WarBrokerEventID.OnRandomEvent, OnRandomEvent);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnForceLiquidation, OnForceLiquidation);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnSettlement, OnTurnSettlement);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnTutorialWelcomeComplete, OnTutorialWelcomeComplete);
     }
 
     private void UnregisterEvents()
@@ -84,10 +96,11 @@ public class GameplayManager : ManagerBase
             return;
         }
 
+        var config = campaignSystem.Data.Config;
+
         // 开始存档追踪
         if (saveSystem != null)
         {
-            var config = campaignSystem.Data.Config;
             saveSystem.BeginCampaignTracking(config.CampaignId, config.CampaignName);
         }
 
@@ -97,8 +110,78 @@ public class GameplayManager : ManagerBase
         // 先打开主界面，确保能接收到第一回合的阶段事件
         uiService.ShowWindow<GameplayWindow>("GameplayWindow");
 
-        // 然后开始第一回合
-        campaignSystem.StartTurn();
+        // 检查是否需要启动教程
+        bool isTutorialMode = CheckAndStartTutorial();
+
+        if (isTutorialMode)
+        {
+            // 教程模式：由教程系统控制流程，等待 OnTutorialWelcomeComplete 事件
+            waitingForIntroComplete = true;
+            Debug.Log("[GameplayManager] 教程模式：等待开场对话完成...");
+        }
+        else if (!string.IsNullOrEmpty(config.IntroScriptName))
+        {
+            // 非教程但有开场白：播放开场白，完成后开始回合
+            waitingForIntroComplete = true;
+            Debug.Log($"[GameplayManager] 播放战役开场白: {config.IntroScriptName}");
+            PlayIntroScript(config.IntroScriptName, config.IntroScriptLabel);
+        }
+        else
+        {
+            // 无开场白：直接开始第一回合
+            campaignSystem.StartTurn();
+        }
+    }
+
+    /// <summary>
+    /// 播放战役开场白脚本
+    /// </summary>
+    private async void PlayIntroScript(string scriptName, string startLabel)
+    {
+#if NANINOVEL
+        if (naninovelService == null)
+        {
+            Debug.LogWarning("[GameplayManager] NaninovelService 不可用，跳过开场白");
+            StartFirstTurn();
+            return;
+        }
+
+        try
+        {
+            await naninovelService.PlayScriptAsync(
+                scriptName,
+                startLabel,
+                waitForCompletion: true,
+                pauseGameplayInput: true,
+                stopCurrent: true
+            );
+
+            // 开场白播放完成，开始回合
+            Debug.Log("[GameplayManager] 开场白播放完成");
+            StartFirstTurn();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[GameplayManager] 开场白播放失败: {ex.Message}");
+            StartFirstTurn();
+        }
+#else
+        Debug.Log("[GameplayManager] Naninovel 未启用，跳过开场白");
+        StartFirstTurn();
+#endif
+    }
+
+    /// <summary>
+    /// 开始第一回合（供开场白/教程完成后调用）
+    /// </summary>
+    public void StartFirstTurn()
+    {
+        if (waitingForIntroComplete)
+        {
+            waitingForIntroComplete = false;
+            Debug.Log("[GameplayManager] 开场白/教程对话完成，开始第一回合");
+            campaignSystem.StartTurn();
+        }
     }
 
     #region 玩家操作接口
@@ -188,6 +271,44 @@ public class GameplayManager : ManagerBase
     public MarketData GetMarketData() => campaignSystem.Data.Market;
     public BattleData GetBattleData() => campaignSystem.Data.Battle;
     public CommissionSystem GetCommissionSystem() => campaignSystem.GetCommissionSystem();
+
+    #endregion
+
+    #region 教程
+
+    /// <summary>检查并启动教程，返回是否为教程模式</summary>
+    private bool CheckAndStartTutorial()
+    {
+        var config = campaignSystem.Data?.Config;
+        if (config == null) return false;
+
+        // 检查是否为教程关卡且教程未完成
+        bool isTutorialCampaign = config.IsTutorial;
+        bool tutorialCompleted = TutorialManager.IsTutorialCompleted();
+
+        if (isTutorialCampaign && !tutorialCompleted)
+        {
+            // 启动教程
+            if (TutorialManager.Instance != null)
+            {
+                Debug.Log("[GameplayManager] 启动教程...");
+                TutorialManager.Instance.StartTutorial();
+                return true;
+            }
+            else
+            {
+                Debug.LogWarning("[GameplayManager] TutorialManager.Instance is null, cannot start tutorial.");
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>处理教程开场白完成事件</summary>
+    private void OnTutorialWelcomeComplete(object param1, object param2)
+    {
+        StartFirstTurn();
+    }
 
     #endregion
 

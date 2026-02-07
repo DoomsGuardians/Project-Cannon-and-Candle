@@ -17,7 +17,7 @@ MonoBehaviour:
     Resources:
     - name: Dialogue
       pathPrefix: TextPrinters
-      guid: 1bc08ccd31adff6439e97161aa6e1d8b
+      guid: 1036d2b69fa3d574e8e7125e0856c6fd
   - Id: TextPrinters/323e8cc6-ab5f-4065-aa3a-6dffa7c04774
     Resources:
     - name: Fullscreen
@@ -89,60 +89,14 @@ MonoBehaviour:
       pathPrefix: Spawn
       guid: e466d9326b30a4b49a3dad428b4d9968
   - Id: UI
-    Resources:
-    - name: ClickThroughPanel
-      pathPrefix: UI
-      guid: 702c32b2de0c0784b9a66ec90601874f
-    - name: BacklogUI
-      pathPrefix: UI
-      guid: 7fba909c66b25324cb77db18679c2c96
-    - name: CGGalleryUI
-      pathPrefix: UI
-      guid: 71da50c8dae82bd42ba67528804e820c
-    - name: ConfirmationUI
-      pathPrefix: UI
-      guid: 88d03f19bcbff914ba33a7c9895e2d7c
-    - name: ContinueInputUI
-      pathPrefix: UI
-      guid: 1add671f8348e8443bcc56290e82fc5e
-    - name: ExternalScriptsUI
-      pathPrefix: UI
-      guid: 671ceb4f549ddf046913d7debf113469
-    - name: LoadingUI
-      pathPrefix: UI
-      guid: 53aad00e5cf184e458adb001c550518a
-    - name: MovieUI
-      pathPrefix: UI
-      guid: f9a211517d1cb1a44964dc2254463049
-    - name: RollbackUI
-      pathPrefix: UI
-      guid: a32c73a3aff4b274c85b3ff16c854b07
-    - name: SaveLoadUI
-      pathPrefix: UI
-      guid: 8d53726b3d08433479398f02b4780e7f
-    - name: SceneTransitionUI
-      pathPrefix: UI
-      guid: e3b234b4273b7f64ab3f1d9fe425ed23
-    - name: SettingsUI
-      pathPrefix: UI
-      guid: 65c37f59e9b266f468dd5381fdc03fc3
-    - name: TipsUI
-      pathPrefix: UI
-      guid: f5aae572225ee1b4c96d1a17fc5cb073
-    - name: TitleUI
-      pathPrefix: UI
-      guid: 4b121aa1be1b7e04480b452c595ff17a
-    - name: VariableInputUI
-      pathPrefix: UI
-      guid: bb95f484e341dcd4391a572f22b7d067
-    - name: PauseUI
-      pathPrefix: UI
-      guid: 480f5db62ea305c46b89a86496d2a0c9
-    - name: ToastUI
-      pathPrefix: UI
-      guid: dd85ce99288c2f8488447fa511b1c0d6
-    - name: ScriptNavigatorUI
-      pathPrefix: UI
-      guid: 735d6aa767879aa469134858c5b2f0a7
+    Resources: []
   - Id: Characters/46416531-12cf-4266-84b6-6b47fcdc6c13
     Resources: []
+  - Id: Scripts
+    Resources:
+    - name: Tutorial
+      pathPrefix: Scripts
+      guid: 98911518768b386488a35e98e8834d6a
+    - name: Tutorial
+      pathPrefix: Scripts
+      guid: 73e67b124fa696e4c85aa9ad62ea3048

@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -18,6 +19,7 @@ public static class WarBrokerConfigSetup
         CreateEmptyOrderConfig();
         CreateEmptyCampaignConfig();
         CreateAllVictorProfiles();
+        CreateTutorialConfig();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("[WarBroker] 所有空配置已创建！请使用 Campaign Editor 进行编辑。");
@@ -141,6 +143,131 @@ public static class WarBrokerConfigSetup
         config.BetraySelfThreshold = 0.2f;
         EditorUtility.SetDirty(config);
         Debug.Log("[WarBroker] VictorProfile_Madman 已创建 (疯子)");
+    }
+
+    [MenuItem("WarBroker/Create Empty Configs/Tutorial Config")]
+    public static void CreateTutorialConfig()
+    {
+        var config = CreateOrLoad<TutorialConfig>("TutorialConfig");
+
+        // 填充示例教程步骤（使用 Naninovel 脚本）
+        config.Steps = new List<TutorialStep>
+        {
+            // 步骤1：欢迎
+            new TutorialStep
+            {
+                StepId = "welcome",
+                Description = "欢迎语",
+                ScriptName = "Tutorial",
+                StartLabel = "welcome",
+                Trigger = TutorialTrigger.Immediate
+            },
+
+            // 步骤2：介绍市场
+            new TutorialStep
+            {
+                StepId = "intro_market",
+                Description = "市场介绍",
+                ScriptName = "Tutorial",
+                StartLabel = "intro_market",
+                Trigger = TutorialTrigger.Immediate,
+                HighlightTarget = "MarketPanel"
+            },
+
+            // 步骤3：教玩家买入
+            new TutorialStep
+            {
+                StepId = "teach_buy",
+                Description = "教买入",
+                ScriptName = "Tutorial",
+                StartLabel = "teach_buy",
+                Trigger = TutorialTrigger.WaitForBuy,
+                TriggerParameter = "ATK",
+                HighlightTarget = "BuyButton_ATK"
+            },
+
+            // 步骤4：买入成功
+            new TutorialStep
+            {
+                StepId = "buy_success",
+                Description = "买入成功反馈",
+                ScriptName = "Tutorial",
+                StartLabel = "buy_success",
+                Trigger = TutorialTrigger.Immediate
+            },
+
+            // 步骤5：介绍将军
+            new TutorialStep
+            {
+                StepId = "intro_generals",
+                Description = "将军介绍",
+                ScriptName = "Tutorial",
+                StartLabel = "intro_generals",
+                Trigger = TutorialTrigger.Immediate,
+                HighlightTarget = "GeneralPanel"
+            },
+
+            // 步骤6：教分配指令
+            new TutorialStep
+            {
+                StepId = "teach_assign",
+                Description = "教分配指令",
+                ScriptName = "Tutorial",
+                StartLabel = "teach_assign",
+                Trigger = TutorialTrigger.WaitForAssign,
+                HighlightTarget = "GeneralCard_0"
+            },
+
+            // 步骤7：结束回合
+            new TutorialStep
+            {
+                StepId = "teach_endturn",
+                Description = "教结束回合",
+                ScriptName = "Tutorial",
+                StartLabel = "teach_endturn",
+                Trigger = TutorialTrigger.WaitForEndTurn,
+                HighlightTarget = "EndTurnButton"
+            },
+
+            // 步骤8：战斗说明
+            new TutorialStep
+            {
+                StepId = "battle_intro",
+                Description = "战斗说明",
+                ScriptName = "Tutorial",
+                StartLabel = "battle_intro",
+                Trigger = TutorialTrigger.WaitForPhase,
+                TriggerParameter = "MarketPhase"
+            },
+
+            // 步骤9：核心目标
+            new TutorialStep
+            {
+                StepId = "goal",
+                Description = "游戏目标",
+                ScriptName = "Tutorial",
+                StartLabel = "goal",
+                Trigger = TutorialTrigger.Immediate
+            },
+
+            // 步骤10：结束
+            new TutorialStep
+            {
+                StepId = "complete",
+                Description = "教程结束",
+                ScriptName = "Tutorial",
+                StartLabel = "complete",
+                Trigger = TutorialTrigger.Immediate
+            }
+        };
+
+        EditorUtility.SetDirty(config);
+        AssetDatabase.SaveAssets();
+        Debug.Log("[WarBroker] TutorialConfig 已创建，包含10个教程步骤（使用 Naninovel 脚本）");
+
+        // 选中并高亮创建的资产
+        Selection.activeObject = config;
+        EditorGUIUtility.PingObject(config);
     }
 
     /// <summary>

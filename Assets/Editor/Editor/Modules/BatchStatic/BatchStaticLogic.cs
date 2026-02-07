@@ -43,8 +43,10 @@ public static class BatchStaticLogic
             flags = SetStaticFlag(flags, StaticEditorFlags.OccluderStatic, settings.OccluderStatic);
             flags = SetStaticFlag(flags, StaticEditorFlags.OccludeeStatic, settings.OccludeeStatic);
             flags = SetStaticFlag(flags, StaticEditorFlags.BatchingStatic, settings.BatchingStatic);
+#pragma warning disable CS0618 // NavigationStatic 和 OffMeshLinkGeneration 虽已过时但仍可用
             flags = SetStaticFlag(flags, StaticEditorFlags.NavigationStatic, settings.NavigationStatic);
             flags = SetStaticFlag(flags, StaticEditorFlags.OffMeshLinkGeneration, settings.OffMeshLinkGeneration);
+#pragma warning restore CS0618
 
             GameObjectUtility.SetStaticEditorFlags(go, flags);
             count++;

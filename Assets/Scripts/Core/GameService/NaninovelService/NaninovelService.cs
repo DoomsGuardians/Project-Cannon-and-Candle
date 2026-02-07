@@ -9,7 +9,9 @@ using System.Linq;
 using System.Threading;
 using Naninovel;
 using Naninovel.Async;
+using Naninovel.UI;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>
 /// Naninovel 视觉小说框架的集成服务
@@ -35,11 +37,34 @@ public class NaninovelService : ILogic
     private string currentScriptPath;
     private bool releaseInputOnStop;
     private bool allowNaninovelCamera;
+    private bool urpCameraStackConfigured;
 
     public bool IsInitialized => initializationSucceeded && scriptPlayer != null && Engine.Initialized;
     public bool IsPlaying => scriptPlayer != null && (scriptPlayer.Playing || scriptPlayer.Completing);
+    public bool InitializationFailed => initializationFailed;
 
     public Camera NaniCamera => TryGetNaninovelCamera(out var camera) ? camera : null;
+
+    /// <summary>
+    /// 等待 Naninovel 初始化完成
+    /// </summary>
+    public async UniTask WaitForInitializationAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsInitialized) return;
+
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+            lifetimeCts?.Token ?? CancellationToken.None,
+            cancellationToken);
+
+        try
+        {
+            await EnsureInitializedAsync(linkedCts.Token);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[NaninovelService] WaitForInitializationAsync failed: {ex.Message}");
+        }
+    }
 
     public void OnInit()
     {
@@ -82,6 +107,7 @@ public class NaninovelService : ILogic
         activePlaybackLabel = null;
         currentScriptPath = null;
         allowNaninovelCamera = false;
+        urpCameraStackConfigured = false;
         UpdateNaninovelCameraState(forceDisable: true);
     }
 
@@ -145,6 +171,9 @@ public class NaninovelService : ILogic
                 lockedInputThisPlayback = true;
                 releaseInputOnStop = true;
             }
+
+            // 确保 URP 相机堆栈已设置
+            SetupURPCameraStack();
 
             if (!string.IsNullOrEmpty(startLabel))
                 await scriptPlayer.LoadAndPlayAtLabel(scriptName, startLabel);
@@ -295,6 +324,33 @@ public class NaninovelService : ILogic
         pendingStartLabel = null;
         eventService?.SendMessage(EventID.OnDialogueStart, currentScriptPath, activePlaybackLabel);
         UpdateNaninovelCameraState();
+        FixTextPrinterPosition();
+    }
+
+    /// <summary>
+    /// 修正 TextPrinter Content 的位置偏移
+    /// </summary>
+    private void FixTextPrinterPosition()
+    {
+        try
+        {
+            var printerManager = Engine.GetService<ITextPrinterManager>();
+            if (printerManager == null) return;
+
+            var printer = printerManager.GetActor(printerManager.DefaultPrinterId);
+            if (printer is UITextPrinter uiPrinter && uiPrinter.PrinterPanel != null)
+            {
+                var content = uiPrinter.PrinterPanel.Content;
+                if (content != null)
+                {
+                    content.anchoredPosition = Vector2.zero;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"[NaninovelService] Failed to fix TextPrinter position: {ex.Message}");
+        }
     }
 
     private void HandleScriptStop(Script script)
@@ -350,6 +406,75 @@ public class NaninovelService : ILogic
 
         camera = manager.Camera;
         return camera != null;
+    }
+
+    /// <summary>
+    /// 设置 URP 相机堆栈，将 Naninovel UI 相机添加到主相机的 stack 中
+    /// </summary>
+    private void SetupURPCameraStack()
+    {
+        if (urpCameraStackConfigured) return;
+
+        Debug.Log("[NaninovelService] SetupURPCameraStack called");
+
+        try
+        {
+            var cameraManager = Engine.GetService<ICameraManager>();
+            if (cameraManager == null)
+            {
+                Debug.LogWarning("[NaninovelService] ICameraManager not available");
+                return;
+            }
+
+            // 获取 Naninovel 的 UI 相机
+            var naniUICamera = cameraManager.UICamera;
+            if (naniUICamera == null)
+            {
+                Debug.Log("[NaninovelService] No Naninovel UI camera (UseUICamera may be disabled)");
+                return;
+            }
+
+            // 获取主相机
+            var mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                Debug.LogWarning("[NaninovelService] No main camera found, will retry later");
+                return;
+            }
+
+            // 获取主相机的 URP 数据
+            var mainCameraData = mainCamera.GetUniversalAdditionalCameraData();
+            if (mainCameraData == null)
+            {
+                Debug.LogWarning("[NaninovelService] Main camera has no UniversalAdditionalCameraData");
+                return;
+            }
+
+            // 设置 Naninovel UI 相机为 Overlay 模式
+            var naniCameraData = naniUICamera.GetUniversalAdditionalCameraData();
+            if (naniCameraData != null)
+            {
+                naniCameraData.renderType = CameraRenderType.Overlay;
+                Debug.Log("[NaninovelService] Set Naninovel UI camera to Overlay mode");
+            }
+
+            // 同步输出属性，避免 "output properties do not match" 警告
+            naniUICamera.allowHDR = mainCamera.allowHDR;
+            naniUICamera.allowMSAA = mainCamera.allowMSAA;
+
+            // 添加到主相机的堆栈（如果还没添加）
+            if (!mainCameraData.cameraStack.Contains(naniUICamera))
+            {
+                mainCameraData.cameraStack.Add(naniUICamera);
+                Debug.Log("[NaninovelService] Added Naninovel UI camera to main camera stack");
+            }
+
+            urpCameraStackConfigured = true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[NaninovelService] Failed to setup URP camera stack: {ex.Message}");
+        }
     }
 }
 #endif

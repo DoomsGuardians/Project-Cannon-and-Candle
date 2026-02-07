@@ -25,7 +25,6 @@ public class EditorTimeTrackerModule : ToolModule
 
     private TabType _currentTab = TabType.场景编辑时间;
     private Vector2 _scrollPos;
-    private bool _showDetails = false;
 
     public override void OnInitialize()
     {

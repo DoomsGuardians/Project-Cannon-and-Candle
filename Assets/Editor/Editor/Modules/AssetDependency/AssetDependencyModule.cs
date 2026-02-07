@@ -21,7 +21,6 @@ public class AssetDependencyModule : ToolModule
     private bool _showDependencies = true;
     private bool _showReferencers = true;
     private bool _showDetails = false;
-    private string _selectedNodePath = "";
 
     public override bool IsAvailable(ToolContext context)
     {
