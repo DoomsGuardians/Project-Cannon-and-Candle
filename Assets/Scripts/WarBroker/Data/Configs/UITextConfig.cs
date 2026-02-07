@@ -25,8 +25,9 @@ public class UITextConfig : ScriptableObject
     [Tooltip("【GameplayWindow】鼠标悬停在「净资产图标」上时显示的提示\n说明净资产的计算方式")]
     public string TooltipNetWorth = "现金 + 库存价值 - 负债";
 
-    [Tooltip("【GameplayWindow】鼠标悬停在「审计值图标」上时显示的提示\n说明审计值的作用")]
-    public string TooltipAudit = "初始资产，用于计算最终盈亏";
+    // [已禁用] 审计值系统
+    // [Tooltip("【GameplayWindow】鼠标悬停在「审计值图标」上时显示的提示\n说明审计值的作用")]
+    // public string TooltipAudit = "初始资产，用于计算最终盈亏";
 
     [Tooltip("【GameplayWindow】鼠标悬停在「后备役图标/数值」上时显示的提示\n说明后备役的作用和消耗方式")]
     public string TooltipReserves = "后勤储备，用于补充前线兵员。将军撤退或在基地休整时消耗。";

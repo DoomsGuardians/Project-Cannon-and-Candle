@@ -81,7 +81,7 @@ public class PlayerData
     public Dictionary<OrderType, int> Inventory;
     public float BankDebt;
     public List<FuturesContract> FuturesPositions;
-    public int AuditValue;
+    // public int AuditValue;  // [已禁用] 审计值系统
     public float EntryFee;  // 入场费（用于计算总成本）
 
     public void InitFromConfig(CampaignConfig config)
@@ -95,8 +95,8 @@ public class PlayerData
         };
         BankDebt = 0f;
         FuturesPositions = new List<FuturesContract>();
-        AuditValue = 0;
-        EntryFee = 0f;  // 初始化入场费
+        // AuditValue = 0;  // [已禁用] 审计值系统
+        EntryFee = config.IsTutorial ? 0f : config.TicketPrice;  // 教程关卡免费，否则记录门票费用
     }
 
     public float CalculateNetWorth(MarketData market)

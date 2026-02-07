@@ -43,7 +43,7 @@ public class MarketDataTests
             },
             BankDebt = 0f,
             FuturesPositions = new List<FuturesContract>(),
-            AuditValue = 0
+            // AuditValue = 0  // [已禁用] 审计值系统
         };
     }
 

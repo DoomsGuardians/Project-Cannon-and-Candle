@@ -95,7 +95,7 @@ public class CampaignSaveData
 // - Inventory: List<OrderInventoryItem>      // ATK/DEF/RET 库存
 // - BankDebt: float
 // - FuturesPositions: List<FuturesContractSaveData>
-// - AuditValue: int
+// - AuditValue: int  // [已禁用] 审计值系统
 // - EntryFee: float
 //
 // ### MarketSaveData

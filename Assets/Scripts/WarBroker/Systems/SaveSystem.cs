@@ -267,7 +267,8 @@ public class SaveSystem : ILogic
         financial.InitialCash = data.Config.InitialCash;
         financial.FinalCash = data.Player.Cash;
         financial.FinalNetWorth = data.Player.CalculateNetWorth(data.Market);
-        financial.TotalProfitLoss = financial.FinalNetWorth - data.Player.AuditValue;
+        // [修改] 利润 = 最终净资产 - 初始资金 - 门票费用
+        financial.TotalProfitLoss = financial.FinalNetWorth - financial.InitialCash - data.Player.EntryFee;
         financial.CommissionBonus = data.CommissionTotalBonus;
 
         // 统计交易次数

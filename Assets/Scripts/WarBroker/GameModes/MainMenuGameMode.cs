@@ -14,6 +14,7 @@ public class MainMenuGameMode : GameModeBase
         RegisterWindow<SettingsWindow>("Prefabs/WarBroker/UI/Windows/SettingsWindow", "SettingsWindow");
         RegisterWindow<CampaignSelectPopup>("Prefabs/WarBroker/UI/Popups/CampaignSelectPopup", "CampaignSelectPopup");
         RegisterWindow<ArchivePopup>("Prefabs/WarBroker/UI/Popups/ArchivePopup", "ArchivePopup");
+        RegisterWindow<NotificationPopup>("Prefabs/WarBroker/UI/Popups/NotificationPopup", "NotificationPopup");
         RegisterWindow<TooltipPanel>("Prefabs/WarBroker/UI/Panels/TooltipPanel", "TooltipPanel");
     }
 

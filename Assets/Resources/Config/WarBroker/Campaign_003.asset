@@ -17,6 +17,9 @@ MonoBehaviour:
   Description: "\u6807\u51C6\u96BE\u5EA6\u5173\u5361\uFF0C\u5E73\u8861\u7684\u6E38\u620F\u4F53\u9A8C\u3002"
   Thumbnail: {fileID: 21300000, guid: d867fde5a9bdc2340a2da0e35fa5d988, type: 3}
   TicketPrice: 2000
+  IsTutorial: 0
+  IntroScriptName: 
+  IntroScriptLabel: 
   MaxTurns: 60
   InitialCash: 2000
   InitialAtkInventory: 2
@@ -24,30 +27,22 @@ MonoBehaviour:
   InitialRetInventory: 2
   InitialReserves: 60
   BattlefieldSceneName: Battle_003
-  LaneCount: 5
+  LaneCount: 3
   GridCount: 5
   InitialFrontlinePosition: 3
   GeneralConfig: {fileID: 11400000, guid: 976ca2edd99e01b4c89f75361caeef09, type: 2}
   AllyFrontlineAssignments:
   - Position: 0
     GeneralId: adam
-  - Position: 1
-    GeneralId: gottfried
   - Position: 2
     GeneralId: matthias
-  - Position: 3
-    GeneralId: johann
   - Position: 4
     GeneralId: ottavio
   EnemyFrontlineAssignments:
   - Position: 0
     GeneralId: johan
-  - Position: 1
-    GeneralId: carl
   - Position: 2
     GeneralId: gustav
-  - Position: 3
-    GeneralId: axel
   - Position: 4
     GeneralId: lennart
   VictorInitialCash: 1000

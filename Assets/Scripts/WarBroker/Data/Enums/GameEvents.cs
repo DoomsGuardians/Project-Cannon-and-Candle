@@ -26,7 +26,7 @@ public enum WarBrokerEventID
     OnOrderAssigned,
     OnCashChange,
     OnNetWorthChange,
-    OnAuditValueChange,
+    // OnAuditValueChange,  // [已禁用] 审计值系统
     OnIntentChanged,
 
     // 游戏事件

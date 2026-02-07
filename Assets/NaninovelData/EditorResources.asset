@@ -97,6 +97,6 @@ MonoBehaviour:
     - name: Tutorial
       pathPrefix: Scripts
       guid: 98911518768b386488a35e98e8834d6a
-    - name: Tutorial
+    - name: Resources/Naninovel/Scripts/Tutorial
       pathPrefix: Scripts
       guid: 73e67b124fa696e4c85aa9ad62ea3048

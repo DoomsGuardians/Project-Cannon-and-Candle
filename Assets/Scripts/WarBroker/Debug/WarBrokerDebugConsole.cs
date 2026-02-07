@@ -144,7 +144,7 @@ public class WarBrokerDebugConsole : MonoBehaviour
         GUILayout.Label($"战役: {data.Config.CampaignName}");
         GUILayout.Label($"回合: {data.CurrentTurn} / {data.MaxTurns}");
         GUILayout.Label($"阶段: {data.CurrentPhase}");
-        GUILayout.Label($"审计值: {data.Player.AuditValue}");
+        // GUILayout.Label($"审计值: {data.Player.AuditValue}");  // [已禁用] 审计值系统
         GUILayout.Label($"净资产: {data.Player.CalculateNetWorth(data.Market):F2}");
         GUILayout.Label($"后备役: {data.Battle.CurrentReserves}");
 

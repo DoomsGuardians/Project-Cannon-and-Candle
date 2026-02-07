@@ -20,9 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scene/Battle_002.unity
     guid: b3cd5f48fe1f6a340a5c28fd8a990b82
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scene/Battle_003.unity
-    guid: b7fa1b3c1502b8e4c8d8a4604d8d8798
+    guid: 5ea41b8ef0fdb414ababb5097ca7c482
   - enabled: 0
     path: Assets/Scene/Battle_004.unity
     guid: 26c15f4ef8964ba4a9d7088e3cda51a3

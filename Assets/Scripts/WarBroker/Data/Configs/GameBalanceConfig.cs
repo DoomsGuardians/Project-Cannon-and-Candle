@@ -150,19 +150,20 @@ public class GameBalanceConfig : ScriptableObject
     [Range(-20, 0)]
     public int OverrideMoraleChange = -5;
 
-    [Header("===== 审计参数 =====")]
-
-    [Tooltip("军需总部补足指令审计值")]
-    [Range(0, 50)]
-    public int AuditSupplyShortage = 30;
-
-    [Tooltip("将军溃败审计值")]
-    [Range(0, 50)]
-    public int AuditGeneralRouted = 20;
-
-    [Tooltip("审计失败阈值")]
-    [Range(50, 200)]
-    public int AuditFailureThreshold = 100;
+    // [已禁用] 审计值系统
+    // [Header("===== 审计参数 =====")]
+    //
+    // [Tooltip("军需总部补足指令审计值")]
+    // [Range(0, 50)]
+    // public int AuditSupplyShortage = 30;
+    //
+    // [Tooltip("将军溃败审计值")]
+    // [Range(0, 50)]
+    // public int AuditGeneralRouted = 20;
+    //
+    // [Tooltip("审计失败阈值")]
+    // [Range(50, 200)]
+    // public int AuditFailureThreshold = 100;
 
     [Header("===== 随机事件参数 =====")]
 

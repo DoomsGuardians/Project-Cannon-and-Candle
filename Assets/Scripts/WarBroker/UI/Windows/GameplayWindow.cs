@@ -9,11 +9,11 @@ using TMPro;
 public class GameplayWindow : WindowBase
 {
     // 顶部状态栏 - 文本
-    private TMP_Text txtTurn, txtCash, txtNetWorth, txtAudit, txtEventInfo, txtReserves;
+    private TMP_Text txtTurn, txtCash, txtNetWorth, /* txtAudit, */ txtEventInfo, txtReserves;  // [已禁用] 审计值显示
     private TMP_Text txtATK, txtDEF, txtRET;
 
     // 顶部状态栏 - 图标（用于Tooltip）
-    private Image imgTurnIcon, imgCashIcon, imgNetWorthIcon, imgAuditIcon, imgReservesIcon;
+    private Image imgTurnIcon, imgCashIcon, imgNetWorthIcon, /* imgAuditIcon, */ imgReservesIcon;  // [已禁用] 审计值显示
     private Image imgATKIcon, imgDEFIcon, imgRETIcon;
 
     // 按钮和区域
@@ -51,7 +51,7 @@ public class GameplayWindow : WindowBase
             txtTurn = b.txtTurn;
             txtCash = b.txtCash;
             txtNetWorth = b.txtNetWorth;
-            txtAudit = b.txtAudit;
+            // txtAudit = b.txtAudit;  // [已禁用] 审计值显示
             txtReserves = b.txtReserves;
             txtATK = b.txtATK;
             txtDEF = b.txtDEF;
@@ -62,7 +62,7 @@ public class GameplayWindow : WindowBase
             imgTurnIcon = b.imgTurnIcon;
             imgCashIcon = b.imgCashIcon;
             imgNetWorthIcon = b.imgNetWorthIcon;
-            imgAuditIcon = b.imgAuditIcon;
+            // imgAuditIcon = b.imgAuditIcon;  // [已禁用] 审计值显示
             imgReservesIcon = b.imgReservesIcon;
             imgATKIcon = b.imgATKIcon;
             imgDEFIcon = b.imgDEFIcon;
@@ -105,7 +105,7 @@ public class GameplayWindow : WindowBase
         eventService.AddEventListening((EventID)WarBrokerEventID.OnOrderAssigned, OnFinanceChanged);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnCashChange, OnFinanceChanged);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnNetWorthChange, OnFinanceChanged);
-        eventService.AddEventListening((EventID)WarBrokerEventID.OnAuditValueChange, OnFinanceChanged);
+        // eventService.AddEventListening((EventID)WarBrokerEventID.OnAuditValueChange, OnFinanceChanged);  // [已禁用] 审计值显示
         eventService.AddEventListening((EventID)WarBrokerEventID.OnInventoryPreview, OnInventoryPreview);
 
         RefreshUI();
@@ -132,9 +132,9 @@ public class GameplayWindow : WindowBase
         if (imgNetWorthIcon != null)
             AddTooltip(imgNetWorthIcon.gameObject, "净资产", textConfig?.TooltipNetWorth ?? "现金 + 库存价值 - 负债");
 
-        // 审计值图标 Tooltip
-        if (imgAuditIcon != null)
-            AddTooltip(imgAuditIcon.gameObject, "审计值", textConfig?.TooltipAudit ?? "初始资产，用于计算最终盈亏");
+        // [已禁用] 审计值图标 Tooltip
+        // if (imgAuditIcon != null)
+        //     AddTooltip(imgAuditIcon.gameObject, "审计值", textConfig?.TooltipAudit ?? "初始资产，用于计算最终盈亏");
 
         // 后备役图标 Tooltip
         if (imgReservesIcon != null)
@@ -337,8 +337,8 @@ public class GameplayWindow : WindowBase
         // 净资产：只显示数字
         if (txtNetWorth != null) txtNetWorth.text = $"{data.Player.CalculateNetWorth(data.Market):F0}";
 
-        // 审计值：只显示数字
-        if (txtAudit != null) txtAudit.text = $"{data.Player.AuditValue:F0}";
+        // [已禁用] 审计值：只显示数字
+        // if (txtAudit != null) txtAudit.text = $"{data.Player.AuditValue:F0}";
 
         // 指令库存显示
         RefreshInventoryDisplay(data);

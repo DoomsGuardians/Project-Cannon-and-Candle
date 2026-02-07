@@ -98,7 +98,7 @@ public class CampaignDataTests
         Assert.AreEqual(3, player.Inventory[OrderType.DEF]);
         Assert.AreEqual(1, player.Inventory[OrderType.RET]);
         Assert.AreEqual(0, player.BankDebt);
-        Assert.AreEqual(0, player.AuditValue);
+        // Assert.AreEqual(0, player.AuditValue);  // [已禁用] 审计值系统
 
         Object.DestroyImmediate(config);
     }

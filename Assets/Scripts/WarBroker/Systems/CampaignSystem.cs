@@ -720,12 +720,12 @@ public class CampaignSystem : ILogic
             return;
         }
 
-        // 检查战争问责
-        if (Data.Player.AuditValue >= balanceConfig.AuditFailureThreshold)
-        {
-            EndGame(GameResult.Defeat, "战争问责");
-            return;
-        }
+        // [已禁用] 审计值系统 - 战争问责失败条件
+        // if (Data.Player.AuditValue >= balanceConfig.AuditFailureThreshold)
+        // {
+        //     EndGame(GameResult.Defeat, "战争问责");
+        //     return;
+        // }
 
         // 检查战线占领状态
         foreach (var frontline in Data.Battle.Frontlines.Values)

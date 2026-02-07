@@ -16,9 +16,10 @@ public class GameplayWindowBinder : UIBinder
     public Image imgNetWorthIcon;
     public TMP_Text txtNetWorth;
 
-    [Header("===== 顶部状态栏 - 审计值 =====")]
-    public Image imgAuditIcon;
-    public TMP_Text txtAudit;
+    // [已禁用] 审计值系统
+    // [Header("===== 顶部状态栏 - 审计值 =====")]
+    // public Image imgAuditIcon;
+    // public TMP_Text txtAudit;
 
     [Header("===== 顶部状态栏 - 后备役 =====")]
     public Image imgReservesIcon;

@@ -108,7 +108,12 @@ public class CampaignSelectPopup : WindowBase
                     itemBinder.txtName.text = campaign.CampaignName;
 
                 if (itemBinder.txtTicket != null)
-                    itemBinder.txtTicket.text = $"门票: {campaign.TicketPrice:F0}";
+                {
+                    // 教程关卡显示"免费"
+                    itemBinder.txtTicket.text = campaign.IsTutorial
+                        ? "门票: 免费"
+                        : $"门票: {campaign.TicketPrice:F0}";
+                }
 
                 if (itemBinder.imgThumbnail != null && campaign.Thumbnail != null)
                     itemBinder.imgThumbnail.sprite = campaign.Thumbnail;
@@ -150,6 +155,42 @@ public class CampaignSelectPopup : WindowBase
     private void OnSelectCampaign(CampaignConfig campaign)
     {
         if (campaign == null) return;
+
+        // 检查门票价格
+        if (saveSystem?.MetaData != null)
+        {
+            float currentWealth = saveSystem.MetaData.TotalWealth;
+
+            // 教程关卡免费
+            if (!campaign.IsTutorial && currentWealth < campaign.TicketPrice)
+            {
+                // 资产不足，显示提示
+                string message = $"资产不足！\n\n需要: {campaign.TicketPrice:F0}\n当前: {currentWealth:F0}\n差额: {campaign.TicketPrice - currentWealth:F0}";
+
+                uIService.ShowPopupQueued<NotificationPopup>("NotificationPopup", popup =>
+                {
+                    popup.SetNotification("无法进入战役", message, "确定");
+                });
+
+                tooltipPanel?.Hide();
+                return;
+            }
+
+            // 扣除门票费用（教程关卡免费）
+            if (!campaign.IsTutorial && campaign.TicketPrice > 0)
+            {
+                saveSystem.MetaData.TotalWealth -= campaign.TicketPrice;
+                saveSystem.SaveMetaData();
+
+                // 刷新资产显示
+                if (txtTotalWealth != null)
+                {
+                    float wealth = saveSystem.MetaData.TotalWealth;
+                    string sign = wealth >= 0 ? "" : "";
+                    txtTotalWealth.text = $"累计资产: {sign}{wealth:N0}";
+                }
+            }
+        }
 
         selectedCampaign = campaign;
         tooltipPanel?.Hide();

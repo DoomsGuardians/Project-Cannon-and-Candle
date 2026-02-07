@@ -51,7 +51,7 @@ public class WarBrokerDebugWindow : EditorWindow
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("玩家", EditorStyles.boldLabel);
         EditorGUILayout.LabelField($"  现金: {data.Player.Cash:F2}  负债: {data.Player.BankDebt:F2}");
-        EditorGUILayout.LabelField($"  净资产: {data.Player.CalculateNetWorth(data.Market):F2}  审计: {data.Player.AuditValue}");
+        EditorGUILayout.LabelField($"  净资产: {data.Player.CalculateNetWorth(data.Market):F2}");  // [已禁用] 审计值显示
         EditorGUILayout.LabelField($"  后备役: {data.Battle.CurrentReserves}");
         foreach (var kvp in data.Player.Inventory)
             EditorGUILayout.LabelField($"  {kvp.Key}: {kvp.Value}");

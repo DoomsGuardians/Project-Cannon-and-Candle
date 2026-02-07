@@ -21,7 +21,7 @@ MonoBehaviour:
   QuickSaveSlotLimit: 18
   BinarySaveFiles: 1
   ResetOnGoto: 0
-  EnableStateRollback: 1
+  EnableStateRollback: 0
   StateRollbackSteps: 1024
   SavedRollbackSteps: 128
   GameStateHandler: Naninovel.UniversalGameStateSerializer, Elringus.Naninovel.Runtime,

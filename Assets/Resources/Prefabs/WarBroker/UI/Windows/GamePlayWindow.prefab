@@ -1622,7 +1622,7 @@ GameObject:
   - component: {fileID: 4640198241039845932}
   - component: {fileID: 3400185782830868700}
   m_Layer: 5
-  m_Name: Button
+  m_Name: EndTurnBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1959,7 +1959,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 112, y: -83.3}
+  m_AnchoredPosition: {x: 112, y: -78}
   m_SizeDelta: {x: 240, y: 70}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &7042506518678085254
@@ -3908,7 +3908,6 @@ MonoBehaviour:
   imgBackground: {fileID: 7324789277841166570}
   displayDuration: 1.2
   exitDuration: 0.25
-  sfxEnter: {fileID: 8300000, guid: d0903d91834e96449be505db94e1205f, type: 3}
 --- !u!225 &5077490664641682323
 CanvasGroup:
   m_ObjectHideFlags: 0

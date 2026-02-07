@@ -588,7 +588,7 @@ public class BattleSystem : ILogic
         if (ally.GetStatus(balanceConfig) == GeneralStatus.Routed)
         {
             ally.ReorganizeTurns = balanceConfig.ReorganizeTurns;
-            campaignData.Player.AuditValue += balanceConfig.AuditGeneralRouted;
+            // campaignData.Player.AuditValue += balanceConfig.AuditGeneralRouted;  // [已禁用] 审计值系统
             eventService.SendMessage((EventID)WarBrokerEventID.OnGeneralRouted, ally, null);
         }
 

@@ -122,16 +122,9 @@ MonoBehaviour:
       ActivateOnMove: 0
   - Name: Rollback
     AlwaysProcess: 0
-    Keys: 4e010000
-    Axes:
-    - AxisName: Mouse ScrollWheel
-      TriggerMode: 1
-      TriggerTolerance: 0.001
-    Swipes:
-    - Direction: 3
-      FingerCount: 1
-      MinimumDistance: 50
-      ActivateOnMove: 0
+    Keys:
+    Axes: []
+    Swipes: []
   - Name: CameraLookX
     AlwaysProcess: 0
     Keys: 

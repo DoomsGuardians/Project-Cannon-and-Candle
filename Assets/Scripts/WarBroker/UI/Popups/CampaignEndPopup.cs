@@ -98,7 +98,8 @@ public class CampaignEndPopup : WindowBase
         if (txtStats != null)
         {
             float netWorth = data.Player.CalculateNetWorth(data.Market);
-            float profit = netWorth - data.Player.AuditValue;
+            // [修改] 利润 = 最终净资产 - 初始资金 - 门票费用
+            float profit = netWorth - data.Config.InitialCash - data.Player.EntryFee;
 
             string turnLabel = textConfig?.CampaignStatsTurn ?? "最终星期";
             string cashLabel = textConfig?.CampaignStatsCash ?? "现金";
