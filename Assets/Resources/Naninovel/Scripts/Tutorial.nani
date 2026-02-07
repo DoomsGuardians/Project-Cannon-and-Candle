@@ -5,35 +5,44 @@
 @printer Dialogue
 Narrator: 欢迎，华伦斯坦公爵。
 Narrator: 我是您的军需参谋。让我为您介绍一下战争掮客的生意。
+Narrator: 所谓战争掮客就是作为雇佣将领进行战争投机。
+Narrator: 恕我冒昧，但战争是一门肮脏的生意，只会说漂亮话是打不赢仗的。
+Narrator: 因此还请记得无论如何都请将自己的利益作为第一位。
+Narrator: 没必要为了别人的领土搭上自己的前途。
+Narrator: 呵，我说的太多了。
+Narrator: 言归正传，接下来我来向您介绍一下您具体可以经营哪些生意。
 @hidePrinter
 @stop
 
 # intro_ui
 @printer Dialogue
-Narrator: 这是战场总览。您可以看到我方和敌方的将军部署。
-Narrator: 首先，让我们打开军需市场。请点击左上角的【市场】按钮。
+Narrator: 首先是战场总览。稍后您可以通过按住鼠标右键转动镜头，WASD控制移动。
+Narrator: 通过观察，您可以清晰地看到我方和敌方的将军部署。
+Narrator: 在上方的信息栏中，你可以看到绝大多数你所需要的信息，将鼠标悬停在图标上可以看到对应的解释和说明。
+Narrator: 接下来，让我们打开军需市场。请点击左上角的【市场】按钮。
 @hidePrinter
 @stop
 
 # intro_market
 @printer Dialogue
 Narrator: 这是军需市场。您可以在这里买卖三种军用物资。
-Narrator: ATK——进攻指令，用于攻城和突击。
-Narrator: DEF——防御指令，用于构筑工事和坚守。
-Narrator: RET——撤退指令，用于战略转移和重组。
+Narrator: ATK——进攻令，用于攻城和突击。
+Narrator: DEF——防御令，用于构筑工事和坚守。
+Narrator: RET——撤退令，用于战略转移和重组。
+Narrator: 这三种命令将作为您“操控”手下将领的重要资源，当然，在你们的关系不是太差的前提下。
 @hidePrinter
 @stop
 
 # teach_buy
 @printer Dialogue
-Narrator: 现在，请尝试购买一些ATK指令。
-Narrator: 点击ATK的【买入】按钮。
+Narrator: 现在，请尝试购买一些进攻令。
+Narrator: 点击进攻令的【买入】按钮。
 @hidePrinter
 @stop
 
 # buy_success
 @printer Dialogue
-Narrator: 很好！您购买了ATK指令。
+Narrator: 很好！您购买了进攻令。
 Narrator: 注意：买入会推高价格，卖出会压低价格。这就是市场。
 @hidePrinter
 @stop
@@ -41,7 +50,7 @@ Narrator: 注意：买入会推高价格，卖出会压低价格。这就是市�
 # intro_generals
 @printer Dialogue
 Narrator: 现在关闭市场面板，让我们看看战场上的将军。
-Narrator: 点击战场上的一位将军查看详情。
+Narrator: 点击战场上的一支部队来查看详情。
 @hidePrinter
 @stop
 
@@ -49,7 +58,7 @@ Narrator: 点击战场上的一位将军查看详情。
 @printer Dialogue
 Narrator: 这是将军详情面板。每回合，您需要给将军分配指令。
 Narrator: 将军有自己的意图。您可以【强化】他的想法，或者【篡改】成其他指令。
-Narrator: 现在，请把您买到的ATK指令分配给这位将军。
+Narrator: 现在，请把您买到的进攻令分配给这位将军。
 @hidePrinter
 @stop
 
@@ -57,6 +66,8 @@ Narrator: 现在，请把您买到的ATK指令分配给这位将军。
 @printer Dialogue
 Narrator: 很好！指令已分配。
 Narrator: 将军会在战斗阶段根据指令行动。
+Narrator: 强化总是会生效，而篡改则不然，这取决于这位将军有多信任你。
+Narrator: 通过你的指令战胜敌人，或时不时强化将军的指令可以提高他对你的信任。
 @hidePrinter
 @stop
 
@@ -69,7 +80,15 @@ Narrator: 指令分配完毕后，点击【结束回合】进入战斗阶段。
 # battle_intro
 @printer Dialogue
 Narrator: 战斗将自动进行。您的将军会根据指令行动。
-Narrator: ATK克DEF，DEF克RET，RET克ATK——就像剪刀石头布。
+Narrator: 简单来说，进攻令可以推进战线，追击敌人，并造成敌人兵力的损失。
+Narrator: 而防御令虽然无法夺取土地，但是应对进攻则十分有效。
+Narrator: 撤退虽然会撤出目前占据的地盘，但是可以收拢残兵，从后备役中恢复兵力。
+Narrator: 除了撤退，您也可以通过部署在大本营更快地恢复兵力。
+Narrator: 但请注意，一场战役中双方后备役的数量是有限的。一旦失去了后备役，因兵力降到0而溃退的部队就再也无法重返战场了。
+Narrator: 除了指令以外，部队的兵力、士气、将军的偏好以及其他随机因素都可能会左右一场战斗的胜负。
+Narrator: 目前的战场宽度较为狭窄，只有一条战线。
+Narrator: 每条战线又分为五个营地。玩家从一号营地出发，而对手从五号出发。
+Narrator: 要取得这场战役的胜利，就需要占领全部五个营地，包括对方的大本营。
 @hidePrinter
 @stop
 
