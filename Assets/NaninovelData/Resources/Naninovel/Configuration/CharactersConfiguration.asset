@@ -109,7 +109,7 @@ MonoBehaviour:
       MessageSound: 
       MessageSoundPlayback: 0
       VoiceSource: {fileID: 0}
-      LinkedPrinter: 
+      LinkedPrinter: Dialogue
       Poses: []
   AvatarLoader:
     PathPrefix: CharacterAvatars

@@ -92,12 +92,12 @@ MonoBehaviour:
     Resources: []
   - Id: Characters/46416531-12cf-4266-84b6-6b47fcdc6c13
     Resources:
-    - name: cold
-      pathPrefix: Characters/Narrator
-      guid: 018f98b555d96a540ab860bc350120c5
     - name: Default
       pathPrefix: Characters/Narrator
       guid: 8e9ae152bf3f61243af4c31a3e195e15
+    - name: cold
+      pathPrefix: Characters/Narrator
+      guid: 018f98b555d96a540ab860bc350120c5
     - name: laugh
       pathPrefix: Characters/Narrator
       guid: cb8ede844fadffb4896bc416f246780f

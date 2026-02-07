@@ -11,13 +11,15 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3de8092c050fb94b917c6b64b225966, type: 3}
   m_Name: Campaign_Tutorial_Advanced
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   CampaignId: Campaign_Tutorial_Advanced
-  CampaignName: "高级教程 - 掮客的艺术"
-  Description: "学习情报系统、委托任务和期货交易的进阶技巧。\n掌握这些工具，才能成为真正的战争掮客。"
+  CampaignName: "\u7EF4\u5C14\u6ED5\u65AF\u6CF0\u56E0\u9698\u53E3"
+  Description: "1632\u5E748\u6708\uFF0C\u534E\u4F26\u65AF\u5766\u5728\u7EBD\u4F26\u5821\u9644\u8FD1\u7684\u7EF4\u5C14\u6ED5\u65AF\u6CF0\u56E0\u9AD8\u5730\u7B51\u5792\u56FA\u5B88\uFF0C\u907F\u5F00\u745E\u5178\u519B\u961F\u7684\u91CE\u6218\u4F18\u52BF\u3002\u53E4\u65AF\u5854\u592B\u4E8C\u4E16\u5728\u8865\u7ED9\u8017\u5C3D\u7684\u538B\u529B\u4E0B\u88AB\u8FEB\u53D1\u52A8\u5F3A\u653B\uFF0C\u4F46\u5728\u534E\u4F26\u65AF\u5766\u4E25\u5BC6\u7684\u5DE5\u4E8B\u4E0E\u4EA4\u53C9\u706B\u529B\u6253\u51FB\u4E0B\u53D7\u632B\uFF0C\u4F24\u4EA1\u6570\u5343\u540E\u88AB\u8FEB\u64A4\u519B\u3002\u6B64\u6218\u6253\u7834\u4E86\u745E\u5178\u56FD\u738B\u7684\u201C\u4E0D\u8D25\u795E\u8BDD\u201D\uFF0C\u6210\u529F\u4FDD\u62A4\u4E86\u5E1D\u56FD\u5728\u5357\u5FB7\u7684\u9632\u5FA1\u9635\u7EBF\u3002"
   Thumbnail: {fileID: 21300000, guid: 22f4c3a66942e1d4595f545e805719c3, type: 3}
   TicketPrice: 0
   IsTutorial: 1
+  IntroScriptName: 
+  IntroScriptLabel: 
   MaxTurns: 10
   InitialCash: 1000
   InitialAtkInventory: 3
@@ -39,8 +41,8 @@ MonoBehaviour:
   VictorProfile: {fileID: 11400000, guid: b94556c4ff59f4e47952099b2e2a2188, type: 2}
   AvailableEvents:
   - EventId: evt_plague
-    EventName: "瘟疫爆发"
-    Description: "营中爆发不明高热，患者两日即衰竭，以致兵营半空。此敌非火枪与刀剑可比。\n军中瘟疫蔓延，所有将军兵力-2。"
+    EventName: "\u761F\u75AB\u7206\u53D1"
+    Description: "\u8425\u4E2D\u7206\u53D1\u4E0D\u660E\u9AD8\u70ED\uFF0C\u60A3\u8005\u4E24\u65E5\u5373\u8870\u7AED\uFF0C\u4EE5\u81F4\u5175\u8425\u534A\u7A7A\u3002\u6B64\u654C\u975E\u706B\u67AA\u4E0E\u5200\u5251\u53EF\u6BD4\u3002\n\u519B\u4E2D\u761F\u75AB\u8513\u5EF6\uFF0C\u6240\u6709\u5C06\u519B\u5175\u529B-2\u3002"
     Illustration: {fileID: 21300000, guid: 6f905e4ab3c93f845b8160025079fb28, type: 3}
     ProductionModifier: 0
     AtkDemandModifier: 0
@@ -50,8 +52,8 @@ MonoBehaviour:
     RandomTrustChange: 0
     Duration: 2
   - EventId: evt_supply
-    EventName: "补给线畅通"
-    Description: "战区后方补给动脉畅通无阻。物资车队在护卫下准时抵达各指定兵站，前线士气与火力维持稳定。我军生命线强韧。\n进攻指令需求量增大，随机将领信任提高。"
+    EventName: "\u8865\u7ED9\u7EBF\u7545\u901A"
+    Description: "\u6218\u533A\u540E\u65B9\u8865\u7ED9\u52A8\u8109\u7545\u901A\u65E0\u963B\u3002\u7269\u8D44\u8F66\u961F\u5728\u62A4\u536B\u4E0B\u51C6\u65F6\u62B5\u8FBE\u5404\u6307\u5B9A\u5175\u7AD9\uFF0C\u524D\u7EBF\u58EB\u6C14\u4E0E\u706B\u529B\u7EF4\u6301\u7A33\u5B9A\u3002\u6211\u519B\u751F\u547D\u7EBF\u5F3A\u97E7\u3002\n\u8FDB\u653B\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u63D0\u9AD8\u3002"
     Illustration: {fileID: 21300000, guid: 2be0dac92af4c094da1fdfec8a6a6b59, type: 3}
     ProductionModifier: 0.5
     AtkDemandModifier: 0.2
@@ -61,8 +63,8 @@ MonoBehaviour:
     RandomTrustChange: 10
     Duration: 1
   - EventId: evt_morale_boost
-    EventName: "补给线遇险"
-    Description: "职部确认补给线在战区后方遭突袭，关键物资损失，备用路线瘫痪。前线部队断粮在即。\n防守指令需求量增大，随机将领信任降低。"
+    EventName: "\u8865\u7ED9\u7EBF\u9047\u9669"
+    Description: "\u804C\u90E8\u786E\u8BA4\u8865\u7ED9\u7EBF\u5728\u6218\u533A\u540E\u65B9\u906D\u7A81\u88AD\uFF0C\u5173\u952E\u7269\u8D44\u635F\u5931\uFF0C\u5907\u7528\u8DEF\u7EBF\u762B\u75EA\u3002\u524D\u7EBF\u90E8\u961F\u65AD\u7CAE\u5728\u5373\u3002\n\u9632\u5B88\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u964D\u4F4E\u3002"
     Illustration: {fileID: 21300000, guid: 6e7592d1f33631d47a04d161077cf94b, type: 3}
     ProductionModifier: -1
     AtkDemandModifier: 0
