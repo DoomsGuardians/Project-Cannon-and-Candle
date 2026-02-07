@@ -17,7 +17,11 @@ MonoBehaviour:
   AsyncExceptionLogType: 0
   AsyncInstantiation: 1
   InitializeOnApplicationLoad: 0
+<<<<<<< Updated upstream
   SceneIndependent: 0
+=======
+  SceneIndependent: 1
+>>>>>>> Stashed changes
   ShowInitializationUI: 0
   CustomInitializationUI: {fileID: 0}
   EnableBridging: 1

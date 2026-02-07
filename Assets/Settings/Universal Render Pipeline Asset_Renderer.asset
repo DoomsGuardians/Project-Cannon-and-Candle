@@ -12,11 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c00684596c83415c937216dd3749cc70, type: 3}
   m_Name: LilliputRendererFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     shader: {fileID: 4800000, guid: f7399535f5a144f588321bf53197ca6d, type: 3}
     renderPassEvent: 550
     enableInSceneView: 0
+<<<<<<< Updated upstream
+=======
+--- !u!114 &-6234567890123456789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 275f5bdae320b4c4ab659c138a3011a0, type: 3}
+  m_Name: KuwaharaRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  settings:
+    shader: {fileID: 4800000, guid: c6234abe79462414fafabe558334bb2a, type: 3}
+    renderPassEvent: 550
+    enableInSceneView: 0
+>>>>>>> Stashed changes
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33,8 +53,16 @@ MonoBehaviour:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
     hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
   m_RendererFeatures:
+<<<<<<< Updated upstream
   - {fileID: -7879600206679962541}
   m_RendererFeatureMap: 530cbf245c09a692
+=======
+  - {fileID: 5453808036720336356}
+  - {fileID: 8849911736867365869}
+  - {fileID: -6234567890123456789}
+  - {fileID: -7879600206679962541}
+  m_RendererFeatureMap: e4dde28d83d1af4bed238af9d533d17ab1c2d3e4f5a6b7c8530cbf245c09a692
+>>>>>>> Stashed changes
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -76,3 +104,43 @@ MonoBehaviour:
   m_CopyDepthMode: 1
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+<<<<<<< Updated upstream
+=======
+--- !u!114 &5453808036720336356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f98c5cc2ccb80648a09525e0c77e467, type: 3}
+  m_Name: PCSSRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings:
+    shader: {fileID: 4800000, guid: 93f5c4b38a2e6014e98eddeea489d653, type: 3}
+    softness: 200
+    blockerSearchRadius: 0.1
+    maxFilterRadius: 0.2
+    blockerSamples: 64
+    filterSamples: 64
+--- !u!114 &8849911736867365869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3b5c7d9e1f2a4b6c8d0e2f4a6b8c0d, type: 3}
+  m_Name: GTTonemappingRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  settings:
+    shader: {fileID: 4800000, guid: a5b7c9d1e3f5a7b9c1d3e5f7a9b1c3d5, type: 3}
+    renderPassEvent: 550
+    enableInSceneView: 1
+>>>>>>> Stashed changes
