@@ -25,6 +25,9 @@ Shader "Hidden/PostProcessing/Kuwahara"
         float4 _MainTex_TexelSize;
         int _Radius;
 
+        // 参考分辨率高度，用于保持不同屏幕尺寸下效果一致
+        static const float REFERENCE_HEIGHT = 1080.0;
+
         struct Attributes
         {
             float4 positionOS : POSITION;
@@ -52,11 +55,15 @@ Shader "Hidden/PostProcessing/Kuwahara"
             half3 colorSqSum = 0;
             int sampleCount = _Radius * _Radius;
 
+            // 根据当前分辨率与参考分辨率的比例缩放采样步长
+            // 保证在不同屏幕尺寸下采样的屏幕空间区域一致
+            float scale = _MainTex_TexelSize.w / REFERENCE_HEIGHT;
+
             for (int x = 0; x < _Radius; x++)
             {
                 for (int y = 0; y < _Radius; y++)
                 {
-                    float2 offset = float2(x + 1, y + 1) * direction * _MainTex_TexelSize.xy;
+                    float2 offset = float2(x + 1, y + 1) * direction * _MainTex_TexelSize.xy * scale;
                     half3 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offset).rgb;
                     colorSum += color;
                     colorSqSum += color * color;

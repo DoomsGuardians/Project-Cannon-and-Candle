@@ -53,7 +53,7 @@ MonoBehaviour:
   - {fileID: 8849911736867365869}
   - {fileID: -6234567890123456789}
   - {fileID: -7879600206679962541}
-  m_RendererFeatureMap: ed238af9d533d17ab1c2d3e4f5a6b7c8530cbf245c09a692
+  m_RendererFeatureMap: ed238af9d533d17aeb7e223d895d7aa9530cbf245c09a692
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -91,10 +91,25 @@ MonoBehaviour:
     zFailOperation: 0
   m_ShadowTransparentReceive: 1
   m_RenderingMode: 0
-  m_DepthPrimingMode: 2
+  m_DepthPrimingMode: 1
   m_CopyDepthMode: 1
   m_AccurateGbufferNormals: 1
   m_IntermediateTextureMode: 1
+--- !u!114 &5453808036720336356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f98c5cc2ccb80648a09525e0c77e467, type: 3}
+  m_Name: PCSSRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings: {shader: {fileID: 4800000, guid: 93f5c4b38a2e6014e98eddeea489d653, type: 3}, softness: 500, blockerSearchRadius: 0.2, maxFilterRadius: 0.3, blockerSamples: 64, filterSamples: 64}
+  m_Material: {fileID: 0}
 --- !u!114 &8849911736867365869
 MonoBehaviour:
   m_ObjectHideFlags: 0

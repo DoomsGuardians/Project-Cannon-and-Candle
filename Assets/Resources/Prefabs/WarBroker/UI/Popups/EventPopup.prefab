@@ -355,6 +355,7 @@ GameObject:
   - component: {fileID: 4732847900516232957}
   - component: {fileID: 5925452563922412178}
   - component: {fileID: 2962945412458287030}
+  - component: {fileID: 715499298320720205}
   m_Layer: 5
   m_Name: EventPopup
   m_TagString: Untagged
@@ -408,6 +409,7 @@ MonoBehaviour:
   btnConfirm: {fileID: 3480176485949680814}
   txtBtnConfirm: {fileID: 2532696971444602620}
   imgIllustration: {fileID: 1737017149608681538}
+  sfxEnter: {fileID: 8300000, guid: d4521aa227472164192e7437200a304d, type: 3}
 --- !u!114 &2962945412458287030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -438,6 +440,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &715499298320720205
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4334929801857550900}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4712477138142488111
 GameObject:
   m_ObjectHideFlags: 0

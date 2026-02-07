@@ -1971,7 +1971,7 @@ MonoBehaviour:
   clickScale: 0.95
   clickDuration: 0.1
   clickEase: 6
-  animateWhenDisabled: 0
+  animateWhenDisabled: 1
 --- !u!114 &2027798765826530783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2626,7 +2626,7 @@ MonoBehaviour:
   clickScale: 0.95
   clickDuration: 0.1
   clickEase: 6
-  animateWhenDisabled: 0
+  animateWhenDisabled: 1
 --- !u!114 &4640116018312982582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3637,7 +3637,7 @@ MonoBehaviour:
   clickScale: 0.95
   clickDuration: 0.1
   clickEase: 6
-  animateWhenDisabled: 0
+  animateWhenDisabled: 1
 --- !u!114 &8556252394332757185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3926,7 +3926,7 @@ MonoBehaviour:
   clickScale: 0.95
   clickDuration: 0.1
   clickEase: 6
-  animateWhenDisabled: 0
+  animateWhenDisabled: 1
 --- !u!114 &1361869422436743151
 MonoBehaviour:
   m_ObjectHideFlags: 0

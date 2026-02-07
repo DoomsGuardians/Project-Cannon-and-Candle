@@ -32,6 +32,9 @@ Shader "Hidden/LilliputURP"
         float _BokehRadius;     // 模糊半径
         float _GaussianStrength; // 高斯模糊强度
 
+        // 参考分辨率高度，用于保持不同屏幕尺寸下效果一致
+        static const float REFERENCE_HEIGHT = 1080.0;
+
         struct Attributes
         {
             float4 positionOS : POSITION;
@@ -209,6 +212,9 @@ Shader "Hidden/LilliputURP"
             half4 Frag(Varyings input) : SV_Target
             {
                 float2 texelSize = _MainTex_TexelSize.xy;
+                // 根据当前分辨率与参考分辨率的比例缩放采样步长
+                float scale = _MainTex_TexelSize.w / REFERENCE_HEIGHT;
+
                 half4 centerSample = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
                 half centerCoC = centerSample.a;
                 half absCenterCoC = abs(centerCoC);
@@ -225,7 +231,7 @@ Shader "Hidden/LilliputURP"
                 for (int i = 0; i < KERNEL_SIZE; i++)
                 {
                     float2 kernelSample = GetKernelSample(i);
-                    float2 offset = kernelSample * absCenterCoC * texelSize;
+                    float2 offset = kernelSample * absCenterCoC * texelSize * scale;
                     half4 s = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv + offset);
                     half radius = length(kernelSample) * absCenterCoC;
 
@@ -322,7 +328,9 @@ Shader "Hidden/LilliputURP"
                 half absCoc = abs(coc);
 
                 // Scale gaussian blur by CoC and gaussian strength
-                float blurScale = absCoc * _GaussianStrength * _MainTex_TexelSize.x;
+                // 根据当前分辨率与参考分辨率的比例缩放
+                float scale = _MainTex_TexelSize.w / REFERENCE_HEIGHT;
+                float blurScale = absCoc * _GaussianStrength * _MainTex_TexelSize.x * scale;
 
                 half3 color = 0;
                 for (int i = 0; i < 9; i++)
@@ -359,7 +367,9 @@ Shader "Hidden/LilliputURP"
                 half absCoc = abs(coc);
 
                 // Scale gaussian blur by CoC and gaussian strength
-                float blurScale = absCoc * _GaussianStrength * _MainTex_TexelSize.y;
+                // 根据当前分辨率与参考分辨率的比例缩放
+                float scale = _MainTex_TexelSize.w / REFERENCE_HEIGHT;
+                float blurScale = absCoc * _GaussianStrength * _MainTex_TexelSize.y * scale;
 
                 half3 color = 0;
                 for (int i = 0; i < 9; i++)

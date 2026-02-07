@@ -33,6 +33,9 @@ public class VictorLetterPopup : WindowBase
     // 上次显示信件的回合
     private int lastLetterTurn = 0;
 
+    // 音效
+    private AudioClip sfxEnter;
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -53,6 +56,7 @@ public class VictorLetterPopup : WindowBase
             txtContent = binder.txtContent;
             btnConfirm = binder.btnConfirm;
             txtBtnConfirm = binder.txtBtnConfirm;
+            sfxEnter = binder.sfxEnter;
         }
 
         // 监听 Victor 回合开始事件（缓存数据）
@@ -68,6 +72,12 @@ public class VictorLetterPopup : WindowBase
 
     public override void OnShow()
     {
+        // 播放入场音效
+        if (sfxEnter != null)
+        {
+            audioService?.PlaySFX(sfxEnter);
+        }
+
         // 获取输入锁
         InputRouter.Acquire(InputChannel.Gameplay, this);
 

@@ -13,4 +13,7 @@ public class BattleResultPopupBinder : UIBinder
     public Button btnConfirm;
     public TMP_Text txtBtnConfirm;
     public Image imgIllustration;
+
+    [Header("音效")]
+    public AudioClip sfxEnter;
 }

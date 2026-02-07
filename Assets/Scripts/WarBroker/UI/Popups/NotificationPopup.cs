@@ -18,6 +18,7 @@ public class NotificationPopup : WindowBase
 
     private string title;
     private string content;
+    private AudioClip sfxEnter;
 
     public override void OnAwake()
     {
@@ -30,11 +31,18 @@ public class NotificationPopup : WindowBase
             txtContent = binder.txtContent;
             btnConfirm = binder.btnConfirm;
             txtBtnConfirm = binder.txtBtnConfirm;
+            sfxEnter = binder.sfxEnter;
         }
     }
 
     public override void OnShow()
     {
+        // 播放入场音效
+        if (sfxEnter != null)
+        {
+            audioService?.PlaySFX(sfxEnter);
+        }
+
         InputRouter.Acquire(InputChannel.Gameplay, this);
         AddButtonListener(btnConfirm, OnConfirm);
         RefreshUI();

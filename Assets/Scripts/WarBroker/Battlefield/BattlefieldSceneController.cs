@@ -39,14 +39,14 @@ public class BattlefieldSceneController : MonoBehaviour
     [SerializeField] private AudioClip chargeSound;                // 冲锋音效
     [SerializeField] private AudioClip landingSound;               // 落地音效
     [SerializeField] private AudioClip[] gunfireSounds;            // 枪声音效数组（齐射用）
-    [SerializeField] private AudioClip cannonSound;                // 开炮音效
+    [SerializeField] private AudioClip[] cannonSounds;             // 开炮音效数组
     [SerializeField] private AudioClip soldierFallSound;           // 锡兵倒下音效
     [SerializeField] private AudioClip soldierRiseSound;           // 锡兵复活音效
     [SerializeField] private AudioClip moveSound;                  // 部队移动音效
     [SerializeField] private AudioClip selectGeneralSound;         // 选中将军音效
 
     [Header("齐射音效设置")]
-    [SerializeField] private int gunfireVolleyCount = 4;           // 齐射次数
+    [SerializeField] private int gunfireVolleyCount = 2;           // 齐射次数
     [SerializeField] private float gunfireVolleySpread = 0.15f;    // 齐射时间分散范围
 
     [Header("相机")]
@@ -941,7 +941,7 @@ public class BattlefieldSceneController : MonoBehaviour
     {
         if (chargeSound == null) return;
         if (audioService == null) audioService = GameRoot.Instance?.audioService;
-        audioService?.PlaySFX(chargeSound, 0.7f);
+        audioService?.PlaySFX(chargeSound, 1f);
     }
 
     /// <summary>播放落地音效</summary>
@@ -981,8 +981,9 @@ public class BattlefieldSceneController : MonoBehaviour
     /// <summary>播放开炮音效</summary>
     private void PlayCannonSound()
     {
-        if (cannonSound == null) return;
-        audioService?.PlaySFX(cannonSound, 0.4f);
+        if (cannonSounds == null || cannonSounds.Length == 0) return;
+        var clip = cannonSounds[Random.Range(0, cannonSounds.Length)];
+        audioService?.PlaySFX(clip, 0.4f);
     }
 
     /// <summary>播放锡兵倒下音效</summary>

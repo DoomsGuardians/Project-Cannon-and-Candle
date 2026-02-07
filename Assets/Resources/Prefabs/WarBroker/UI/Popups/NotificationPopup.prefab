@@ -227,6 +227,7 @@ MonoBehaviour:
   txtContent: {fileID: 8187701980937454869}
   btnConfirm: {fileID: 3480176485949680814}
   txtBtnConfirm: {fileID: 2532696971444602620}
+  sfxEnter: {fileID: 8300000, guid: d4521aa227472164192e7437200a304d, type: 3}
 --- !u!1 &4712477138142488111
 GameObject:
   m_ObjectHideFlags: 0

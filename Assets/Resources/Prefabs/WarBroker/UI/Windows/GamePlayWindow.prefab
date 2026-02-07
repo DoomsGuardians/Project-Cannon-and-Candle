@@ -1767,7 +1767,7 @@ MonoBehaviour:
   hoverSound: {fileID: 8300000, guid: 48fe285f3400e324881cf4a8d464eb80, type: 3}
   hoverVolume: 1
   enableClickSound: 1
-  clickSound: {fileID: 8300000, guid: d0903d91834e96449be505db94e1205f, type: 3}
+  clickSound: {fileID: 8300000, guid: bb882f6f2f0f242489e384bd74a1690f, type: 3}
   clickVolume: 1
   playSoundWhenDisabled: 0
 --- !u!1 &2580596015256509038
@@ -3177,7 +3177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
   m_OnCullStateChanged:
@@ -3906,10 +3906,9 @@ MonoBehaviour:
   txtPhaseTitle: {fileID: 372559250314726597}
   txtPhaseSubtitle: {fileID: 3665849024357326866}
   imgBackground: {fileID: 7324789277841166570}
-  slideInDuration: 0.3
   displayDuration: 1.2
-  slideOutDuration: 0.3
-  slideDistance: 300
+  exitDuration: 0.25
+  sfxEnter: {fileID: 8300000, guid: d0903d91834e96449be505db94e1205f, type: 3}
 --- !u!225 &5077490664641682323
 CanvasGroup:
   m_ObjectHideFlags: 0

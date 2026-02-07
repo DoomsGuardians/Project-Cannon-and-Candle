@@ -20,6 +20,7 @@ public class EventPopup : WindowBase
 
     private RandomEventConfig eventConfig;
     private UITextConfig textConfig;
+    private AudioClip sfxEnter;
 
     public override void OnAwake()
     {
@@ -37,11 +38,18 @@ public class EventPopup : WindowBase
             btnConfirm = binder.btnConfirm;
             txtBtnConfirm = binder.txtBtnConfirm;
             imgIllustration = binder.imgIllustration;
+            sfxEnter = binder.sfxEnter;
         }
     }
 
     public override void OnShow()
     {
+        // 播放入场音效
+        if (sfxEnter != null)
+        {
+            audioService?.PlaySFX(sfxEnter);
+        }
+
         // 获取输入锁
         InputRouter.Acquire(InputChannel.Gameplay, this);
 

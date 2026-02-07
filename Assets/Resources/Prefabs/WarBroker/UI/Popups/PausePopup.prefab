@@ -445,6 +445,7 @@ MonoBehaviour:
   txtBtnSettings: {fileID: 2870327821465347042}
   txtBtnMainMenu: {fileID: 4293778356647931635}
   txtBtnQuit: {fileID: 1279259955822174204}
+  sfxEnter: {fileID: 8300000, guid: d4521aa227472164192e7437200a304d, type: 3}
 --- !u!225 &1684179857615068126
 CanvasGroup:
   m_ObjectHideFlags: 0

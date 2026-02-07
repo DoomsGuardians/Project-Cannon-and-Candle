@@ -418,6 +418,7 @@ MonoBehaviour:
   btnMainMenu: {fileID: 231387316351461361}
   txtBtnRestart: {fileID: 89617308592235058}
   txtBtnMainMenu: {fileID: 6076340873274425434}
+  sfxEnter: {fileID: 8300000, guid: d4521aa227472164192e7437200a304d, type: 3}
 --- !u!1 &6837431543967814521
 GameObject:
   m_ObjectHideFlags: 0

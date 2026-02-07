@@ -43,7 +43,7 @@ MonoBehaviour:
   active: 1
   focusDistance:
     m_OverrideState: 1
-    m_Value: 10
+    m_Value: 7
   focusRange:
     m_OverrideState: 1
     m_Value: 50
@@ -124,7 +124,7 @@ MonoBehaviour:
     m_Value: 1
   contrast:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 1.5
   linearStart:
     m_OverrideState: 1
     m_Value: 0.1
@@ -170,4 +170,4 @@ MonoBehaviour:
   active: 1
   radius:
     m_OverrideState: 1
-    m_Value: 3
+    m_Value: 5

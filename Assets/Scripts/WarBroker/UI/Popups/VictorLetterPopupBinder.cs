@@ -17,4 +17,7 @@ public class VictorLetterPopupBinder : UIBinder
     [Header("按钮")]
     public Button btnConfirm;
     public TMP_Text txtBtnConfirm;
+
+    [Header("音效")]
+    public AudioClip sfxEnter;
 }

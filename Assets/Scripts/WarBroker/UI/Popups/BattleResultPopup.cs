@@ -28,6 +28,7 @@ public class BattleResultPopup : WindowBase
     // UI文本配置
     private UITextConfig textConfig;
     private GameplayManager gameplayManager;
+    private AudioClip sfxEnter;
 
     public override void OnAwake()
     {
@@ -46,11 +47,18 @@ public class BattleResultPopup : WindowBase
             btnConfirm = binder.btnConfirm;
             txtBtnConfirm = binder.txtBtnConfirm;
             imgIllustration = binder.imgIllustration;
+            sfxEnter = binder.sfxEnter;
         }
     }
 
     public override void OnShow()
     {
+        // 播放入场音效
+        if (sfxEnter != null)
+        {
+            audioService?.PlaySFX(sfxEnter);
+        }
+
         // 获取输入锁
         InputRouter.Acquire(InputChannel.Gameplay, this);
 

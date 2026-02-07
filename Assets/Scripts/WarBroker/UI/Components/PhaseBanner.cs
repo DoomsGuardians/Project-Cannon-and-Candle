@@ -10,6 +10,7 @@ using System.Collections;
 /// 类似炉石传说的回合开始横幅，用于展示阶段切换
 /// 只显示3个玩家可感知的阶段：玩家阶段、对手阶段、战斗阶段
 /// 动画播放期间会锁定玩家输入
+/// 牌匾风格动画 - 具有厚重感和冲击力
 /// </summary>
 public class PhaseBanner : MonoBehaviour
 {
@@ -21,10 +22,8 @@ public class PhaseBanner : MonoBehaviour
     [SerializeField] private Image imgBackground;
 
     [Header("动画设置")]
-    [SerializeField] private float slideInDuration = 0.3f;
-    [SerializeField] private float displayDuration = 1.2f;
-    [SerializeField] private float slideOutDuration = 0.3f;
-    [SerializeField] private float slideDistance = 200f;
+    [SerializeField] private float displayDuration = 1.0f;
+    [SerializeField] private float exitDuration = 0.25f;
 
     private Sequence currentSequence;
     private UITextConfig textConfig;
@@ -202,26 +201,42 @@ public class PhaseBanner : MonoBehaviour
         // 停止当前动画
         currentSequence?.Kill();
 
-        // 初始位置（从左侧滑入）
-        Vector2 startPos = new Vector2(-slideDistance, 0);
-        Vector2 centerPos = Vector2.zero;
-        Vector2 endPos = new Vector2(slideDistance, 0);
-
-        bannerRect.anchoredPosition = startPos;
+        // 初始状态
+        bannerRect.anchoredPosition = Vector2.zero;
+        bannerRect.localScale = Vector3.one * 0.3f;
         canvasGroup.alpha = 0;
+
+        // 隐藏文字，准备单独动画
+        if (txtPhaseTitle != null) txtPhaseTitle.alpha = 0;
+        if (txtPhaseSubtitle != null) txtPhaseSubtitle.alpha = 0;
 
         currentSequence = DOTween.Sequence();
 
-        // 滑入 + 淡入
-        currentSequence.Append(bannerRect.DOAnchorPos(centerPos, slideInDuration).SetEase(Ease.OutCubic));
-        currentSequence.Join(canvasGroup.DOFade(1f, slideInDuration * 0.5f));
+        // === 入场动画 ===
+        // 使用 OutBack 产生自然的弹性冲击感
+        // 快速弹出并略微超过目标，然后自然回弹
+        currentSequence.Append(bannerRect.DOScale(1f, 0.35f).SetEase(Ease.OutBack, 2f));
+        currentSequence.Join(canvasGroup.DOFade(1f, 0.15f).SetEase(Ease.OutQuad));
 
-        // 停留
+        // 标题文字淡入
+        if (txtPhaseTitle != null)
+        {
+            currentSequence.Join(DOTween.To(() => txtPhaseTitle.alpha, x => txtPhaseTitle.alpha = x, 1f, 0.2f).SetDelay(0.1f).SetEase(Ease.OutQuad));
+        }
+
+        // 副标题淡入
+        if (txtPhaseSubtitle != null)
+        {
+            currentSequence.Join(DOTween.To(() => txtPhaseSubtitle.alpha, x => txtPhaseSubtitle.alpha = x, 1f, 0.25f).SetDelay(0.2f).SetEase(Ease.OutQuad));
+        }
+
+        // === 停留 ===
         currentSequence.AppendInterval(displayDuration);
 
-        // 滑出 + 淡出
-        currentSequence.Append(bannerRect.DOAnchorPos(endPos, slideOutDuration).SetEase(Ease.InCubic));
-        currentSequence.Join(canvasGroup.DOFade(0f, slideOutDuration));
+        // === 出场动画 ===
+        // 平滑缩小淡出
+        currentSequence.Append(bannerRect.DOScale(0.8f, exitDuration).SetEase(Ease.InOutQuad));
+        currentSequence.Join(canvasGroup.DOFade(0f, exitDuration).SetEase(Ease.InQuad));
 
         // 动画完成回调
         currentSequence.OnComplete(OnAnimationComplete);
@@ -250,6 +265,8 @@ public class PhaseBanner : MonoBehaviour
         currentSequence?.Kill();
         if (canvasGroup != null)
             canvasGroup.alpha = 0;
+        if (bannerRect != null)
+            bannerRect.localScale = Vector3.one;
 
         OnAnimationComplete();
     }
