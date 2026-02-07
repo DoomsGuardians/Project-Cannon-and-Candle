@@ -1,0 +1,135 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef6e08c724aae2e4e8565ffca7913c4c, type: 3}
+  m_Name: TutorialConfig_Advanced
+  m_EditorClassIdentifier:
+  Steps:
+  - StepId: welcome
+    Description: "欢迎语，介绍高级教程内容"
+    ScriptName: Tutorial_Advanced
+    StartLabel: welcome
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: intro_info_panel
+    Description: "等待玩家打开情报面板（无对话，纯等待）"
+    ScriptName:
+    StartLabel:
+    Trigger: 8
+    TriggerParameter: InfoPanel
+    HighlightTarget: IntelBtn
+    DisabledButtons:
+    - EndTurn
+    - Market
+    AllowedButtonsOnly: []
+  - StepId: explain_intel
+    Description: "解释情报系统"
+    ScriptName: Tutorial_Advanced
+    StartLabel: explain_intel
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: close_info
+    Description: "提示关闭情报面板，引导看委托"
+    ScriptName: Tutorial_Advanced
+    StartLabel: close_info
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: intro_commissions
+    Description: "介绍委托任务"
+    ScriptName: Tutorial_Advanced
+    StartLabel: intro_commissions
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: explain_commissions
+    Description: "详细解释委托任务"
+    ScriptName: Tutorial_Advanced
+    StartLabel: explain_commissions
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: intro_futures
+    Description: "等待玩家打开市场面板（无对话，纯等待）"
+    ScriptName:
+    StartLabel:
+    Trigger: 8
+    TriggerParameter: MarketPanel
+    HighlightTarget: MarketBtn
+    DisabledButtons:
+    - EndTurn
+    - Intel
+    AllowedButtonsOnly: []
+  - StepId: explain_futures_long
+    Description: "解释做多期货"
+    ScriptName: Tutorial_Advanced
+    StartLabel: explain_futures_long
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: explain_futures_short
+    Description: "解释做空期货"
+    ScriptName: Tutorial_Advanced
+    StartLabel: explain_futures_short
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: futures_risk_warning
+    Description: "期货风险警告"
+    ScriptName: Tutorial_Advanced
+    StartLabel: futures_risk_warning
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons:
+    - EndTurn
+    AllowedButtonsOnly: []
+  - StepId: final_advice
+    Description: "最终建议总结"
+    ScriptName: Tutorial_Advanced
+    StartLabel: final_advice
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons: []
+    AllowedButtonsOnly: []
+  - StepId: complete
+    Description: "教程完成"
+    ScriptName: Tutorial_Advanced
+    StartLabel: complete
+    Trigger: 0
+    TriggerParameter:
+    HighlightTarget:
+    DisabledButtons: []
+    AllowedButtonsOnly: []

@@ -92,6 +92,10 @@ public class BattleSystem : ILogic
 
         ApplyBattleResult(ally, enemy, result);
 
+        // 记录战场指令消耗（用于Alpha因子的伤亡冲击计算）
+        campaignData.Market.BattleConsumption[allyOrder] += 1f;
+        campaignData.Market.BattleConsumption[enemyOrder] += 1f;
+
         // 记录战斗后的位置
         result.AllyNewPosition = ally.GridPosition;
         result.EnemyNewPosition = enemy.GridPosition;

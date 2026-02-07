@@ -27,6 +27,12 @@ public class MarketData
     public Dictionary<OrderType, List<KLineData>> KLineHistory;  // K线历史数据
     public int LastReplenishTurn;                           // 上次补充的回合
 
+    // === 反操纵修复字段 ===
+    public Dictionary<OrderType, int> TurnStartFloat;           // 回合开始流通盘快照（固定基准）
+    public Dictionary<OrderType, int> TurnTradeVolume;          // 本回合累计交易量
+    public Dictionary<OrderType, List<float>> SettlementPriceHistory;  // 结算价历史（用于TWAP）
+    public Dictionary<OrderType, float> BattleConsumption;      // 战场实际消耗量
+
     public void InitFromConfig(OrderConfig config)
     {
         CurrentPrices = new Dictionary<OrderType, float>();
@@ -39,6 +45,12 @@ public class MarketData
         KLineHistory = new Dictionary<OrderType, List<KLineData>>();
         LastReplenishTurn = 0;
 
+        // 初始化反操纵修复字段
+        TurnStartFloat = new Dictionary<OrderType, int>();
+        TurnTradeVolume = new Dictionary<OrderType, int>();
+        SettlementPriceHistory = new Dictionary<OrderType, List<float>>();
+        BattleConsumption = new Dictionary<OrderType, float>();
+
         foreach (var item in config.Orders)
         {
             CurrentPrices[item.OrderType] = item.BasePrice;
@@ -48,6 +60,12 @@ public class MarketData
             LastWeekBurn[item.OrderType] = 0f;
             AccumulatedBurn[item.OrderType] = 0f;
             KLineHistory[item.OrderType] = new List<KLineData>();
+
+            // 初始化反操纵修复字段
+            TurnStartFloat[item.OrderType] = item.InitialStock;
+            TurnTradeVolume[item.OrderType] = 0;
+            SettlementPriceHistory[item.OrderType] = new List<float>();
+            BattleConsumption[item.OrderType] = 0f;
         }
     }
 }
@@ -64,10 +82,19 @@ public class FuturesContract
     public int OpenTurn;        // 开仓回合（防止同回合套利）
     public int ExpirationTurn;
     public float Margin;
+    public int SettlementStartIndex;  // TWAP结算起始索引
 
     public float CalculatePnL(float currentPrice)
     {
         float diff = currentPrice - OpenPrice;
+        if (Direction == FuturesDirection.Short) diff = -diff;
+        return diff * Quantity;
+    }
+
+    /// <summary>使用指定结算价计算盈亏（用于TWAP结算）</summary>
+    public float CalculatePnLWithPrice(float settlementPrice)
+    {
+        float diff = settlementPrice - OpenPrice;
         if (Direction == FuturesDirection.Short) diff = -diff;
         return diff * Quantity;
     }

@@ -152,6 +152,14 @@ public class CampaignSystem : ILogic
 
         Data.CurrentPhase = TurnPhase.TurnStart;
 
+        // Step 0: 拍摄流通盘快照 & 重置交易量（反操纵修复）
+        foreach (OrderType type in Enum.GetValues(typeof(OrderType)))
+        {
+            Data.Market.TurnStartFloat[type] = Data.Market.MarketInventory[type];
+            Data.Market.TurnTradeVolume[type] = 0;
+            Data.Market.BattleConsumption[type] = 0f;
+        }
+
         // Step 1: 时间推进
         // Week++ 已在上一回合结束时完成
 
@@ -376,6 +384,9 @@ public class CampaignSystem : ILogic
     public void EnterSettlementPhase()
     {
         Data.CurrentPhase = TurnPhase.SettlementPhase;
+
+        // Step 0: 记录结算价（用于TWAP期货结算）
+        marketSystem.RecordSettlementPrice();
 
         // Step 1: 记录 K 线 Close 价格和成交量
         marketSystem.FinalizeKLineForTurn();

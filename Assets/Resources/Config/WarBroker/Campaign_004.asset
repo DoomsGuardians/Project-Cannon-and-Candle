@@ -13,10 +13,13 @@ MonoBehaviour:
   m_Name: Campaign_004
   m_EditorClassIdentifier: 
   CampaignId: Campaign_004
-  CampaignName: "\u7EB3\u5FB7\u6797\u6839\u6218\u5F79"
+  CampaignName: "\u5415\u5C91\u4F1A\u6218"
   Description: "\u6807\u51C6\u96BE\u5EA6\u5173\u5361\uFF0C\u5E73\u8861\u7684\u6E38\u620F\u4F53\u9A8C\u3002"
-  Thumbnail: {fileID: 21300000, guid: d867fde5a9bdc2340a2da0e35fa5d988, type: 3}
+  Thumbnail: {fileID: 21300000, guid: 235ed04a4ae597f4685e6aa91144ac11, type: 3}
   TicketPrice: 5000
+  IsTutorial: 0
+  IntroScriptName: 
+  IntroScriptLabel: 
   MaxTurns: 60
   InitialCash: 5000
   InitialAtkInventory: 2

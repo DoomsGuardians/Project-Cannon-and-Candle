@@ -48,6 +48,12 @@ public class BattlefieldCameraController : MonoBehaviour
     [SerializeField] private int priorityActive = 20;
     [SerializeField] private int priorityInactive = 0;
 
+    [Header("地形跟随")]
+    [SerializeField] private LayerMask groundLayer;           // 地形层
+    [SerializeField] private float groundFollowSpeed = 5f;    // 高度跟随平滑速度
+    [SerializeField] private float groundRaycastHeight = 100f; // 射线起始高度
+    [SerializeField] private float pivotHeightOffset = 0f;    // pivot 距地面的偏移
+
     // 战场视角的轨道参数（运行时从 vcamBattlefield 初始化）
     private float currentYaw;
     private float currentPitch;
@@ -141,6 +147,7 @@ public class BattlefieldCameraController : MonoBehaviour
             HandleKeyboardPan();
             HandleRotation();
             HandleZoom();
+            UpdatePivotGroundHeight();
             UpdateOrbitalCamera();
         }
     }
@@ -358,6 +365,29 @@ public class BattlefieldCameraController : MonoBehaviour
         {
             currentDistance -= scroll * zoomSpeed * 0.1f;
             currentDistance = Mathf.Clamp(currentDistance, minZoom, maxZoom);
+        }
+    }
+
+    /// <summary>
+    /// 更新 Pivot 的 Y 坐标以跟随地形高度
+    /// </summary>
+    private void UpdatePivotGroundHeight()
+    {
+        if (battlefieldPivot == null) return;
+
+        Vector3 pivotPos = battlefieldPivot.position;
+
+        // 从 pivot 上方发射向下的射线
+        Vector3 rayOrigin = new Vector3(pivotPos.x, pivotPos.y + groundRaycastHeight, pivotPos.z);
+
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, groundRaycastHeight * 2f, groundLayer))
+        {
+            float targetHeight = hit.point.y + pivotHeightOffset;
+
+            // 平滑插值到目标高度
+            float newY = Mathf.Lerp(pivotPos.y, targetHeight, Time.deltaTime * groundFollowSpeed);
+
+            battlefieldPivot.position = new Vector3(pivotPos.x, newY, pivotPos.z);
         }
     }
 

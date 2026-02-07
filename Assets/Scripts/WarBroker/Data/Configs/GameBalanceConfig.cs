@@ -185,10 +185,6 @@ public class GameBalanceConfig : ScriptableObject
     [Range(0f, 0.2f)]
     public float AlphaLowHPBonus = 0.10f;
 
-    [Tooltip("Alpha战场影响倍率（增强战场对价格的影响）")]
-    [Range(1f, 3f)]
-    public float AlphaMultiplier = 1.5f;
-
     [Tooltip("Beta动量阈值")]
     [Range(0f, 0.3f)]
     public float BetaMomentumThreshold = 0.10f;
@@ -215,11 +211,49 @@ public class GameBalanceConfig : ScriptableObject
 
     [Tooltip("Beta最大值（限制价格上涨幅度）")]
     [Range(2f, 10f)]
-    public float BetaMax = 4f;
+    public float BetaMax = 2.5f;
 
     [Tooltip("Gamma最大值（限制流通盘对价格的影响）")]
     [Range(1f, 5f)]
-    public float GammaMax = 2.5f;
+    public float GammaMax = 1.8f;
+
+    [Header("===== 反操纵参数 =====")]
+
+    [Tooltip("每回合最大交易量比例（相对于回合开始流通盘）")]
+    [Range(0.1f, 1f)]
+    public float MaxTradeVolumeRatio = 0.4f;
+
+    [Header("===== Alpha 多维权重 =====")]
+
+    [Tooltip("Alpha战场影响倍率（增强战场对价格的影响）")]
+    [Range(1f, 3f)]
+    public float AlphaMultiplier = 2.0f;
+
+    [Tooltip("A1 战线位置权重")]
+    [Range(0f, 2f)]
+    public float AlphaWeight_Position = 1.0f;
+
+    [Tooltip("A2 兵力差异权重")]
+    [Range(0f, 2f)]
+    public float AlphaWeight_ForceDelta = 1.2f;
+
+    [Tooltip("A3 伤亡率冲击权重")]
+    [Range(0f, 2f)]
+    public float AlphaWeight_Casualty = 1.5f;
+
+    [Tooltip("A4 将军危机权重")]
+    [Range(0f, 2f)]
+    public float AlphaWeight_GeneralCrisis = 1.3f;
+
+    [Tooltip("A5 后备役压力权重")]
+    [Range(0f, 2f)]
+    public float AlphaWeight_ReservePressure = 1.0f;
+
+    [Header("===== Beta 战场联动 =====")]
+
+    [Tooltip("战线突破冲击乘数")]
+    [Range(1f, 2f)]
+    public float BetaBreakthroughMultiplier = 1.3f;
 
     [Header("===== Alpha位置修正表 =====")]
 

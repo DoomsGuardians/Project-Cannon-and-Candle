@@ -45,8 +45,9 @@ public class MarketSystem : ILogic
     #region 现货交易
 
     /// <summary>
-    /// 买入现货 (GDD v6.0)
+    /// 买入现货 (GDD v6.0 + 反操纵修复)
     /// 逐张计算交易，每张交易后价格变化（通过 Beta 累积）
+    /// 新增交易量上限检查
     /// </summary>
     public bool BuyOrder(OrderType orderType, int quantity, out float totalCost)
     {
@@ -54,14 +55,32 @@ public class MarketSystem : ILogic
         var market = campaignData.Market;
         var player = campaignData.Player;
 
-        if (market.MarketInventory[orderType] < quantity)
+        // 反操纵修复：检查交易量上限
+        int maxTradePerTurn = Mathf.CeilToInt(
+            market.TurnStartFloat[orderType] * balanceConfig.MaxTradeVolumeRatio);
+        int remainingAllowance = maxTradePerTurn - market.TurnTradeVolume[orderType];
+
+        if (remainingAllowance <= 0)
+        {
+            Debug.LogWarning($"本回合 {orderType} 交易量已达上限");
+            return false;
+        }
+
+        // 限制实际交易量
+        int actualQuantity = Mathf.Min(quantity, remainingAllowance);
+        if (actualQuantity < quantity)
+        {
+            Debug.Log($"交易量受限: 请求{quantity}, 实际可交易{actualQuantity}");
+        }
+
+        if (market.MarketInventory[orderType] < actualQuantity)
         {
             Debug.LogWarning($"市场库存不足: {orderType}");
             return false;
         }
 
         // 逐张计算成本
-        for (int i = 0; i < quantity; i++)
+        for (int i = 0; i < actualQuantity; i++)
         {
             float currentPrice = pricingEngine.CalculatePrice(orderType);
             float commission = currentPrice * balanceConfig.CommissionRate;
@@ -82,11 +101,14 @@ public class MarketSystem : ILogic
 
         // 执行交易
         player.Cash -= totalCost;
-        player.Inventory[orderType] += quantity;
-        market.MarketInventory[orderType] -= quantity;
+        player.Inventory[orderType] += actualQuantity;
+        market.MarketInventory[orderType] -= actualQuantity;
+
+        // 更新交易量统计
+        market.TurnTradeVolume[orderType] += actualQuantity;
 
         // 记录消耗量（用于三回合补充计算）
-        market.AccumulatedBurn[orderType] += quantity;
+        market.AccumulatedBurn[orderType] += actualQuantity;
 
         // 更新当前价格
         market.CurrentPrices[orderType] = pricingEngine.CalculatePrice(orderType);
@@ -96,7 +118,7 @@ public class MarketSystem : ILogic
             {
                 Type = TransactionRecord.TransactionType.Buy,
                 OrderType = orderType,
-                Quantity = quantity,
+                Quantity = actualQuantity,
                 Price = market.CurrentPrices[orderType],
                 TotalAmount = totalCost
             }, null);
@@ -106,8 +128,9 @@ public class MarketSystem : ILogic
     }
 
     /// <summary>
-    /// 卖出现货 (GDD v6.0)
+    /// 卖出现货 (GDD v6.0 + 反操纵修复)
     /// 逐张计算交易，每张交易后价格变化（通过 Beta 累积）
+    /// 新增交易量上限检查
     /// </summary>
     public bool SellOrder(OrderType orderType, int quantity, out float totalRevenue)
     {
@@ -115,14 +138,32 @@ public class MarketSystem : ILogic
         var market = campaignData.Market;
         var player = campaignData.Player;
 
-        if (player.Inventory[orderType] < quantity)
+        // 反操纵修复：检查交易量上限
+        int maxTradePerTurn = Mathf.CeilToInt(
+            market.TurnStartFloat[orderType] * balanceConfig.MaxTradeVolumeRatio);
+        int remainingAllowance = maxTradePerTurn - market.TurnTradeVolume[orderType];
+
+        if (remainingAllowance <= 0)
+        {
+            Debug.LogWarning($"本回合 {orderType} 交易量已达上限");
+            return false;
+        }
+
+        // 限制实际交易量
+        int actualQuantity = Mathf.Min(quantity, remainingAllowance);
+        if (actualQuantity < quantity)
+        {
+            Debug.Log($"交易量受限: 请求{quantity}, 实际可交易{actualQuantity}");
+        }
+
+        if (player.Inventory[orderType] < actualQuantity)
         {
             Debug.LogWarning($"库存不足: {orderType}");
             return false;
         }
 
         // 逐张计算收益
-        for (int i = 0; i < quantity; i++)
+        for (int i = 0; i < actualQuantity; i++)
         {
             float currentPrice = pricingEngine.CalculatePrice(orderType);
             float commission = currentPrice * balanceConfig.CommissionRate;
@@ -137,8 +178,11 @@ public class MarketSystem : ILogic
 
         // 执行交易
         player.Cash += totalRevenue;
-        player.Inventory[orderType] -= quantity;
-        market.MarketInventory[orderType] += quantity;
+        player.Inventory[orderType] -= actualQuantity;
+        market.MarketInventory[orderType] += actualQuantity;
+
+        // 更新交易量统计
+        market.TurnTradeVolume[orderType] += actualQuantity;
 
         // 更新当前价格
         market.CurrentPrices[orderType] = pricingEngine.CalculatePrice(orderType);
@@ -148,7 +192,7 @@ public class MarketSystem : ILogic
             {
                 Type = TransactionRecord.TransactionType.Sell,
                 OrderType = orderType,
-                Quantity = quantity,
+                Quantity = actualQuantity,
                 Price = market.CurrentPrices[orderType],
                 TotalAmount = totalRevenue
             }, null);
@@ -182,7 +226,7 @@ public class MarketSystem : ILogic
     #region 期货交易
 
     /// <summary>
-    /// 开立期货合约 (GDD v6.0: 固定 3 回合)
+    /// 开立期货合约 (GDD v6.0: 固定 3 回合 + TWAP结算)
     /// </summary>
     public bool OpenFutures(OrderType orderType, FuturesDirection direction,
         int quantity, out FuturesContract contract)
@@ -219,7 +263,9 @@ public class MarketSystem : ILogic
             Quantity = quantity,
             OpenTurn = campaignData.CurrentTurn,
             ExpirationTurn = campaignData.CurrentTurn + FUTURES_DURATION,
-            Margin = margin
+            Margin = margin,
+            // TWAP结算：记录开仓时结算价历史的索引
+            SettlementStartIndex = market.SettlementPriceHistory[orderType].Count
         };
 
         player.Cash -= margin;
@@ -231,6 +277,9 @@ public class MarketSystem : ILogic
         return true;
     }
 
+    /// <summary>
+    /// 平仓期货合约（使用TWAP结算价）
+    /// </summary>
     public bool CloseFutures(int contractId, out float pnl)
     {
         pnl = 0f;
@@ -247,8 +296,9 @@ public class MarketSystem : ILogic
             return false;
         }
 
-        float currentPrice = market.CurrentPrices[contract.TargetOrder];
-        pnl = contract.CalculatePnL(currentPrice);
+        // 使用 TWAP 结算价计算盈亏
+        float settlementPrice = CalculateFuturesTWAP(contract);
+        pnl = contract.CalculatePnLWithPrice(settlementPrice);
 
         player.Cash += contract.Margin + pnl;
         player.FuturesPositions.Remove(contract);
@@ -307,7 +357,7 @@ public class MarketSystem : ILogic
 
     #region 维克多期货交易
 
-    /// <summary>维克多开立期货合约</summary>
+    /// <summary>维克多开立期货合约（带TWAP结算）</summary>
     public bool VictorOpenFutures(OrderType orderType, FuturesDirection direction, int quantity, out FuturesContract contract)
     {
         contract = null;
@@ -334,7 +384,9 @@ public class MarketSystem : ILogic
             Quantity = quantity,
             OpenTurn = campaignData.CurrentTurn,
             ExpirationTurn = campaignData.CurrentTurn + FUTURES_DURATION,
-            Margin = margin
+            Margin = margin,
+            // TWAP结算：记录开仓时结算价历史的索引
+            SettlementStartIndex = market.SettlementPriceHistory[orderType].Count
         };
 
         ledger.Cash -= margin;
@@ -344,7 +396,7 @@ public class MarketSystem : ILogic
         return true;
     }
 
-    /// <summary>维克多平仓期货合约</summary>
+    /// <summary>维克多平仓期货合约（使用TWAP结算）</summary>
     public bool VictorCloseFutures(int contractId, out float pnl)
     {
         pnl = 0f;
@@ -354,8 +406,9 @@ public class MarketSystem : ILogic
         var contract = ledger.FuturesPositions.Find(c => c.ContractId == contractId);
         if (contract == null) return false;
 
-        float currentPrice = market.CurrentPrices[contract.TargetOrder];
-        pnl = contract.CalculatePnL(currentPrice);
+        // 使用 TWAP 结算价计算盈亏
+        float settlementPrice = CalculateFuturesTWAP(contract);
+        pnl = contract.CalculatePnLWithPrice(settlementPrice);
 
         ledger.Cash += contract.Margin + pnl;
         ledger.FuturesPositions.Remove(contract);
@@ -559,9 +612,9 @@ public class MarketSystem : ILogic
     }
 
     /// <summary>
-    /// 军工厂动态产能（优化版）
-    /// 每 3 回合补充一次，补充量 = 过去 3 回合的累计消耗量
-    /// 这样供给大致等于需求，给玩家和对手操作空间
+    /// 军工厂动态产能（优化版 + 战场消耗联动）
+    /// 每 3 回合补充一次，补充量 = 过去 3 回合的累计消耗量 + 战场消耗
+    /// 战场消耗单独记录，与交易消耗分开计算
     /// </summary>
     private void ReplenishMarketInventory()
     {
@@ -578,7 +631,10 @@ public class MarketSystem : ILogic
 
         foreach (OrderType orderType in Enum.GetValues(typeof(OrderType)))
         {
+            // 交易消耗 + 战场消耗
             float accumulatedBurn = market.AccumulatedBurn[orderType];
+            float battleConsumption = market.BattleConsumption[orderType];
+            float totalConsumption = accumulatedBurn + battleConsumption;
 
             // 产能系数随机 0.9~1.1，让供给略有波动
             float productionFactor = UnityEngine.Random.Range(
@@ -586,7 +642,7 @@ public class MarketSystem : ILogic
                 balanceConfig.ProductionFactorMax);
 
             // 动态产能 = 累计消耗 × 产能系数
-            float dynamicProduction = accumulatedBurn * productionFactor;
+            float dynamicProduction = totalConsumption * productionFactor;
 
             // 保底产能：每 3 回合至少补充 2 份（防止市场完全枯竭）
             int finalProduction = Mathf.Max(2, Mathf.RoundToInt(dynamicProduction));
@@ -595,9 +651,9 @@ public class MarketSystem : ILogic
             market.MarketInventory[orderType] += finalProduction;
 
             // 更新 LastWeekBurn（用于其他系统参考）
-            market.LastWeekBurn[orderType] = accumulatedBurn;
+            market.LastWeekBurn[orderType] = totalConsumption;
 
-            // 重置累计消耗
+            // 重置累计消耗（不重置BattleConsumption，在回合开始时重置）
             market.AccumulatedBurn[orderType] = 0f;
         }
     }
@@ -700,6 +756,56 @@ public class MarketSystem : ILogic
             // 记录成交量（本回合消耗量）
             currentKLine.Volume = market.LastWeekBurn[orderType];
         }
+    }
+
+    #endregion
+
+    #region TWAP结算（反操纵修复）
+
+    /// <summary>
+    /// 回合结束时记录结算价（用于期货TWAP结算）
+    /// 使用 PricingEngine 的 CalculateSettlementPrice 计算（剥离 Gamma）
+    /// </summary>
+    public void RecordSettlementPrice()
+    {
+        var market = campaignData.Market;
+
+        foreach (OrderType orderType in Enum.GetValues(typeof(OrderType)))
+        {
+            // 使用结算价（剥离Gamma影响）
+            float settlementPrice = pricingEngine.CalculateSettlementPrice(orderType);
+            market.SettlementPriceHistory[orderType].Add(settlementPrice);
+        }
+    }
+
+    /// <summary>
+    /// 计算期货的TWAP结算价
+    /// 使用合约开仓后的所有结算价均值
+    /// </summary>
+    public float CalculateFuturesTWAP(FuturesContract contract)
+    {
+        var market = campaignData.Market;
+        var priceHistory = market.SettlementPriceHistory[contract.TargetOrder];
+
+        int startIndex = contract.SettlementStartIndex;
+        int endIndex = priceHistory.Count;
+
+        // 如果没有足够的结算价历史，使用当前结算价
+        if (endIndex <= startIndex)
+        {
+            return pricingEngine.CalculateSettlementPrice(contract.TargetOrder);
+        }
+
+        // 计算TWAP
+        float sum = 0f;
+        int count = 0;
+        for (int i = startIndex; i < endIndex; i++)
+        {
+            sum += priceHistory[i];
+            count++;
+        }
+
+        return sum / count;
     }
 
     #endregion

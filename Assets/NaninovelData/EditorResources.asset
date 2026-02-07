@@ -91,12 +91,29 @@ MonoBehaviour:
   - Id: UI
     Resources: []
   - Id: Characters/46416531-12cf-4266-84b6-6b47fcdc6c13
-    Resources: []
+    Resources:
+    - name: cold
+      pathPrefix: Characters/Narrator
+      guid: 018f98b555d96a540ab860bc350120c5
+    - name: Default
+      pathPrefix: Characters/Narrator
+      guid: 8e9ae152bf3f61243af4c31a3e195e15
+    - name: laugh
+      pathPrefix: Characters/Narrator
+      guid: cb8ede844fadffb4896bc416f246780f
+    - name: smile
+      pathPrefix: Characters/Narrator
+      guid: dd7b0e3172b0ce04aaec1074391e85a5
   - Id: Scripts
     Resources:
     - name: Tutorial
       pathPrefix: Scripts
       guid: 98911518768b386488a35e98e8834d6a
-    - name: Resources/Naninovel/Scripts/Tutorial
+    - name: Tutorial_Advanced
+      pathPrefix: Scripts
+      guid: c3a4991b323f13045aabce8c7761c957
+    - name: Tutorial
       pathPrefix: Scripts
       guid: 73e67b124fa696e4c85aa9ad62ea3048
+  - Id: CharacterAvatars
+    Resources: []

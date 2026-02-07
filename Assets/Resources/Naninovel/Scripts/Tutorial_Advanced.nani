@@ -1,0 +1,124 @@
+; 高级教程脚本 - 情报、委托与期货
+; 教授玩家进阶机制：情报系统、委托任务、期货交易
+; 使用标签区分步骤，TutorialManager 根据配置跳转
+
+# welcome
+@printer Dialogue
+Narrator.smile: 欢迎回来，公爵大人。
+Narrator: 看来基础的买卖您已经驾轻就熟了。
+Narrator: 但要成为真正的战争掮客，光会倒卖军令可不够。
+Narrator: 今天，让我为您介绍三件利器——情报、委托与期货。
+Narrator.cold: 这三样东西，用得好能让您富可敌国，用不好……呵，破产的掮客可没人同情。
+Narrator: 准备好了吗？让我们从情报开始。
+Narrator: 请点击左上角的【情报】按钮，打开情报面板。
+@hidePrinter
+@stop
+
+# intro_info_panel
+; 此标签不再使用，等待逻辑无需对话
+@stop
+
+# explain_intel
+@printer Dialogue
+Narrator.smile: 很好，这就是情报面板。
+Narrator: 在这个尔虞我诈的时代，信息就是金币。
+Narrator: 情报面板向您展示战场的关键信息。
+Narrator: 您可以看到双方的兵力对比、战线态势，以及——最重要的——将军们的动向。
+Narrator: 我方将军的意图您当然了如指掌。
+Narrator: 但敌方将军呢？这就要靠情报了。
+Narrator: 情报的准确度取决于多种因素：间谍的能力、敌将的谨慎程度、甚至天气。
+Narrator.cold: 有时情报会误导您——这也是战争的一部分。
+Narrator: 聪明的掮客会结合情报和市场价格波动来推断对手的意图。
+Narrator: 如果进攻令突然涨价，而情报显示敌军在调动……您该明白这意味着什么。
+@hidePrinter
+@stop
+
+# close_info
+@printer Dialogue
+Narrator: 现在，让我们谈谈另一件事——委托任务。
+Narrator: 您注意到屏幕右侧的任务栏了吗？
+@hidePrinter
+@stop
+
+# intro_commissions
+@printer Dialogue
+Narrator: 这些是来自各方势力的委托。
+Narrator: 教廷、商会、贵族……每个人都想在战争中分一杯羹。
+Narrator: 他们愿意付钱让您完成特定目标。
+@hidePrinter
+@stop
+
+# explain_commissions
+@printer Dialogue
+Narrator: 委托任务通常要求您达成某些条件：
+Narrator: 比如让某位将军获胜、让某种军令涨价、或者在特定时机持有某些头寸。
+Narrator: 完成委托可以获得丰厚的奖金——有时比您倒卖军令赚得还多。
+Narrator: 但要小心：有些委托之间可能相互矛盾。
+Narrator: 您不可能同时让进攻令涨价又让它跌价。选择很重要。
+Narrator.cold: 另外，接受委托就意味着承诺。完不成……呵，名声可是掮客的命根子。
+Narrator: 建议您在接受委托前，仔细评估自己的能力和市场走势。
+Narrator: 最后，让我们谈谈掮客真正的杀手锏——期货。
+Narrator: 请打开【市场】面板，然后切换到期货标签。
+@hidePrinter
+@stop
+
+# intro_futures
+; 此标签不再使用，等待逻辑无需对话
+@stop
+
+# explain_futures_long
+@printer Dialogue
+Narrator: 期货，简单来说，就是押注未来的价格。
+Narrator: 您现在看到的是期货交易界面。
+Narrator: 【做多】意味着您押注价格会涨。
+Narrator: 如果三回合后进攻令的价格比现在高，您就赚钱。反之，您就亏钱。
+Narrator: 做多的逻辑很直观：您觉得要打仗了，进攻令会涨，那就做多进攻令。
+@hidePrinter
+@stop
+
+# explain_futures_short
+@printer Dialogue
+Narrator: 【做空】则相反——您押注价格会跌。
+Narrator: 如果价格下跌，您反而赚钱。
+Narrator: 这听起来有些反直觉，但却是掮客最强大的武器。
+Narrator: 想象一下：您知道某场战斗会惨败，防御令会变得一文不值。
+Narrator: 普通商人只能眼睁睁看着亏损。但您？您可以做空防御令，从崩盘中获利。
+Narrator.cold: 更进一步——如果您能操纵战局，让价格按您预期的方向走……
+Narrator.smile: 呵，我什么都没说。
+@hidePrinter
+@stop
+
+# futures_risk_warning
+@printer Dialogue
+Narrator.cold: 但期货是双刃剑，公爵大人。
+Narrator: 您需要支付保证金来开仓。如果价格剧烈波动，保证金不足时会被强制平仓。
+Narrator: 那意味着不仅亏光本金，还可能倒欠银行一笔。
+Narrator: 期货合约固定三回合到期。到期时自动结算，盈亏直接计入您的账户。
+Narrator: 当然，您也可以提前平仓——如果您觉得赚够了，或者想止损。
+Narrator.cold: 记住：杠杆能放大收益，也能放大亏损。贪婪的掮客往往死于自己的聪明。
+@hidePrinter
+@stop
+
+# final_advice
+@printer Dialogue
+Narrator: 让我总结一下今天学到的：
+Narrator: 情报——帮您看清战场迷雾，预判对手动向。
+Narrator: 委托——额外的收入来源，但要量力而行。
+Narrator: 期货——放大收益的利器，但也是破产的捷径。
+Narrator: 这三样东西组合起来，才是战争掮客的完整武器库。
+Narrator: 用情报预判价格走势，用期货放大收益，用委托锦上添花。
+Narrator: 或者反过来——用委托目标指导您的期货方向，再用情报验证判断。
+Narrator: 没有固定的套路，只有灵活的头脑。
+@hidePrinter
+@stop
+
+# complete
+@printer Dialogue
+Narrator.smile: 高级教程到此结束，公爵大人。
+Narrator: 您现在已经掌握了战争掮客的全部技艺。
+Narrator: 剩下的，就是在血与火中磨练您的判断力了。
+Narrator.cold: 记住：战争会结束，但账本是永恒的。
+Narrator.cold: 愿您的金库永远比战场上的尸体更多。
+Narrator.smile: 祝您财源广进，华伦斯坦公爵。
+@hidePrinter
+@stop

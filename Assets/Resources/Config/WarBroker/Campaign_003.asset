@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Campaign_003
   m_EditorClassIdentifier: 
   CampaignId: Campaign_003
-  CampaignName: "\u7EB3\u5FB7\u6797\u6839\u6218\u5F79"
+  CampaignName: "\u7EBD\u4F26\u5821\u6218\u5F79"
   Description: "\u6807\u51C6\u96BE\u5EA6\u5173\u5361\uFF0C\u5E73\u8861\u7684\u6E38\u620F\u4F53\u9A8C\u3002"
-  Thumbnail: {fileID: 21300000, guid: d867fde5a9bdc2340a2da0e35fa5d988, type: 3}
+  Thumbnail: {fileID: 21300000, guid: 9c77943545379c44d9f19b292175e88c, type: 3}
   TicketPrice: 2000
   IsTutorial: 0
   IntroScriptName: 

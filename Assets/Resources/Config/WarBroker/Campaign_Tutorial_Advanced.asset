@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3de8092c050fb94b917c6b64b225966, type: 3}
+  m_Name: Campaign_Tutorial_Advanced
+  m_EditorClassIdentifier:
+  CampaignId: Campaign_Tutorial_Advanced
+  CampaignName: "高级教程 - 掮客的艺术"
+  Description: "学习情报系统、委托任务和期货交易的进阶技巧。\n掌握这些工具，才能成为真正的战争掮客。"
+  Thumbnail: {fileID: 21300000, guid: 22f4c3a66942e1d4595f545e805719c3, type: 3}
+  TicketPrice: 0
+  IsTutorial: 1
+  MaxTurns: 10
+  InitialCash: 1000
+  InitialAtkInventory: 3
+  InitialDefInventory: 3
+  InitialRetInventory: 3
+  InitialReserves: 60
+  BattlefieldSceneName: Battle_Tutorial_Advanced
+  LaneCount: 1
+  GridCount: 5
+  InitialFrontlinePosition: 3
+  GeneralConfig: {fileID: 11400000, guid: 976ca2edd99e01b4c89f75361caeef09, type: 2}
+  AllyFrontlineAssignments:
+  - Position: 2
+    GeneralId: arnim
+  EnemyFrontlineAssignments:
+  - Position: 2
+    GeneralId: gustav
+  VictorInitialCash: 500
+  VictorProfile: {fileID: 11400000, guid: b94556c4ff59f4e47952099b2e2a2188, type: 2}
+  AvailableEvents:
+  - EventId: evt_plague
+    EventName: "瘟疫爆发"
+    Description: "营中爆发不明高热，患者两日即衰竭，以致兵营半空。此敌非火枪与刀剑可比。\n军中瘟疫蔓延，所有将军兵力-2。"
+    Illustration: {fileID: 21300000, guid: 6f905e4ab3c93f845b8160025079fb28, type: 3}
+    ProductionModifier: 0
+    AtkDemandModifier: 0
+    DefDemandModifier: 0.3
+    RetDemandModifier: 0.2
+    AllTroopChange: -2
+    RandomTrustChange: 0
+    Duration: 2
+  - EventId: evt_supply
+    EventName: "补给线畅通"
+    Description: "战区后方补给动脉畅通无阻。物资车队在护卫下准时抵达各指定兵站，前线士气与火力维持稳定。我军生命线强韧。\n进攻指令需求量增大，随机将领信任提高。"
+    Illustration: {fileID: 21300000, guid: 2be0dac92af4c094da1fdfec8a6a6b59, type: 3}
+    ProductionModifier: 0.5
+    AtkDemandModifier: 0.2
+    DefDemandModifier: 0
+    RetDemandModifier: 0
+    AllTroopChange: 0
+    RandomTrustChange: 10
+    Duration: 1
+  - EventId: evt_morale_boost
+    EventName: "补给线遇险"
+    Description: "职部确认补给线在战区后方遭突袭，关键物资损失，备用路线瘫痪。前线部队断粮在即。\n防守指令需求量增大，随机将领信任降低。"
+    Illustration: {fileID: 21300000, guid: 6e7592d1f33631d47a04d161077cf94b, type: 3}
+    ProductionModifier: -1
+    AtkDemandModifier: 0
+    DefDemandModifier: 0.2
+    RetDemandModifier: 0
+    AllTroopChange: 0
+    RandomTrustChange: -10
+    Duration: 4
+  Commissions:
+  - {fileID: 11400000, guid: f2b95a920d7099d469ebe5993aa2073d, type: 2}
+  - {fileID: 11400000, guid: fb5d86e91d49ba946ae546eff0df75ab, type: 2}
