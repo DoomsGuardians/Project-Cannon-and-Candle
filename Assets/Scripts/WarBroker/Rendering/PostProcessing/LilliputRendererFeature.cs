@@ -204,6 +204,13 @@ public class LilliputRendererFeature : ScriptableRendererFeature
             }
 
             float focusDistance = volume.focusDistance.value;
+
+            // 如果有动态焦点距离，使用动态值
+            if (LilliputController.DynamicFocusDistance.HasValue)
+            {
+                focusDistance = LilliputController.DynamicFocusDistance.Value;
+            }
+
             float focusRange = Mathf.Max(0.1f, volume.focusRange.value);
             float blurStrength = Mathf.Max(0f, volume.blurStrength.value);
             int iterations = volume.blurIterations.value;

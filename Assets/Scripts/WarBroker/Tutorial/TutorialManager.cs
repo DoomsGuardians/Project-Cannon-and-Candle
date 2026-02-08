@@ -196,6 +196,14 @@ public class TutorialManager : MonoBehaviour
             ShowHighlight(step.HighlightTarget);
         }
 
+        // 2.5 如果是 WaitForPhaseBanner 触发器，先等待 PhaseBanner 动画完成再播放对话
+        if (step.Trigger == TutorialTrigger.WaitForPhaseBanner)
+        {
+            Debug.Log($"[TutorialManager] WaitForPhaseBanner step, waiting for banner animation before dialogue...");
+            yield return WaitForPhaseBannerComplete();
+            yield return WaitForPopupsClosed();
+        }
+
         // 3. 播放 Naninovel 对话
         if (!string.IsNullOrEmpty(step.ScriptName))
         {
@@ -220,8 +228,8 @@ public class TutorialManager : MonoBehaviour
 
             Debug.Log("[TutorialManager] Welcome step complete, PhaseBanner and popups done");
         }
-        // 5. 其他步骤：等待触发条件
-        else if (step.Trigger != TutorialTrigger.Immediate)
+        // 5. 其他步骤：等待触发条件（WaitForPhaseBanner 已在上面处理完成，这里跳过）
+        else if (step.Trigger != TutorialTrigger.Immediate && step.Trigger != TutorialTrigger.WaitForPhaseBanner)
         {
             waitingForTrigger = true;
             Debug.Log($"[TutorialManager] Waiting for trigger: {step.Trigger} ({step.TriggerParameter})");
@@ -454,8 +462,26 @@ public class TutorialManager : MonoBehaviour
     /// <summary>等待弹窗关闭后继续（设置 waitingForTrigger = false）</summary>
     private IEnumerator WaitForPopupsAndContinue()
     {
+        // 先等待 PhaseBanner 动画完成
+        yield return WaitForPhaseBannerComplete();
+        // 再等待弹窗关闭
         yield return WaitForPopupsClosed();
         waitingForTrigger = false;
+    }
+
+    /// <summary>等待 PhaseBanner 动画完成</summary>
+    private IEnumerator WaitForPhaseBannerComplete()
+    {
+        var gameplayWindow = GetGameplayWindow();
+        if (gameplayWindow == null) yield break;
+
+        var phaseBanner = gameplayWindow.GetPhaseBanner();
+        if (phaseBanner == null) yield break;
+
+        while (phaseBanner.IsPlaying)
+        {
+            yield return null;
+        }
     }
 
     /// <summary>供UI按钮调用</summary>

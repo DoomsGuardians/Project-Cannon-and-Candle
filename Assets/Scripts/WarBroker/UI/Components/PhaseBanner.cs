@@ -73,10 +73,18 @@ public class PhaseBanner : MonoBehaviour
         // 如果不是玩家可感知的阶段，或者与上次相同，不显示
         if (string.IsNullOrEmpty(phaseKey) || phaseKey == lastShownPhase)
         {
-            // 直接调用回调并发送完成事件
-            onComplete?.Invoke();
-            GameRoot.Instance?.eventService?.SendMessage(
-                (EventID)WarBrokerEventID.OnPhaseBannerComplete, phase, null);
+            // 如果有动画正在播放，等待动画完成后再发送事件
+            if (IsPlaying)
+            {
+                StartCoroutine(WaitForAnimationAndSendComplete(onComplete, phase));
+            }
+            else
+            {
+                // 直接调用回调并发送完成事件
+                onComplete?.Invoke();
+                GameRoot.Instance?.eventService?.SendMessage(
+                    (EventID)WarBrokerEventID.OnPhaseBannerComplete, phase, null);
+            }
             return false;
         }
 
@@ -125,6 +133,23 @@ public class PhaseBanner : MonoBehaviour
         // 锁定输入并播放动画
         LockInput();
         PlayBannerAnimation();
+    }
+
+    /// <summary>
+    /// 等待当前动画完成后发送完成事件（用于 banner 不需要显示但有动画正在播放的情况）
+    /// </summary>
+    private IEnumerator WaitForAnimationAndSendComplete(Action onComplete, TurnPhase phase)
+    {
+        // 等待当前动画完成
+        while (IsPlaying)
+        {
+            yield return null;
+        }
+
+        // 调用回调并发送完成事件
+        onComplete?.Invoke();
+        GameRoot.Instance?.eventService?.SendMessage(
+            (EventID)WarBrokerEventID.OnPhaseBannerComplete, phase, null);
     }
 
     /// <summary>

@@ -31935,6 +31935,7 @@ GameObject:
   - component: {fileID: 1474480992}
   - component: {fileID: 1474480994}
   - component: {fileID: 1474480993}
+  - component: {fileID: 1474480995}
   m_Layer: 0
   m_Name: Battlefield
   m_TagString: Untagged
@@ -32140,6 +32141,23 @@ MonoBehaviour:
   criticalIntensity: 1
   lightIntensity: 0.1
   defaultDuration: 0.2
+--- !u!114 &1474480995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474480988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d56eeab9debe8a746935ba82720ae44e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transitionSpeed: 5
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  debugMode: 0
 --- !u!1001 &1479843578
 PrefabInstance:
   m_ObjectHideFlags: 0

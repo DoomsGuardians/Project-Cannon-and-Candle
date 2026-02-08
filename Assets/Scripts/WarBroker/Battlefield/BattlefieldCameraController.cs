@@ -71,12 +71,18 @@ public class BattlefieldCameraController : MonoBehaviour
     // 战斗前位置记录
     private Vector3 preBattlePivotPosition;
 
+    // Lilliput 景深控制
+    private LilliputController lilliputController;
+
     private void Start()
     {
         if (GameRoot.Instance != null)
         {
             inputService = GameRoot.Instance.inputService;
         }
+
+        // 获取 Lilliput 景深控制器
+        lilliputController = GetComponent<LilliputController>();
 
         // 获取 Battlefield 相机的 Transposer 并从中初始化轨道参数
         if (vcamBattlefield != null)
@@ -419,6 +425,9 @@ public class BattlefieldCameraController : MonoBehaviour
         vcamFocusUnit.Follow = target;
         vcamFocusUnit.LookAt = target;
 
+        // 通知景深控制器跟随目标
+        lilliputController?.SetFocusTarget(target);
+
         // 切换到 FocusUnit 模式
         // vcamFocusUnit 在 Inspector 中配置：
         // - Body: Transposer，Follow Offset 与 vcamBattlefield 相同角度但距离更近
@@ -446,6 +455,9 @@ public class BattlefieldCameraController : MonoBehaviour
         if (enemyUnit != null)
             battleTargetGroup.AddMember(enemyUnit, targetWeight, targetRadius);
 
+        // 通知景深控制器跟随玩家侧单位（优先）
+        lilliputController?.SetFocusTarget(allyUnit ?? enemyUnit);
+
         // vcamBattle 的 Follow/LookAt 在 Inspector 中设为 battleTargetGroup
         SetMode(CameraMode.Battle);
     }
@@ -471,6 +483,9 @@ public class BattlefieldCameraController : MonoBehaviour
     {
         // 取消之前的平移动画
         panTweener?.Kill();
+
+        // 清除景深焦点目标
+        lilliputController?.ClearFocusTarget();
 
         // 切换回 Battlefield 模式
         SetMode(CameraMode.Battlefield);

@@ -624,6 +624,11 @@ public class GameplayWindow : WindowBase
     #region 教程按钮控制
 
     /// <summary>
+    /// 获取 PhaseBanner 组件（供教程系统使用）
+    /// </summary>
+    public PhaseBanner GetPhaseBanner() => phaseBanner;
+
+    /// <summary>
     /// 设置按钮的 interactable 状态（供教程系统使用）
     /// </summary>
     /// <param name="buttonId">按钮标识：Market, Intel, EndTurn</param>

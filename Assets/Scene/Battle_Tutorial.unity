@@ -11734,6 +11734,7 @@ GameObject:
   - component: {fileID: 1474480994}
   - component: {fileID: 1474480993}
   - component: {fileID: 1474480995}
+  - component: {fileID: 1474480996}
   m_Layer: 0
   m_Name: Battlefield
   m_TagString: Untagged
@@ -11850,6 +11851,12 @@ MonoBehaviour:
   panEase: 7
   priorityActive: 20
   priorityInactive: 0
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  groundFollowSpeed: 5
+  groundRaycastHeight: 100
+  pivotHeightOffset: 0
 --- !u!114 &1474480992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11948,6 +11955,23 @@ MonoBehaviour:
   config: {fileID: 11400000, guid: cbdef3cdb376a4649bdaf365a21db1a1, type: 2}
   highlightOverlay: {fileID: 1079927117190503707, guid: e0993cebe95728a4f97e85a09566dbc5, type: 3}
   ignoreCompletedStatus: 1
+--- !u!114 &1474480996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1474480988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d56eeab9debe8a746935ba82720ae44e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transitionSpeed: 5
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  debugMode: 1
 --- !u!1 &1512656122
 GameObject:
   m_ObjectHideFlags: 3
