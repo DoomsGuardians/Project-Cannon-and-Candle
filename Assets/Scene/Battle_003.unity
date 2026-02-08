@@ -10171,7 +10171,7 @@ Transform:
   m_GameObject: {fileID: 331130633}
   serializedVersion: 2
   m_LocalRotation: {x: 0.29380757, y: -0.35084772, z: 0.11694924, w: 0.8814227}
-  m_LocalPosition: {x: 26.74424, y: 18.457777, z: -36.429142}
+  m_LocalPosition: {x: 13.744239, y: 15, z: -14.52914}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10239,7 +10239,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: fd2665870bb121a43a6dda577da6af9b, type: 2}
+  sharedProfile: {fileID: 11400000, guid: 53f5c04f59f717743bfae9c71dc88908, type: 2}
 --- !u!114 &331130639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25503,7 +25503,7 @@ Transform:
   m_GameObject: {fileID: 1130474868}
   serializedVersion: 2
   m_LocalRotation: {x: 0.08976966, y: -0.3653641, z: -0.00640262, w: 0.9265039}
-  m_LocalPosition: {x: 13.000001, y: 3.457777, z: -21.900002}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -26810,7 +26810,7 @@ Transform:
   m_GameObject: {fileID: 1564400179}
   serializedVersion: 2
   m_LocalRotation: {x: 0.29380754, y: -0.3508477, z: 0.11694918, w: 0.8814227}
-  m_LocalPosition: {x: 26.74424, y: 18.457777, z: -36.429142}
+  m_LocalPosition: {x: 13.744239, y: 15, z: -14.52914}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -32542,13 +32542,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1192329439129344837}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.073905155, y: -0.90648705, z: 0.17842285, w: 0.37547922}
+  m_LocalRotation: {x: 0.9839871, y: -0.027957493, z: -0.084613144, w: 0.15436445}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1399784221}
-  m_LocalEulerAnglesHint: {x: 22.27, y: -135, z: 0}
+  m_LocalEulerAnglesHint: {x: 17.401, y: -169.424, z: -175.122}
 --- !u!108 &1176149262377427455
 Light:
   m_ObjectHideFlags: 0
@@ -32560,8 +32560,8 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 0.7490196, g: 0.8982159, b: 1, a: 1}
-  m_Intensity: 0.2
+  m_Color: {r: 1, g: 0.9167952, b: 0.7490196, a: 1}
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208

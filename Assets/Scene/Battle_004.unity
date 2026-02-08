@@ -10409,7 +10409,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: d2d2b5fe9584eab43bf123497563234f, type: 2}
+  sharedProfile: {fileID: 11400000, guid: 53f5c04f59f717743bfae9c71dc88908, type: 2}
 --- !u!114 &331130639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53499,8 +53499,8 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.8695353, b: 0.7490196, a: 1}
-  m_Intensity: 0.5
+  m_Color: {r: 0.85882354, g: 0.99303305, b: 1, a: 1}
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208

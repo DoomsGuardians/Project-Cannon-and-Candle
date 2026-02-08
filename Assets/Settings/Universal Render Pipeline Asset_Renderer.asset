@@ -17,6 +17,21 @@ MonoBehaviour:
     shader: {fileID: 4800000, guid: f7399535f5a144f588321bf53197ca6d, type: 3}
     renderPassEvent: 550
     enableInSceneView: 0
+--- !u!114 &-6632898124925298658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69a19d29ef66464ea0afc7cd84fd6c2, type: 3}
+  m_Name: VolumetricFogRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  downsampleDepthShader: {fileID: 4800000, guid: cffeaeec0396a2c4dad475266cc8dfeb, type: 3}
+  volumetricFogShader: {fileID: 4800000, guid: 08f816187f9af0244a95556ee0cab83f, type: 3}
 --- !u!114 &-6234567890123456789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53,7 +68,8 @@ MonoBehaviour:
   - {fileID: 8849911736867365869}
   - {fileID: -6234567890123456789}
   - {fileID: -7879600206679962541}
-  m_RendererFeatureMap: ed238af9d533d17aeb7e223d895d7aa9530cbf245c09a692
+  - {fileID: -6632898124925298658}
+  m_RendererFeatureMap: ed238af9d533d17aeb7e223d895d7aa9530cbf245c09a6921e1879484c36f3a3
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
