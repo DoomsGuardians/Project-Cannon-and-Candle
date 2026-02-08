@@ -3722,7 +3722,7 @@ MonoBehaviour:
   txtPersonality: {fileID: 342118056095154983}
   txtPosition: {fileID: 2673908375604538110}
   sliderHP: {fileID: 8652265761646360674}
-  txtHP: {fileID: 7672809124236953509}
+  txtHP: {fileID: 7187555636707825939}
   txtStatus: {fileID: 7672809124236953509}
   trustArea: {fileID: 4254709529912001653}
   txtTrust: {fileID: 1663673754246108233}

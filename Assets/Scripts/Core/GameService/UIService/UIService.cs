@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -335,7 +334,15 @@ public class UIService : ILogic
     /// <returns>可见窗口列表</returns>
     public List<WindowBase> GetVisibleWindows()
     {
-        return windowList.Where(w => w.isVisible).ToList();
+        var result = new List<WindowBase>();
+        for (int i = 0; i < windowList.Count; i++)
+        {
+            if (windowList[i].isVisible)
+            {
+                result.Add(windowList[i]);
+            }
+        }
+        return result;
     }
 
     /// <summary>

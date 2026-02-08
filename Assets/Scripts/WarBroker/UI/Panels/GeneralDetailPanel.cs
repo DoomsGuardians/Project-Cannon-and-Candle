@@ -124,9 +124,11 @@ public class GeneralDetailPanel : WindowBase
         // 获取 TooltipPanel
         tooltipPanel = uIService.GetWindow<TooltipPanel>("TooltipPanel");
 
-        // 监听意图变化事件
+        // 监听数据变化事件
         eventService.AddEventListening((EventID)WarBrokerEventID.OnIntentChanged, OnIntentChanged);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTradeExecuted, OnDataChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleResult, OnDataChanged);
+        eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnDataChanged);
 
         RefreshUI();
     }

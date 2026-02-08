@@ -405,14 +405,4 @@ public class MusicPlayerManager : ManagerBase
     }
 
     #endregion
-
-    private void Update()
-    {
-        // 检测曲目是否播放完毕，自动切换下一首
-        if (isPlaying && audioService != null && musicConfig != null)
-        {
-            // 由于 AudioService 使用循环播放，这里不需要手动检测曲目结束
-            // 如果需要列表播放模式，可以在这里添加检测逻辑
-        }
-    }
 }

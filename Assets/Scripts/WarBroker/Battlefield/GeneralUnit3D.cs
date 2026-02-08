@@ -70,9 +70,16 @@ public class GeneralUnit3D : MonoBehaviour
     private bool useDynamicSoldiers = false;
     private OrderType? lastSoldierPose;
 
+    // 缓存引用
+    private Camera mainCamera;
+    private BattlefieldSceneController battlefieldController;
+
 
     private void Awake()
     {
+        // 缓存主相机引用
+        mainCamera = Camera.main;
+
         if (selectionIndicator != null)
             selectionIndicator.SetActive(false);
 
@@ -95,15 +102,14 @@ public class GeneralUnit3D : MonoBehaviour
         // 让意图气泡始终朝向相机（Billboard效果）
         if (intentBubbleCanvas != null && intentBubbleCanvas.gameObject.activeSelf)
         {
-            var cam = Camera.main;
-            if (cam != null)
+            if (mainCamera != null)
             {
-                intentBubbleCanvas.transform.rotation = cam.transform.rotation;
+                intentBubbleCanvas.transform.rotation = mainCamera.transform.rotation;
 
                 // 基于相机距离渐隐
                 if (intentBubbleCanvasGroup != null)
                 {
-                    float distance = Vector3.Distance(cam.transform.position, transform.position);
+                    float distance = Vector3.Distance(mainCamera.transform.position, transform.position);
                     float alpha = Mathf.InverseLerp(bubbleFadeEndDistance, bubbleFadeStartDistance, distance);
                     intentBubbleCanvasGroup.alpha = alpha;
                 }
@@ -186,6 +192,12 @@ public class GeneralUnit3D : MonoBehaviour
     {
         if (intentBubbleImage == null) return;
 
+        // 缓存 BattlefieldSceneController 引用
+        if (battlefieldController == null)
+        {
+            battlefieldController = FindObjectOfType<BattlefieldSceneController>();
+        }
+
         // 添加EventTrigger组件来处理点击
         var trigger = intentBubbleImage.gameObject.GetComponent<EventTrigger>();
         if (trigger == null)
@@ -206,8 +218,7 @@ public class GeneralUnit3D : MonoBehaviour
             if (inputService != null && !inputService.CanStartGameplayInput())
                 return;
 
-            var controller = FindObjectOfType<BattlefieldSceneController>();
-            controller?.OnGeneralClicked(this);
+            battlefieldController?.OnGeneralClicked(this);
         });
         trigger.triggers.Add(clickEntry);
 
@@ -300,30 +311,58 @@ public class GeneralUnit3D : MonoBehaviour
         }
     }
 
-    /// <summary>更新锡兵数量显示（直接使用Prefab中的锡兵实例）</summary>
+    /// <summary>更新锡兵数量显示（基于目标数量调整，保持动画后的状态一致性）</summary>
     private void UpdateSoldierCount(int troops)
     {
         if (soldierSlots == null) return;
 
         int targetCount = Mathf.Clamp(troops, 0, soldierSlots.Length);
 
+        // 统计当前激活的锡兵数量
+        int currentActiveCount = 0;
         for (int i = 0; i < soldierSlots.Length; i++)
         {
-            if (soldierSlots[i] == null) continue;
+            if (soldierSlots[i] != null && soldierSlots[i].gameObject.activeSelf)
+                currentActiveCount++;
+        }
 
-            var soldier = soldierSlots[i].gameObject;
-            bool shouldBeActive = i < targetCount;
+        // 如果当前激活数量与目标一致，不做任何修改（保持动画后的状态）
+        if (currentActiveCount == targetCount)
+        {
+            currentSoldierCount = targetCount;
+            return;
+        }
 
-            if (shouldBeActive && !soldier.activeSelf)
+        // 需要减少锡兵（隐藏多余的）
+        if (currentActiveCount > targetCount)
+        {
+            int toHide = currentActiveCount - targetCount;
+            // 从后往前隐藏激活的锡兵
+            for (int i = soldierSlots.Length - 1; i >= 0 && toHide > 0; i--)
             {
-                // 显示锡兵，重置状态
-                soldier.transform.localRotation = Quaternion.identity;
-                soldier.transform.localScale = Vector3.one;
-                soldier.SetActive(true);
+                if (soldierSlots[i] != null && soldierSlots[i].gameObject.activeSelf)
+                {
+                    soldierSlots[i].gameObject.SetActive(false);
+                    toHide--;
+                }
             }
-            else if (!shouldBeActive && soldier.activeSelf)
+        }
+        // 需要增加锡兵（显示更多）
+        else if (currentActiveCount < targetCount)
+        {
+            int toShow = targetCount - currentActiveCount;
+            // 从前往后显示未激活的锡兵
+            for (int i = 0; i < soldierSlots.Length && toShow > 0; i++)
             {
-                soldier.SetActive(false);
+                if (soldierSlots[i] != null && !soldierSlots[i].gameObject.activeSelf)
+                {
+                    var soldier = soldierSlots[i].gameObject;
+                    // 重置状态并显示
+                    soldier.transform.localRotation = Quaternion.identity;
+                    soldier.transform.localScale = Vector3.one;
+                    soldier.SetActive(true);
+                    toShow--;
+                }
             }
         }
 
@@ -826,6 +865,16 @@ public class GeneralUnit3D : MonoBehaviour
     {
         currentAnimation?.Kill();
         transform.DOKill();
+
+        // 清理 EventTrigger 监听器，防止内存泄漏
+        if (intentBubbleImage != null)
+        {
+            var trigger = intentBubbleImage.gameObject.GetComponent<EventTrigger>();
+            if (trigger != null)
+            {
+                trigger.triggers.Clear();
+            }
+        }
 
         // 停止所有锡兵的动画
         if (soldierSlots != null)

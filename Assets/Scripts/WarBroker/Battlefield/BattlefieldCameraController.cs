@@ -74,8 +74,14 @@ public class BattlefieldCameraController : MonoBehaviour
     // Lilliput 景深控制
     private LilliputController lilliputController;
 
+    // 缓存的主相机引用
+    private Camera mainCamera;
+
     private void Start()
     {
+        // 缓存主相机引用
+        mainCamera = Camera.main;
+
         if (GameRoot.Instance != null)
         {
             inputService = GameRoot.Instance.inputService;
@@ -170,7 +176,6 @@ public class BattlefieldCameraController : MonoBehaviour
         panTweener?.Kill();
 
         // 获取相机的水平朝向（忽略Y轴）
-        var mainCamera = Camera.main;
         if (mainCamera == null) return;
 
         Vector3 cameraForward = mainCamera.transform.forward;
@@ -574,7 +579,7 @@ public class BattlefieldCameraController : MonoBehaviour
     /// </summary>
     public float GetBlendDuration()
     {
-        var brain = Camera.main?.GetComponent<CinemachineBrain>();
+        var brain = mainCamera?.GetComponent<CinemachineBrain>();
         if (brain != null)
         {
             return brain.m_DefaultBlend.m_Time;

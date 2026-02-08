@@ -26,12 +26,18 @@ public class LilliputController : MonoBehaviour
     // 当前跟随的目标（Battle/FocusUnit 模式）
     private Transform focusTarget;
 
+    // 缓存的主相机引用
+    private Camera mainCamera;
+
     // 静态属性供渲染器读取
     public static float? DynamicFocusDistance { get; private set; }
 
     void Start()
     {
         cameraController = GetComponent<BattlefieldCameraController>();
+
+        // 缓存主相机引用
+        mainCamera = Camera.main;
 
         // 初始化焦点距离
         currentFocusDistance = 20f;
@@ -63,7 +69,6 @@ public class LilliputController : MonoBehaviour
 
     private void UpdateFocusDistance()
     {
-        var mainCamera = Camera.main;
         if (mainCamera == null) return;
 
         var currentMode = cameraController?.CurrentMode ?? BattlefieldCameraController.CameraMode.Battlefield;
@@ -72,7 +77,7 @@ public class LilliputController : MonoBehaviour
         {
             case BattlefieldCameraController.CameraMode.Battlefield:
                 // 鼠标射线与地面交点的距离
-                UpdateFromMouseRaycast(mainCamera);
+                UpdateFromMouseRaycast();
                 break;
 
             case BattlefieldCameraController.CameraMode.Battle:
@@ -86,12 +91,12 @@ public class LilliputController : MonoBehaviour
         }
     }
 
-    private void UpdateFromMouseRaycast(Camera camera)
+    private void UpdateFromMouseRaycast()
     {
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 500f, groundLayer))
         {
-            targetFocusDistance = Vector3.Distance(camera.transform.position, hit.point);
+            targetFocusDistance = Vector3.Distance(mainCamera.transform.position, hit.point);
         }
     }
 

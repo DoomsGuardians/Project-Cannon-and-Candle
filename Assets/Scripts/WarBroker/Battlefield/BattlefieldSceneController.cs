@@ -70,6 +70,9 @@ public class BattlefieldSceneController : MonoBehaviour
     private AudioService audioService;
     private GameBalanceConfig balanceConfig;
 
+    // 缓存的相机引用（避免每帧调用 Camera.main）
+    private Camera mainCamera;
+
     // 动画队列
     private Queue<BattleResult> animationQueue = new Queue<BattleResult>();
     private bool isPlayingAnimation = false;
@@ -106,6 +109,9 @@ public class BattlefieldSceneController : MonoBehaviour
 
     private void Start()
     {
+        // 缓存主相机引用
+        mainCamera = Camera.main;
+
         if (eventService != null)
         {
             eventService.AddEventListening((EventID)WarBrokerEventID.OnBattleResult, OnBattleResult);
@@ -126,14 +132,14 @@ public class BattlefieldSceneController : MonoBehaviour
     private void HandleUnitClick()
     {
         if (!Input.GetMouseButtonDown(0)) return;
-        if (Camera.main == null) return;
+        if (mainCamera == null) return;
 
         // 检查是否可以进行游戏输入
         var inputService = GameRoot.Instance?.inputService;
         if (inputService != null && !inputService.CanStartGameplayInput())
             return;
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
         {
             var unit = hit.collider.GetComponent<GeneralUnit3D>();
@@ -500,6 +506,12 @@ public class BattlefieldSceneController : MonoBehaviour
             totalBattlesInQueue = 0;
             currentBattleIndex = 0;
             OnAllAnimationsComplete?.Invoke();
+
+            // 相机返回默认视角（恢复战斗前位置）
+            if (battlefieldCamera != null)
+            {
+                battlefieldCamera.SmoothReturnToDefault(true);
+            }
 
             // 发送事件通知战斗动画播放完成
             eventService?.SendMessage((EventID)WarBrokerEventID.OnBattleAnimationsComplete, null, null);

@@ -40,17 +40,6 @@ MonoBehaviour:
   VictorInitialCash: 400
   VictorProfile: {fileID: 11400000, guid: 373e5c01c3159cc4fa9d6471b4dab230, type: 2}
   AvailableEvents:
-  - EventId: evt_plague
-    EventName: "\u761F\u75AB\u7206\u53D1"
-    Description: "\u8425\u4E2D\u7206\u53D1\u4E0D\u660E\u9AD8\u70ED\uFF0C\u60A3\u8005\u4E24\u65E5\u5373\u8870\u7AED\uFF0C\u4EE5\u81F4\u5175\u8425\u534A\u7A7A\u3002\u6B64\u654C\u975E\u706B\u67AA\u4E0E\u5200\u5251\u53EF\u6BD4\u3002\n\u519B\u4E2D\u761F\u75AB\u8513\u5EF6\uFF0C\u6240\u6709\u5C06\u519B\u5175\u529B-2\u3002"
-    Illustration: {fileID: 21300000, guid: 6f905e4ab3c93f845b8160025079fb28, type: 3}
-    ProductionModifier: -0.3
-    AtkDemandModifier: 0
-    DefDemandModifier: 0.3
-    RetDemandModifier: 0.2
-    AllTroopChange: -2
-    RandomTrustChange: 0
-    Duration: 2
   - EventId: evt_supply
     EventName: "\u8865\u7ED9\u7EBF\u7545\u901A"
     Description: "\u6218\u533A\u540E\u65B9\u8865\u7ED9\u52A8\u8109\u7545\u901A\u65E0\u963B\u3002\u7269\u8D44\u8F66\u961F\u5728\u62A4\u536B\u4E0B\u51C6\u65F6\u62B5\u8FBE\u5404\u6307\u5B9A\u5175\u7AD9\uFF0C\u524D\u7EBF\u58EB\u6C14\u4E0E\u706B\u529B\u7EF4\u6301\u7A33\u5B9A\u3002\n\u8FDB\u653B\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u63D0\u9AD8\u3002"
@@ -76,7 +65,7 @@ MonoBehaviour:
   - EventId: evt_ta_fortify
     EventName: "\u8425\u5792\u5EFA\u6210"
     Description: "\u534E\u4F26\u65AF\u5766\u4E0B\u4EE4\u4FEE\u7B51\u7684\u68F1\u5821\u9635\u5730\u7EC8\u4E8E\u5B8C\u5DE5\u2014\u2014\u5DE5\u5175\u4EEC\u5728\u9AD8\u5730\u4E0A\u6784\u5EFA\u4E86\u5B8C\u6574\u7684\u58D5\u6C9F\u548C\u70AE\u53F0\u4F53\u7CFB\u3002\u9632\u5B88\u4F18\u52BF\u663E\u8457\u589E\u5F3A\u3002"
-    Illustration: {fileID: 0}
+    Illustration: {fileID: 21300000, guid: a03b61c9a22db5d42a134b47cb05dfe3, type: 3}
     ProductionModifier: 0.2
     AtkDemandModifier: 0
     DefDemandModifier: 0.4
@@ -87,7 +76,7 @@ MonoBehaviour:
   - EventId: evt_ta_sortie
     EventName: "\u745E\u5178\u8BD5\u63A2\u6027\u8FDB\u653B"
     Description: "\u53E4\u65AF\u5854\u592B\u6D3E\u9063\u524D\u950B\u90E8\u961F\u8BD5\u63A2\u6211\u65B9\u9635\u5730\u3002\u867D\u7136\u89C4\u6A21\u4E0D\u5927\uFF0C\u4F46\u8FDB\u653B\u6307\u4EE4\u7684\u9700\u6C42\u5F00\u59CB\u4E0A\u5347\u3002"
-    Illustration: {fileID: 0}
+    Illustration: {fileID: 21300000, guid: 23b34bd279dee314b9fff542498e023c, type: 3}
     ProductionModifier: 0
     AtkDemandModifier: 0.3
     DefDemandModifier: 0.1

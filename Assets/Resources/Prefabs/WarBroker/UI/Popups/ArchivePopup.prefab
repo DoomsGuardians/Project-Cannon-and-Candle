@@ -245,7 +245,6 @@ MonoBehaviour:
   txtNoHistory: {fileID: 99096618633580669}
   btnClose: {fileID: 817919040556153214}
   btnClearData: {fileID: 3384375945965782552}
-  sfxEnter: {fileID: 8300000, guid: d4521aa227472164192e7437200a304d, type: 3}
 --- !u!1 &810928581623256634
 GameObject:
   m_ObjectHideFlags: 0

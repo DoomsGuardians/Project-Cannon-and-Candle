@@ -21,11 +21,11 @@ MonoBehaviour:
   IntroScriptName: 
   IntroScriptLabel: 
   MaxTurns: 60
-  InitialCash: 10000
+  InitialCash: 20000
   InitialAtkInventory: 0
   InitialDefInventory: 0
   InitialRetInventory: 0
-  InitialReserves: 45
+  InitialReserves: 100
   BattlefieldSceneName: Battle_004
   LaneCount: 5
   GridCount: 5
@@ -53,46 +53,13 @@ MonoBehaviour:
     GeneralId: bernhard
   - Position: 4
     GeneralId: gustav
-  VictorInitialCash: 14000
+  VictorInitialCash: 24000
   VictorProfile: {fileID: 11400000, guid: 9f965ddfeafd0834298b9884e26f38b0, type: 2}
   AvailableEvents:
-  - EventId: evt_plague
-    EventName: "\u761F\u75AB\u7206\u53D1"
-    Description: "\u8425\u4E2D\u7206\u53D1\u4E0D\u660E\u9AD8\u70ED\uFF0C\u60A3\u8005\u4E24\u65E5\u5373\u8870\u7AED\uFF0C\u4EE5\u81F4\u5175\u8425\u534A\u7A7A\u3002\u6B64\u654C\u975E\u706B\u67AA\u4E0E\u5200\u5251\u53EF\u6BD4\u3002\n\u519B\u4E2D\u761F\u75AB\u8513\u5EF6\uFF0C\u6240\u6709\u5C06\u519B\u5175\u529B-2\u3002"
-    Illustration: {fileID: 21300000, guid: 6f905e4ab3c93f845b8160025079fb28, type: 3}
-    ProductionModifier: -0.3
-    AtkDemandModifier: 0
-    DefDemandModifier: 0.3
-    RetDemandModifier: 0.2
-    AllTroopChange: -2
-    RandomTrustChange: 0
-    Duration: 2
-  - EventId: evt_supply
-    EventName: "\u8865\u7ED9\u7EBF\u7545\u901A"
-    Description: "\u6218\u533A\u540E\u65B9\u8865\u7ED9\u52A8\u8109\u7545\u901A\u65E0\u963B\u3002\u7269\u8D44\u8F66\u961F\u5728\u62A4\u536B\u4E0B\u51C6\u65F6\u62B5\u8FBE\u5404\u6307\u5B9A\u5175\u7AD9\uFF0C\u524D\u7EBF\u58EB\u6C14\u4E0E\u706B\u529B\u7EF4\u6301\u7A33\u5B9A\u3002\n\u8FDB\u653B\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u63D0\u9AD8\u3002"
-    Illustration: {fileID: 21300000, guid: 2be0dac92af4c094da1fdfec8a6a6b59, type: 3}
-    ProductionModifier: 0.5
-    AtkDemandModifier: 0.2
-    DefDemandModifier: 0
-    RetDemandModifier: 0
-    AllTroopChange: 0
-    RandomTrustChange: 10
-    Duration: 1
-  - EventId: evt_supply_raid
-    EventName: "\u8865\u7ED9\u7EBF\u9047\u9669"
-    Description: "\u804C\u90E8\u786E\u8BA4\u8865\u7ED9\u7EBF\u5728\u6218\u533A\u540E\u65B9\u906D\u7A81\u88AD\uFF0C\u5173\u952E\u7269\u8D44\u635F\u5931\uFF0C\u5907\u7528\u8DEF\u7EBF\u762B\u75EA\u3002\u524D\u7EBF\u90E8\u961F\u65AD\u7CAE\u5728\u5373\u3002\n\u9632\u5B88\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u964D\u4F4E\u3002"
-    Illustration: {fileID: 21300000, guid: 6e7592d1f33631d47a04d161077cf94b, type: 3}
-    ProductionModifier: -1
-    AtkDemandModifier: 0
-    DefDemandModifier: 0.2
-    RetDemandModifier: 0
-    AllTroopChange: 0
-    RandomTrustChange: -10
-    Duration: 4
   - EventId: evt_l_fog
     EventName: "\u6D53\u96FE\u964D\u4E34"
     Description: "\u5341\u4E00\u6708\u7684\u6668\u96FE\u5C06\u6574\u4E2A\u6218\u573A\u7B3C\u7F69\u5728\u767D\u5E55\u4E4B\u4E2D\u3002\u4E94\u5341\u6B65\u5916\u4EBA\u5F71\u6A21\u7CCA\uFF0C\u53CB\u519B\u4E0E\u654C\u519B\u5DF2\u65E0\u6CD5\u5206\u8FA8\u3002\u6218\u672F\u90E8\u7F72\u7686\u6210\u7A7A\u8C08\u3002"
-    Illustration: {fileID: 0}
+    Illustration: {fileID: 21300000, guid: 6f905e4ab3c93f845b8160025079fb28, type: 3}
     ProductionModifier: 0
     AtkDemandModifier: 0.15
     DefDemandModifier: 0.15
@@ -103,7 +70,7 @@ MonoBehaviour:
   - EventId: evt_l_pappenheim
     EventName: "\u5E15\u672C\u6D77\u59C6\u9A70\u63F4"
     Description: "\u5E15\u672C\u6D77\u59C6\u5C06\u519B\u7684\u91CD\u9A91\u5175\u7EC8\u4E8E\u8D76\u5230\u6218\u573A\uFF01\u9ED1\u7532\u94C1\u9A91\u4ECE\u4FA7\u7FFC\u51B2\u5165\u745E\u5178\u9635\u7EBF\uFF0C\u53F7\u89D2\u58F0\u4E2D\u5927\u5730\u9707\u98A4\u3002\u6218\u5C40\u77AC\u95F4\u9006\u8F6C\uFF01"
-    Illustration: {fileID: 0}
+    Illustration: {fileID: 21300000, guid: c24bdbb9f61cd9d46a9452c62e360b7d, type: 3}
     ProductionModifier: 0.5
     AtkDemandModifier: 0.6
     DefDemandModifier: -0.2
@@ -114,7 +81,7 @@ MonoBehaviour:
   - EventId: evt_l_kingfall
     EventName: "\u56FD\u738B\u9635\u4EA1\u7684\u4F20\u95FB"
     Description: "\u6D53\u96FE\u4E2D\u4F20\u6765\u9707\u60CA\u6D88\u606F\u2014\u2014\u6709\u4EBA\u58F0\u79F0\u4EB2\u773C\u770B\u5230\u745E\u5178\u56FD\u738B\u4ECE\u9A6C\u4E0A\u6454\u843D\uFF0C\u88AB\u706B\u67AA\u51FB\u4E2D\uFF01\u745E\u5178\u9635\u7EBF\u4E00\u7247\u6DF7\u4E71\u2026\u2026\u4F46\u4F20\u95FB\u672A\u7ECF\u8BC1\u5B9E\u3002"
-    Illustration: {fileID: 0}
+    Illustration: {fileID: 21300000, guid: 23b34bd279dee314b9fff542498e023c, type: 3}
     ProductionModifier: 0
     AtkDemandModifier: 0.2
     DefDemandModifier: 0
@@ -125,7 +92,7 @@ MonoBehaviour:
   - EventId: evt_l_counter
     EventName: "\u745E\u5178\u7EDD\u6B7B\u53CD\u6251"
     Description: "'\u4E3A\u56FD\u738B\u590D\u4EC7\uFF01'\u2014\u2014\u745E\u5178\u5168\u519B\u7206\u53D1\u51FA\u75AF\u72C2\u7684\u6218\u610F\u3002\u5931\u53BB\u6307\u6325\u5B98\u53CD\u800C\u8BA9\u4ED6\u4EEC\u53D8\u6210\u4E0D\u987E\u4E00\u5207\u7684\u6740\u622E\u673A\u5668\u3002\u524D\u7EBF\u538B\u529B\u9AA4\u589E\u3002"
-    Illustration: {fileID: 0}
+    Illustration: {fileID: 21300000, guid: 74a27697f6f5aa34683e5fffaf62fa4a, type: 3}
     ProductionModifier: -0.3
     AtkDemandModifier: 0.3
     DefDemandModifier: 0.4
