@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefaultDuration: 0.35
   DefaultEasing: 1
-  AutoShowOnModify: 1
+  AutoShowOnModify: 0
   SceneOrigin: {x: 0.5, y: 0}
   ZOffset: 50
   ZStep: 0.1

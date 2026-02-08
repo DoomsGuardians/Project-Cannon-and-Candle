@@ -11,6 +11,7 @@ public class InfoPanel : WindowBase
 {
     private TMP_Text txtMarketIntel, txtBattleIntel, txtAllyIntel, txtEnemyIntel, txtBattleHistory;
     private KLineChartView chartAtk, chartDef, chartRet;
+    private Button btnClose;
     private GameplayManager gameplayManager;
     private UITextConfig textConfig;
     private GameBalanceConfig balanceConfig;
@@ -82,6 +83,9 @@ public class InfoPanel : WindowBase
             chartAtk = b.chartAtk;
             chartDef = b.chartDef;
             chartRet = b.chartRet;
+
+            // 关闭按钮
+            btnClose = b.btnClose;
         }
 
         InitializeCharts();
@@ -108,6 +112,8 @@ public class InfoPanel : WindowBase
 
     public override void OnShow()
     {
+        AddButtonListener(btnClose, OnClose);
+
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnStart, OnRefresh);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTurnEnd, OnRefresh);
         eventService.AddEventListening((EventID)WarBrokerEventID.OnTradeExecuted, OnRefresh);
@@ -736,4 +742,9 @@ public class InfoPanel : WindowBase
     }
 
     private void OnRefresh(object p1, object p2) => RefreshUI();
+
+    private void OnClose()
+    {
+        uIService.HideWindow(Name);
+    }
 }

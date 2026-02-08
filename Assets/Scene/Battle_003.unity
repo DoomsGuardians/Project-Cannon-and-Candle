@@ -10170,8 +10170,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 331130633}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.26923874, y: -0.35395786, z: 0.10716984, w: 0.8892351}
-  m_LocalPosition: {x: 23.30818, y: 13.457777, z: -32.796856}
+  m_LocalRotation: {x: 0.29380757, y: -0.35084772, z: 0.11694924, w: 0.8814227}
+  m_LocalPosition: {x: 26.74424, y: 18.457777, z: -36.429142}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10563,8 +10563,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 586360558}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.18910757, y: -0.000000002452785, z: 4.7236476e-10, w: 0.9819564}
-  m_LocalPosition: {x: 0, y: 10, z: -25}
+  m_LocalRotation: {x: 0.2669336, y: 0.000000012153612, z: -0.0000000033663554, w: 0.96371496}
+  m_LocalPosition: {x: 0, y: 15, z: -25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -26186,9 +26186,9 @@ MonoBehaviour:
   rotateSpeed: 1
   minPitch: 10
   maxPitch: 80
-  zoomSpeed: 0.015
+  zoomSpeed: 0.02
   minZoom: 2
-  maxZoom: 15
+  maxZoom: 30
   panSpeed: 35
   panLimitX: {x: -40, y: 40}
   panLimitZ: {x: -40, y: 40}
@@ -26697,7 +26697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 1
-  m_FollowOffset: {x: 0, y: 10, z: -15}
+  m_FollowOffset: {x: 0, y: 15, z: -20}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -26809,8 +26809,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1564400179}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2692387, y: -0.35395783, z: 0.10716979, w: 0.88923514}
-  m_LocalPosition: {x: 23.30818, y: 13.457777, z: -32.796856}
+  m_LocalRotation: {x: 0.29380754, y: -0.3508477, z: 0.11694918, w: 0.8814227}
+  m_LocalPosition: {x: 26.74424, y: 18.457777, z: -36.429142}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -32394,7 +32394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 10, z: -25}
+  m_FollowOffset: {x: 0, y: 15, z: -25}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1

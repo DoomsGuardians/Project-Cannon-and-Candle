@@ -32,5 +32,9 @@ MonoBehaviour:
     Mood: 4
   - Clip: {fileID: 8300000, guid: a17f892d93fa50f48b2f7d7eaf4c78f5, type: 3}
     Mood: 3
+  - Clip: {fileID: 8300000, guid: fe0a577270728f841bb7463659e1c094, type: 3}
+    Mood: 1
+  - Clip: {fileID: 8300000, guid: 215520298fb55214f98abbc625e086dd, type: 3}
+    Mood: 2
   DefaultMood: 0
   CrossfadeDuration: 1

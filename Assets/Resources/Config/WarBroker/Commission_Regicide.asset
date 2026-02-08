@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
+  m_Name: Commission_Regicide
+  m_EditorClassIdentifier:
+  CommissionId: Regicide
+  DisplayName: 弑王棋局
+  Description: 双方总伤亡达到180单位
+  CommissionerName: 红衣主教黎塞留
+  CommissionerAvatar: {fileID: 21300000, guid: a0139e59470174548b00f25c712b0567, type: 3}
+  CommissionerQuote: "让这战场成为无差别的绞肉机。帝国与新教最精锐的军团必须在那里彼此耗尽最后一滴血——当两把最锋利的剑一同折断，欧洲的新秩序将从尸堆上升起。"
+  BonusAmount: 12000
+  Type: 3
+  TargetValue: 180
+  SecondaryTargetValue: 0
+  NaninovelScriptName:

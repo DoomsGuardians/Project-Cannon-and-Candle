@@ -14,18 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CampaignId: Campaign_002
   CampaignName: "\u6C83\u5C14\u52A0\u65AF\u7279\u6218\u5F79"
-  Description: "1628\u5E74\u7684\u6C83\u5C14\u52A0\u65AF\u7279\u6218\u5F79\u662F\u534E\u4F26\u65AF\u5766\u519B\u4E8B\u751F\u6DAF\u7684\u5173\u952E\u80DC\u5229\u3002\u4F5C\u4E3A\u5E1D\u56FD\u519B\u961F\u603B\u53F8\u4EE4\uFF0C\u4ED6\u6307\u6325\u90E8\u961F\u5728\u6B64\u5F7B\u5E95\u51FB\u8D25\u4E86\u4E39\u9EA6\u56FD\u738B\u514B\u91CC\u65AF\u8482\u5B89\u56DB\u4E16\u7684\u519B\u961F\u3002\u6B64\u5F79\u76F4\u63A5\u5BFC\u81F4\u4E86\u4E39\u9EA6\u9000\u51FA\u4E09\u5341\u5E74\u6218\u4E89\uFF0C\u5E76\u6781\u5927\u5730\u5DE9\u56FA\u4E86\u534E\u4F26\u65AF\u5766\u4E2A\u4EBA\u7684\u6743\u52BF\u4E0E\u58F0\u671B\uFF0C\u4E3A\u5176\u65E5\u540E\u664B\u5347\u201C\u6CE2\u7F57\u7684\u6D77\u5C06\u519B\u201D\u5960\u5B9A\u4E86\u57FA\u7840\u3002"
+  Description: "1628\u5E74\u7684\u6C83\u5C14\u52A0\u65AF\u7279\u6218\u5F79\u662F\u534E\u4F26\u65AF\u5766\u519B\u4E8B\u751F\u6DAF\u7684\u5173\u952E\u80DC\u5229\u3002\u4F5C\u4E3A\u5E1D\u56FD\u519B\u961F\u603B\u53F8\u4EE4\uFF0C\u4ED6\u6307\u6325\u90E8\u961F\u5728\u6B64\u5F7B\u5E95\u51FB\u8D25\u4E86\u4E39\u9EA6\u56FD\u738B\u514B\u91CC\u65AF\u8482\u5B89\u56DB\u4E16\u7684\u519B\u961F\u3002\u6B64\u5F79\u76F4\u63A5\u5BFC\u81F4\u4E86\u4E39\u9EA6\u9000\u51FA\u4E09\u5341\u5E74\u6218\u4E89\uFF0C\u5E76\u6781\u5927\u5730\u5DE9\u56FA\u4E86\u534E\u4F26\u65AF\u5766\u4E2A\u4EBA\u7684\u6743\u52BF\u4E0E\u58F0\u671B\uFF0C\u4E3A\u5176\u65E5\u540E\u664B\u5347\"\u6CE2\u7F57\u7684\u6D77\u5C06\u519B\"\u5960\u5B9A\u4E86\u57FA\u7840\u3002"
   Thumbnail: {fileID: 21300000, guid: 5c815a91e07790241a31cd8f1b557cbc, type: 3}
-  TicketPrice: 2000
+  TicketPrice: 3000
   IsTutorial: 0
   IntroScriptName: 
   IntroScriptLabel: 
-  MaxTurns: 60
+  MaxTurns: 45
   InitialCash: 2000
   InitialAtkInventory: 1
-  InitialDefInventory: 1
+  InitialDefInventory: 2
   InitialRetInventory: 1
-  InitialReserves: 60
+  InitialReserves: 50
   BattlefieldSceneName: Battle_002
   LaneCount: 3
   GridCount: 5
@@ -45,14 +45,14 @@ MonoBehaviour:
     GeneralId: johan
   - Position: 4
     GeneralId: axel
-  VictorInitialCash: 1000
+  VictorInitialCash: 3000
   VictorProfile: {fileID: 11400000, guid: e40085894468c3847b88ddd0d10b2772, type: 2}
   AvailableEvents:
   - EventId: evt_plague
     EventName: "\u761F\u75AB\u7206\u53D1"
     Description: "\u8425\u4E2D\u7206\u53D1\u4E0D\u660E\u9AD8\u70ED\uFF0C\u60A3\u8005\u4E24\u65E5\u5373\u8870\u7AED\uFF0C\u4EE5\u81F4\u5175\u8425\u534A\u7A7A\u3002\u6B64\u654C\u975E\u706B\u67AA\u4E0E\u5200\u5251\u53EF\u6BD4\u3002\n\u519B\u4E2D\u761F\u75AB\u8513\u5EF6\uFF0C\u6240\u6709\u5C06\u519B\u5175\u529B-2\u3002"
     Illustration: {fileID: 21300000, guid: 6f905e4ab3c93f845b8160025079fb28, type: 3}
-    ProductionModifier: 0
+    ProductionModifier: -0.3
     AtkDemandModifier: 0
     DefDemandModifier: 0.3
     RetDemandModifier: 0.2
@@ -61,7 +61,7 @@ MonoBehaviour:
     Duration: 2
   - EventId: evt_supply
     EventName: "\u8865\u7ED9\u7EBF\u7545\u901A"
-    Description: "\u6218\u533A\u540E\u65B9\u8865\u7ED9\u52A8\u8109\u7545\u901A\u65E0\u963B\u3002\u7269\u8D44\u8F66\u961F\u5728\u62A4\u536B\u4E0B\u51C6\u65F6\u62B5\u8FBE\u5404\u6307\u5B9A\u5175\u7AD9\uFF0C\u524D\u7EBF\u58EB\u6C14\u4E0E\u706B\u529B\u7EF4\u6301\u7A33\u5B9A\u3002\u6211\u519B\u751F\u547D\u7EBF\u5F3A\u97E7\u3002\n\u8FDB\u653B\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u63D0\u9AD8\u3002"
+    Description: "\u6218\u533A\u540E\u65B9\u8865\u7ED9\u52A8\u8109\u7545\u901A\u65E0\u963B\u3002\u7269\u8D44\u8F66\u961F\u5728\u62A4\u536B\u4E0B\u51C6\u65F6\u62B5\u8FBE\u5404\u6307\u5B9A\u5175\u7AD9\uFF0C\u524D\u7EBF\u58EB\u6C14\u4E0E\u706B\u529B\u7EF4\u6301\u7A33\u5B9A\u3002\n\u8FDB\u653B\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u63D0\u9AD8\u3002"
     Illustration: {fileID: 21300000, guid: 2be0dac92af4c094da1fdfec8a6a6b59, type: 3}
     ProductionModifier: 0.5
     AtkDemandModifier: 0.2
@@ -70,7 +70,7 @@ MonoBehaviour:
     AllTroopChange: 0
     RandomTrustChange: 10
     Duration: 1
-  - EventId: evt_morale_boost
+  - EventId: evt_supply_raid
     EventName: "\u8865\u7ED9\u7EBF\u9047\u9669"
     Description: "\u804C\u90E8\u786E\u8BA4\u8865\u7ED9\u7EBF\u5728\u6218\u533A\u540E\u65B9\u906D\u7A81\u88AD\uFF0C\u5173\u952E\u7269\u8D44\u635F\u5931\uFF0C\u5907\u7528\u8DEF\u7EBF\u762B\u75EA\u3002\u524D\u7EBF\u90E8\u961F\u65AD\u7CAE\u5728\u5373\u3002\n\u9632\u5B88\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u964D\u4F4E\u3002"
     Illustration: {fileID: 21300000, guid: 6e7592d1f33631d47a04d161077cf94b, type: 3}
@@ -81,6 +81,40 @@ MonoBehaviour:
     AllTroopChange: 0
     RandomTrustChange: -10
     Duration: 4
+  - EventId: evt_w_navy
+    EventName: "\u4E39\u9EA6\u8230\u961F\u5C01\u9501"
+    Description: "\u514B\u91CC\u65AF\u8482\u5B89\u56DB\u4E16\u7684\u6218\u8230\u5C01\u9501\u4E86\u6CE2\u7F57\u7684\u6D77\u6CBF\u5CB8\u2014\u2014\u6240\u6709\u6D77\u8DEF\u519B\u9700\u8FD0\u8F93\u4E2D\u65AD\u3002\u9646\u8DEF\u8865\u7ED9\u5C1A\u53EF\u7EF4\u6301\uFF0C\u4F46\u6210\u672C\u7FFB\u500D\u3002"
+    Illustration: {fileID: 0}
+    ProductionModifier: -0.8
+    AtkDemandModifier: 0.1
+    DefDemandModifier: 0.1
+    RetDemandModifier: 0.1
+    AllTroopChange: 0
+    RandomTrustChange: -5
+    Duration: 3
+  - EventId: evt_w_tide
+    EventName: "\u6F6E\u6C50\u6709\u5229"
+    Description: "\u9000\u6F6E\u66B4\u9732\u4E86\u6CBF\u6D77\u6D45\u6EE9\u2014\u2014\u4E00\u6761\u610F\u6599\u4E4B\u5916\u7684\u6E21\u6CB3\u70B9\u3002\u5E1D\u56FD\u9A91\u5175\u53EF\u4EE5\u7ED5\u8FC7\u4E39\u9EA6\u4EBA\u7684\u6B63\u9762\u9632\u7EBF\u53D1\u8D77\u7A81\u88AD\u3002"
+    Illustration: {fileID: 0}
+    ProductionModifier: 0
+    AtkDemandModifier: 0.5
+    DefDemandModifier: -0.1
+    RetDemandModifier: 0
+    AllTroopChange: 0
+    RandomTrustChange: 10
+    Duration: 1
+  - EventId: evt_w_winter
+    EventName: "\u5BD2\u6F6E\u6765\u88AD"
+    Description: "\u6CE2\u7F57\u7684\u6D77\u7684\u5317\u98CE\u63D0\u524D\u5357\u4E0B\u3002\u58EB\u5175\u4EEC\u5728\u58D5\u6C9F\u91CC\u745F\u745F\u53D1\u6296\uFF0C\u51BB\u4F24\u7684\u624B\u8FDE\u6273\u673A\u90FD\u6263\u4E0D\u4F4F\u3002\u6BCF\u4E2A\u56DE\u5408\u90FD\u5728\u5931\u53BB\u4EBA\u3002"
+    Illustration: {fileID: 0}
+    ProductionModifier: -0.4
+    AtkDemandModifier: -0.2
+    DefDemandModifier: 0
+    RetDemandModifier: 0.3
+    AllTroopChange: -1
+    RandomTrustChange: -5
+    Duration: 3
   Commissions:
-  - {fileID: 11400000, guid: 220be6319dc547b46bf1ec6f157246bd, type: 2}
-  - {fileID: 11400000, guid: f2b95a920d7099d469ebe5993aa2073d, type: 2}
+  - {fileID: 11400000, guid: a1b2c3d4e5f600010000000000000021, type: 2}
+  - {fileID: 11400000, guid: a1b2c3d4e5f600010000000000000022, type: 2}
+  - {fileID: 11400000, guid: a1b2c3d4e5f600010000000000000023, type: 2}

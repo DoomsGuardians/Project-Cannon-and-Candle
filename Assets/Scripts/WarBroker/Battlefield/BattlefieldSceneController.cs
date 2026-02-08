@@ -501,12 +501,6 @@ public class BattlefieldSceneController : MonoBehaviour
             currentBattleIndex = 0;
             OnAllAnimationsComplete?.Invoke();
 
-            // 平滑返回默认视角，恢复战斗前位置
-            if (battlefieldCamera != null)
-            {
-                battlefieldCamera.SmoothReturnToDefault(restorePreBattlePosition: true);
-            }
-
             // 发送事件通知战斗动画播放完成
             eventService?.SendMessage((EventID)WarBrokerEventID.OnBattleAnimationsComplete, null, null);
             return;

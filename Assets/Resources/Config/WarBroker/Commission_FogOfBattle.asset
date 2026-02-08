@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
+  m_Name: Commission_FogOfBattle
+  m_EditorClassIdentifier:
+  CommissionId: FogOfBattle
+  DisplayName: 雾中决战
+  Description: 至少2条战线推进至敌方大本营（Grid 5）
+  CommissionerName: 斐迪南二世
+  CommissionerAvatar: {fileID: 21300000, guid: 94647991a64cb7846b609d5aed4b7cc4, type: 3}
+  CommissionerQuote: "北方雄狮就在对面——这是一劳永逸的机会。不惜一切代价，两条战线以上必须突入敌营！"
+  BonusAmount: 8000
+  Type: 0
+  TargetValue: 5
+  SecondaryTargetValue: 2
+  NaninovelScriptName:

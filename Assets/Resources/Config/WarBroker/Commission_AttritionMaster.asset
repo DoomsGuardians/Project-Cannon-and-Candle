@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
+  m_Name: Commission_AttritionMaster
+  m_EditorClassIdentifier:
+  CommissionId: AttritionMaster
+  DisplayName: 消耗战大师
+  Description: 双方总伤亡达到120单位
+  CommissionerName: 蒂利伯爵
+  CommissionerAvatar: {fileID: 21300000, guid: f57dbc987d02ccf48a1965ea6a4e058a, type: 3}
+  CommissionerQuote: "瑞典人的补给线比肠子还脆。不急着打——让饥饿和疾病替我们作战。等他们的骨头都碎了，论功行赏。"
+  BonusAmount: 4500
+  Type: 3
+  TargetValue: 120
+  SecondaryTargetValue: 0
+  NaninovelScriptName:

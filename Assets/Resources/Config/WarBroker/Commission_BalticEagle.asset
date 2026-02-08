@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
+  m_Name: Commission_BalticEagle
+  m_EditorClassIdentifier:
+  CommissionId: BalticEagle
+  DisplayName: 波罗的海之鹰
+  Description: 至少2条战线推进至Grid 4以上
+  CommissionerName: 斐迪南二世
+  CommissionerAvatar: {fileID: 21300000, guid: 94647991a64cb7846b609d5aed4b7cc4, type: 3}
+  CommissionerQuote: "丹麦人的舰队仍在波罗的海耀武扬威——朕需要你打开通往海岸的道路。至少两条战线推进到前哨！"
+  BonusAmount: 2500
+  Type: 0
+  TargetValue: 4
+  SecondaryTargetValue: 2
+  NaninovelScriptName:

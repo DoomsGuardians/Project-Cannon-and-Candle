@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
+  m_Name: Commission_TradeGuardian
+  m_EditorClassIdentifier:
+  CommissionId: TradeGuardian
+  DisplayName: 商路守护者
+  Description: 不让任何敌将推进至Grid 2（守住后方商路）
+  CommissionerName: 乔瓦尼·巴蒂斯塔·塞尼
+  CommissionerAvatar: {fileID: 21300000, guid: e22e2c22d1836154b99f9e1d563e5189, type: 3}
+  CommissionerQuote: "战争拖得越久，北方贸易就越萧条。别让敌人打到我们的港口——保住后方，酬金翻倍。"
+  BonusAmount: 1500
+  Type: 2
+  TargetValue: 2
+  SecondaryTargetValue: 0
+  NaninovelScriptName:

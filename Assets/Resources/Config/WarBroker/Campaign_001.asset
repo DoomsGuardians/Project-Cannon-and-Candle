@@ -16,16 +16,16 @@ MonoBehaviour:
   CampaignName: "\u7EB3\u5FB7\u6797\u6839\u6218\u5F79"
   Description: "1634\u5E74\u7EB3\u5FB7\u6797\u6839\u6218\u5F79\u65F6\uFF0C\u534E\u4F26\u65AF\u5766\u867D\u5DF2\u9047\u523A\u8EAB\u4EA1\uFF0C\u4F46\u4ED6\u751F\u524D\u6269\u5EFA\u7684\u5E1D\u56FD\u519B\u4F53\u7CFB\u4ECD\u662F\u6838\u5FC3\u3002\u5E1D\u56FD\u4E0E\u897F\u73ED\u7259\u8054\u519B\u51ED\u501F\u9AD8\u5730\u5DE5\u4E8B\uFF0C\u5F7B\u5E95\u51FB\u6E83\u4E86\u745E\u5178\u7CBE\u9510\u7684\u591A\u6B21\u51B2\u950B\u3002\u6B64\u5F79\u4EE5\u5929\u4E3B\u6559\u9635\u8425\u5B8C\u80DC\u544A\u7EC8\uFF0C\u745E\u5178\u52BF\u529B\u88AB\u8FEB\u64A4\u51FA\u5357\u5FB7\uFF0C\u6218\u5C40\u4ECE\u6B64\u7531\u745E\u5178\u4E3B\u5BFC\u8F6C\u4E3A\u6CD5\u745E\u540C\u76DF\u9636\u6BB5\u3002"
   Thumbnail: {fileID: 21300000, guid: d867fde5a9bdc2340a2da0e35fa5d988, type: 3}
-  TicketPrice: 1000
+  TicketPrice: 1500
   IsTutorial: 0
   IntroScriptName: 
   IntroScriptLabel: 
-  MaxTurns: 50
-  InitialCash: 1000
-  InitialAtkInventory: 1
+  MaxTurns: 45
+  InitialCash: 1500
+  InitialAtkInventory: 2
   InitialDefInventory: 1
   InitialRetInventory: 1
-  InitialReserves: 60
+  InitialReserves: 55
   BattlefieldSceneName: Battle_001
   LaneCount: 3
   GridCount: 5
@@ -45,14 +45,14 @@ MonoBehaviour:
     GeneralId: gustav
   - Position: 4
     GeneralId: axel
-  VictorInitialCash: 2000
+  VictorInitialCash: 1500
   VictorProfile: {fileID: 11400000, guid: e40085894468c3847b88ddd0d10b2772, type: 2}
   AvailableEvents:
   - EventId: evt_plague
     EventName: "\u761F\u75AB\u7206\u53D1"
     Description: "\u8425\u4E2D\u7206\u53D1\u4E0D\u660E\u9AD8\u70ED\uFF0C\u60A3\u8005\u4E24\u65E5\u5373\u8870\u7AED\uFF0C\u4EE5\u81F4\u5175\u8425\u534A\u7A7A\u3002\u6B64\u654C\u975E\u706B\u67AA\u4E0E\u5200\u5251\u53EF\u6BD4\u3002\n\u519B\u4E2D\u761F\u75AB\u8513\u5EF6\uFF0C\u6240\u6709\u5C06\u519B\u5175\u529B-2\u3002"
     Illustration: {fileID: 21300000, guid: 6f905e4ab3c93f845b8160025079fb28, type: 3}
-    ProductionModifier: 0
+    ProductionModifier: -0.3
     AtkDemandModifier: 0
     DefDemandModifier: 0.3
     RetDemandModifier: 0.2
@@ -61,7 +61,7 @@ MonoBehaviour:
     Duration: 2
   - EventId: evt_supply
     EventName: "\u8865\u7ED9\u7EBF\u7545\u901A"
-    Description: "\u6218\u533A\u540E\u65B9\u8865\u7ED9\u52A8\u8109\u7545\u901A\u65E0\u963B\u3002\u7269\u8D44\u8F66\u961F\u5728\u62A4\u536B\u4E0B\u51C6\u65F6\u62B5\u8FBE\u5404\u6307\u5B9A\u5175\u7AD9\uFF0C\u524D\u7EBF\u58EB\u6C14\u4E0E\u706B\u529B\u7EF4\u6301\u7A33\u5B9A\u3002\u6211\u519B\u751F\u547D\u7EBF\u5F3A\u97E7\u3002\n\u8FDB\u653B\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u63D0\u9AD8\u3002"
+    Description: "\u6218\u533A\u540E\u65B9\u8865\u7ED9\u52A8\u8109\u7545\u901A\u65E0\u963B\u3002\u7269\u8D44\u8F66\u961F\u5728\u62A4\u536B\u4E0B\u51C6\u65F6\u62B5\u8FBE\u5404\u6307\u5B9A\u5175\u7AD9\uFF0C\u524D\u7EBF\u58EB\u6C14\u4E0E\u706B\u529B\u7EF4\u6301\u7A33\u5B9A\u3002\n\u8FDB\u653B\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u63D0\u9AD8\u3002"
     Illustration: {fileID: 21300000, guid: 2be0dac92af4c094da1fdfec8a6a6b59, type: 3}
     ProductionModifier: 0.5
     AtkDemandModifier: 0.2
@@ -70,7 +70,7 @@ MonoBehaviour:
     AllTroopChange: 0
     RandomTrustChange: 10
     Duration: 1
-  - EventId: evt_morale_boost
+  - EventId: evt_supply_raid
     EventName: "\u8865\u7ED9\u7EBF\u9047\u9669"
     Description: "\u804C\u90E8\u786E\u8BA4\u8865\u7ED9\u7EBF\u5728\u6218\u533A\u540E\u65B9\u906D\u7A81\u88AD\uFF0C\u5173\u952E\u7269\u8D44\u635F\u5931\uFF0C\u5907\u7528\u8DEF\u7EBF\u762B\u75EA\u3002\u524D\u7EBF\u90E8\u961F\u65AD\u7CAE\u5728\u5373\u3002\n\u9632\u5B88\u6307\u4EE4\u9700\u6C42\u91CF\u589E\u5927\uFF0C\u968F\u673A\u5C06\u9886\u4FE1\u4EFB\u964D\u4F4E\u3002"
     Illustration: {fileID: 21300000, guid: 6e7592d1f33631d47a04d161077cf94b, type: 3}
@@ -81,6 +81,40 @@ MonoBehaviour:
     AllTroopChange: 0
     RandomTrustChange: -10
     Duration: 4
+  - EventId: evt_n_spanish
+    EventName: "\u897F\u73ED\u7259\u63F4\u519B\u62B5\u8FBE"
+    Description: "\u6765\u81EA\u7C73\u5170\u7684\u6377\u62A5\u2014\u2014\u67A2\u673A\u4E3B\u6559\u56E0\u51E1\u7279\u7684\u897F\u73ED\u7259\u65B9\u9635\u5DF2\u7A7F\u8D8A\u963F\u5C14\u5351\u65AF\u3002\u4E00\u4E07\u4E94\u5343\u540D\u94C1\u7532\u6B65\u5175\u6B63\u5728\u96C6\u7ED3\uFF0C\u5168\u519B\u58EB\u6C14\u5927\u632F\u3002"
+    Illustration: {fileID: 0}
+    ProductionModifier: 0.3
+    AtkDemandModifier: 0.4
+    DefDemandModifier: -0.1
+    RetDemandModifier: -0.1
+    AllTroopChange: 2
+    RandomTrustChange: 15
+    Duration: 2
+  - EventId: evt_n_highland
+    EventName: "\u9AD8\u5730\u4E89\u593A\u6218"
+    Description: "\u745E\u5178\u524D\u950B\u5728\u9ECE\u660E\u524D\u62A2\u5360\u4E86\u4FEF\u77B0\u6218\u573A\u7684\u9AD8\u5730\u3002\u5E1D\u56FD\u70AE\u5175\u88AB\u8FEB\u8F6C\u79FB\u9635\u5730\uFF0C\u9632\u5FA1\u90E8\u7F72\u88AB\u6253\u4E71\uFF0C\u5C40\u90E8\u6218\u7EBF\u627F\u538B\u3002"
+    Illustration: {fileID: 0}
+    ProductionModifier: 0
+    AtkDemandModifier: -0.1
+    DefDemandModifier: 0.4
+    RetDemandModifier: 0.1
+    AllTroopChange: -1
+    RandomTrustChange: -10
+    Duration: 2
+  - EventId: evt_n_desertion
+    EventName: "\u96C7\u4F63\u5175\u54D7\u53D8"
+    Description: "\u4E09\u4E2A\u6708\u6CA1\u53D1\u9977\u4E86\uFF01\u610F\u5927\u5229\u8FDE\u961F\u7684\u961F\u957F\u628A\u5251\u63D2\u5728\u519B\u9700\u5B98\u7684\u684C\u5B50\u4E0A\u2014\u2014'\u8981\u4E48\u7ED9\u94B1\uFF0C\u8981\u4E48\u6211\u4EEC\u7ED9\u81EA\u5DF1\u653E\u5047\u3002'"
+    Illustration: {fileID: 0}
+    ProductionModifier: -0.5
+    AtkDemandModifier: -0.2
+    DefDemandModifier: 0
+    RetDemandModifier: 0.3
+    AllTroopChange: -1
+    RandomTrustChange: -15
+    Duration: 3
   Commissions:
-  - {fileID: 11400000, guid: 220be6319dc547b46bf1ec6f157246bd, type: 2}
-  - {fileID: 11400000, guid: f2b95a920d7099d469ebe5993aa2073d, type: 2}
+  - {fileID: 11400000, guid: a1b2c3d4e5f60001000000000000001e, type: 2}
+  - {fileID: 11400000, guid: a1b2c3d4e5f60001000000000000001f, type: 2}
+  - {fileID: 11400000, guid: a1b2c3d4e5f600010000000000000020, type: 2}

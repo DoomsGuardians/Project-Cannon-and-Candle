@@ -22,6 +22,10 @@ public class PausePopup : WindowBase
     private InputService inputService;
     private UITextConfig textConfig;
 
+    // ESC 输入延迟检测，避免打开面板的 ESC 立即触发关闭
+    private const float ESC_DELAY = 0.15f;
+    private float showTime;
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -49,6 +53,9 @@ public class PausePopup : WindowBase
 
     public override void OnShow()
     {
+        // 记录显示时间，用于延迟检测 ESC
+        showTime = Time.unscaledTime;
+
         // 获取输入锁
         InputRouter.Acquire(InputChannel.Gameplay, this);
 
@@ -86,6 +93,10 @@ public class PausePopup : WindowBase
 
     private void HandleUpdate()
     {
+        // 延迟检测，避免打开面板的 ESC 立即触发关闭
+        if (Time.unscaledTime - showTime < ESC_DELAY)
+            return;
+
         // ESC 键关闭暂停面板
         // 注意：由于 PausePopup 获取了 Gameplay 输入锁，InputService.CancelPressed 会被禁用
         // 因此直接使用 Keyboard 检测 ESC 键

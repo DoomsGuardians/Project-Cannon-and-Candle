@@ -28,4 +28,7 @@ public class MarketPanelBinder : UIBinder
     [Header("银行区 - 操作按钮")]
     public Button btnBorrow;
     public Button btnRepay;
+
+    [Header("关闭按钮")]
+    public Button btnClose;
 }

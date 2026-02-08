@@ -39,6 +39,9 @@ public class MarketPanel : WindowBase
     private Button btnBorrow;
     private Button btnRepay;
 
+    [Header("关闭按钮")]
+    private Button btnClose;
+
     private GameplayManager gameplayManager;
     private MarketSystem marketSystem;
     private UITextConfig textConfig;
@@ -83,6 +86,9 @@ public class MarketPanel : WindowBase
             // 银行区域 - 操作按钮
             btnBorrow = b.btnBorrow;
             btnRepay = b.btnRepay;
+
+            // 关闭按钮
+            btnClose = b.btnClose;
         }
     }
 
@@ -106,6 +112,9 @@ public class MarketPanel : WindowBase
         // 银行操作按钮
         AddButtonListener(btnBorrow, OnBorrow);
         AddButtonListener(btnRepay, OnRepay);
+
+        // 关闭按钮
+        AddButtonListener(btnClose, OnClose);
 
         // 设置 Tooltip
         SetupTooltips();
@@ -296,4 +305,9 @@ public class MarketPanel : WindowBase
     }
 
     private void OnDataChanged(object p1, object p2) => RefreshUI();
+
+    private void OnClose()
+    {
+        uIService.HideWindow(Name);
+    }
 }

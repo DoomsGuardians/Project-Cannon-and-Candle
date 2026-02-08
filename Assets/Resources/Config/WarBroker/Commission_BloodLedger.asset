@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
+  m_Name: Commission_BloodLedger
+  m_EditorClassIdentifier:
+  CommissionId: BloodLedger
+  DisplayName: 血色账本
+  Description: 战役总伤亡达到50单位以上
+  CommissionerName: 红衣主教黎塞留
+  CommissionerAvatar: {fileID: 21300000, guid: a0139e59470174548b00f25c712b0567, type: 3}
+  CommissionerQuote: "将军，我需要一场'不幸的意外'。让军队流几滴血——法国会记得这份代价。"
+  BonusAmount: 800
+  Type: 3
+  TargetValue: 50
+  SecondaryTargetValue: 0
+  NaninovelScriptName:

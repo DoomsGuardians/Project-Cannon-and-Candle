@@ -14,4 +14,7 @@ public class InfoPanelBinder : UIBinder
     public KLineChartView chartAtk;
     public KLineChartView chartDef;
     public KLineChartView chartRet;
+
+    [Header("关闭按钮")]
+    public Button btnClose;
 }

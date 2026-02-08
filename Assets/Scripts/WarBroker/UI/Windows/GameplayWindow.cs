@@ -284,8 +284,12 @@ public class GameplayWindow : WindowBase
 
     private void SwitchPanel(string panelName)
     {
-        // 如果点击的是当前面板，则关闭它
-        if (currentPanel == panelName)
+        // 获取目标面板，检查实际显示状态
+        var targetPanel = uIService.GetWindow<WindowBase>(panelName);
+        bool isPanelVisible = targetPanel != null && targetPanel.gameObject.activeSelf;
+
+        // 如果面板正在显示，则关闭它
+        if (isPanelVisible)
         {
             uIService.HideWindow(panelName);
             currentPanel = null;

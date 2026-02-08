@@ -109,8 +109,8 @@ public class CampaignSelectPopup : WindowBase
 
                 if (itemBinder.txtTicket != null)
                 {
-                    // 教程关卡显示"免费"
-                    itemBinder.txtTicket.text = campaign.IsTutorial
+                    // 根据门票价格判断是否免费
+                    itemBinder.txtTicket.text = campaign.TicketPrice <= 0
                         ? "门票: 免费"
                         : $"门票: {campaign.TicketPrice:F0}";
                 }
@@ -161,8 +161,8 @@ public class CampaignSelectPopup : WindowBase
         {
             float currentWealth = saveSystem.MetaData.TotalWealth;
 
-            // 教程关卡免费
-            if (!campaign.IsTutorial && currentWealth < campaign.TicketPrice)
+            // 检查资产是否足够支付门票
+            if (campaign.TicketPrice > 0 && currentWealth < campaign.TicketPrice)
             {
                 // 资产不足，显示提示
                 string message = $"资产不足！\n\n需要: {campaign.TicketPrice:F0}\n当前: {currentWealth:F0}\n差额: {campaign.TicketPrice - currentWealth:F0}";
@@ -176,8 +176,8 @@ public class CampaignSelectPopup : WindowBase
                 return;
             }
 
-            // 扣除门票费用（教程关卡免费）
-            if (!campaign.IsTutorial && campaign.TicketPrice > 0)
+            // 扣除门票费用
+            if (campaign.TicketPrice > 0)
             {
                 saveSystem.MetaData.TotalWealth -= campaign.TicketPrice;
                 saveSystem.SaveMetaData();

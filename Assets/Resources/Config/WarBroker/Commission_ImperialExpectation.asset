@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
+  m_Name: Commission_ImperialExpectation
+  m_EditorClassIdentifier:
+  CommissionId: ImperialExpectation
+  DisplayName: 皇帝的期望
+  Description: 将战线推进至敌方大本营（Grid 5）
+  CommissionerName: 斐迪南二世
+  CommissionerAvatar: {fileID: 21300000, guid: 94647991a64cb7846b609d5aed4b7cc4, type: 3}
+  CommissionerQuote: "朕授尔全权统帅帝国大军，务必彻底粉碎新教叛军，捍卫天主圣教，违命者必严惩不贷！"
+  BonusAmount: 200
+  Type: 0
+  TargetValue: 5
+  SecondaryTargetValue: 1
+  NaninovelScriptName:

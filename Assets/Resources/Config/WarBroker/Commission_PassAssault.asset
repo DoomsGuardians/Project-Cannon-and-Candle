@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d8d9dcd0ec3d64c8f7936a3f622462, type: 3}
+  m_Name: Commission_PassAssault
+  m_EditorClassIdentifier:
+  CommissionId: PassAssault
+  DisplayName: 隘口攻防
+  Description: 将战线推进至Grid 4
+  CommissionerName: 蒂利伯爵
+  CommissionerAvatar: {fileID: 21300000, guid: f57dbc987d02ccf48a1965ea6a4e058a, type: 3}
+  CommissionerQuote: "公爵命令：推进至隘口前沿，切断瑞典人的补给线。至少抵达前哨阵地！"
+  BonusAmount: 250
+  Type: 0
+  TargetValue: 4
+  SecondaryTargetValue: 1
+  NaninovelScriptName:
